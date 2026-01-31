@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/svoi_za_granicey
+    username: app_user
+    password: secret_password
+    driver-class-name: org.postgresql.Driver
+
+  logging:
+    level:
+      org.springframework.jdbc.core: DEBUG
