@@ -1,7 +1,7 @@
 package ru.belov.ourabroad.poi.storage;
 
-import ru.belov.ourabroad.domain.User;
-import ru.belov.ourabroad.enums.UserStatus;
+import ru.belov.ourabroad.core.domain.User;
+import ru.belov.ourabroad.core.enums.UserStatus;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

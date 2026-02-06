@@ -1,6 +1,6 @@
 package ru.belov.ourabroad.poi.storage;
 
-import ru.belov.ourabroad.domain.SpecialistProfile;
+import ru.belov.ourabroad.core.domain.SpecialistProfile;
 
 import java.util.Optional;
 public interface SpecialistProfileRepository {

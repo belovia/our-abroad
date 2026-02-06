@@ -1,6 +1,6 @@
 package ru.belov.ourabroad.poi.storage;
 
-import ru.belov.ourabroad.domain.Profile;
+import ru.belov.ourabroad.core.domain.Profile;
 
 import java.util.Optional;
 

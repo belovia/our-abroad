@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.liquibase.org/xml/ns/dbchangelog
+           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <include file="db/changelog/001-user.xml"/>
+    <include file="db/changelog/002-profile.xml"/>
+    <include file="db/changelog/003-specialist-profile.xml"/>
+    <include file="db/changelog/004-reputation.xml"/>
+    <include file="db/changelog/005-verification.xml"/>
+
+</databaseChangeLog>

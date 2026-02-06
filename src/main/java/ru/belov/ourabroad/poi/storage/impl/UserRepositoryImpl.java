@@ -4,17 +4,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.belov.ourabroad.database.mappers.UserRowMapper;
-import ru.belov.ourabroad.domain.User;
-import ru.belov.ourabroad.enums.UserStatus;
+import ru.belov.ourabroad.core.domain.User;
+import ru.belov.ourabroad.core.enums.UserStatus;
 import ru.belov.ourabroad.poi.storage.UserRepository;
 import ru.belov.ourabroad.poi.storage.helper.ParamHelper;
-import ru.belov.ourabroad.poi.storage.sql.UserSql;
+import ru.belov.ourabroad.poi.storage.mappers.UserRowMapper;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import static ru.belov.ourabroad.poi.storage.sql.UserSql.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -27,9 +28,11 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> findById(String userId) {
         Map<String, Object> params = new HashMap<>();
-        paramHelper.putParam(params, "userId", userId, userId);
+        paramHelper.putParam(params, "id", userId, userId);
+        log.info("[userId: {}] Prepare to find user by id: {}", userId, userId);
+
         return jdbcTemplate.query(
-                UserSql.FIND_BY_ID,
+                FIND_BY_ID,
                 params,
                 rowMapper
         ).stream().findFirst();
@@ -41,8 +44,8 @@ public class UserRepositoryImpl implements UserRepository {
         Map<String, Object> params = new HashMap<>();
         paramHelper.putParam(params, "email", email, userId);
         return jdbcTemplate.query(
-                UserSql.FIND_BY_EMAIL,
-                Map.of("email", email),
+                FIND_BY_EMAIL,
+                params,
                 rowMapper
         ).stream().findFirst();
     }
@@ -51,7 +54,7 @@ public class UserRepositoryImpl implements UserRepository {
     public void save(User user) {
 
         Map<String, Object> params = new HashMap<>();
-
+        log.info("[userId: {}] Prepare user to saving", user.getId());
         paramHelper.putParam(params, "id", user.getId(), user.getId());
         paramHelper.putParam(params, "email", user.getEmail(), user.getId());
         paramHelper.putParam(params, "phone", user.getPhone(), user.getId());
@@ -61,7 +64,7 @@ public class UserRepositoryImpl implements UserRepository {
         paramHelper.putParam(params, "lastLoginAt", user.getLastLoginAt(), user.getId());
 
         jdbcTemplate.update(
-                UserSql.INSERT,
+                INSERT,
                 params
         );
     }
@@ -70,11 +73,13 @@ public class UserRepositoryImpl implements UserRepository {
     public boolean updateLastLogin(String userId, LocalDateTime lastLoginAt) {
 
         Map<String, Object> params = new HashMap<>();
+        log.info("[userId: {}] Prepare user to update login at", userId);
+
         paramHelper.putParam(params, "id", userId, userId);
         paramHelper.putParam(params, "lastLoginAt", lastLoginAt, userId);
-
+        log.info("[userId: {}] Update user last login at", userId);
         return jdbcTemplate.update(
-                UserSql.UPDATE_LAST_LOGIN,
+                UPDATE_LAST_LOGIN,
                 params
         ) > 0;
     }
@@ -82,11 +87,13 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public boolean updateStatus(String userId, UserStatus status) {
         Map<String, Object> params = new HashMap<>();
+        log.info("[userId: {}] Prepare user to update status", userId);
         paramHelper.putParam(params, "id", userId, userId);
         paramHelper.putParam(params, "status", status, userId);
 
+        log.info("[userId: {}] Update user status. New status: {}", userId, status);
         return jdbcTemplate.update(
-                UserSql.UPDATE_STATUS,
+                UPDATE_STATUS,
                 params
         ) > 0;
     }

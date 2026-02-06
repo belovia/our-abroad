@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.liquibase.org/xml/ns/dbchangelog
+           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="003-create-specialist-profile" author="you">
+
+        <createTable tableName="specialist_profile">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+
+            <column name="user_id" type="varchar(36)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+
+            <column name="category" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="description" type="text"/>
+            <column name="price_from" type="integer"/>
+            <column name="price_to" type="integer"/>
+
+            <column name="active" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="rating" type="double">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="reviews_count" type="integer">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createIndex indexName="idx_specialist_profile_active"
+                     tableName="specialist_profile">
+            <column name="active"/>
+        </createIndex>
+
+        <createIndex indexName="idx_specialist_profile_category"
+                     tableName="specialist_profile">
+            <column name="category"/>
+        </createIndex>
+
+    </changeSet>
+
+</databaseChangeLog>
