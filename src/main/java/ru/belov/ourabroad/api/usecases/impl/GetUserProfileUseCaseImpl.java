@@ -1,31 +1,28 @@
-package ru.belov.ourabroad.core.usecases.impl;
+package ru.belov.ourabroad.api.usecases.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ru.belov.ourabroad.core.domain.Profile;
-import ru.belov.ourabroad.core.domain.User;
-import ru.belov.ourabroad.core.usecases.GetUserUsecase;
+import ru.belov.ourabroad.api.usecases.GetUserProfileUseCase;
 import ru.belov.ourabroad.poi.storage.ProfileRepository;
-import ru.belov.ourabroad.poi.storage.UserRepository;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class GetUserUsecaseImpl implements GetUserUsecase {
+public class GetUserProfileUseCaseImpl implements GetUserProfileUseCase {
 
-    private final UserRepository userRepository;
-
+    private final ProfileRepository profileRepository;
     @Override
-    public User getUserById(String userId) {
+    public Profile getByUserId(String userId) {
         if (userId == null || StringUtils.isBlank(userId)) {
             // todo: переделать на более логичный вариант + log
             return null;
         }
-        Optional<User> profileOpt = userRepository.findById(userId);
+        Optional<Profile> profileOpt = profileRepository.findByUserId(userId);
 
         return profileOpt.orElse(null);
     }

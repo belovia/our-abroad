@@ -24,6 +24,17 @@ public class ParamHelper {
         params.put(name, value);
     }
 
+    public void putParam(Map<String, Object> params,
+                         String name,
+                         Object value) {
+
+        if (value == null) {
+            log.error("[parameterName: {} ] parameter value is null", name);
+        }
+
+        params.put(name, value);
+    }
+
     public void requireUserId(String userId, String action) {
         if (userId == null) {
             log.error(
