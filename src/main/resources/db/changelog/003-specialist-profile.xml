@@ -6,48 +6,26 @@
            http://www.liquibase.org/xml/ns/dbchangelog
            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
 
-    <changeSet id="003-create-specialist-profile" author="you">
+    <changeSet id="003-specialist-profile" author="you">
+        <sql>
+            CREATE TABLE IF NOT EXISTS specialist_profile (
+                id              VARCHAR(36) PRIMARY KEY,
+                user_id         VARCHAR(36) NOT NULL UNIQUE,
+                category        VARCHAR(128) NOT NULL,
+                description     TEXT,
+                price_from      INTEGER,
+                price_to        INTEGER,
+                active          BOOLEAN NOT NULL,
+                rating          DOUBLE PRECISION NOT NULL,
+                reviews_count   INTEGER NOT NULL
+                );
 
-        <createTable tableName="specialist_profile">
-            <column name="id" type="varchar(36)">
-                <constraints primaryKey="true"/>
-            </column>
+            CREATE INDEX IF NOT EXISTS idx_specialist_profile_active
+                ON specialist_profile (active);
 
-            <column name="user_id" type="varchar(36)">
-                <constraints nullable="false" unique="true"/>
-            </column>
-
-            <column name="category" type="varchar(128)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="description" type="text"/>
-            <column name="price_from" type="integer"/>
-            <column name="price_to" type="integer"/>
-
-            <column name="active" type="boolean">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="rating" type="double">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="reviews_count" type="integer">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <createIndex indexName="idx_specialist_profile_active"
-                     tableName="specialist_profile">
-            <column name="active"/>
-        </createIndex>
-
-        <createIndex indexName="idx_specialist_profile_category"
-                     tableName="specialist_profile">
-            <column name="category"/>
-        </createIndex>
-
+            CREATE INDEX IF NOT EXISTS idx_specialist_profile_category
+                ON specialist_profile (category);
+        </sql>
     </changeSet>
 
 </databaseChangeLog>

@@ -10,11 +10,13 @@ public interface UserRepository {
 
     Optional<User> findById(String id);
 
-    Optional<User> findByEmail(String email, String userId);
+    Optional<User> findByEmail(String email);
 
     void save(User user);
 
     boolean updateLastLogin(String userId, LocalDateTime lastLoginAt);
 
     boolean updateStatus(String userId, UserStatus status);
+
+    boolean existsByEmail(String email);
 }

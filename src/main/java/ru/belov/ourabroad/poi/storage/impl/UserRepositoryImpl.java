@@ -39,10 +39,10 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByEmail(String email, String userId) {
+    public Optional<User> findByEmail(String email) {
 
         Map<String, Object> params = new HashMap<>();
-        paramHelper.putParam(params, "email", email, userId);
+        paramHelper.putParam(params, "email", email);
         return jdbcTemplate.query(
                 FIND_BY_EMAIL,
                 params,
@@ -96,5 +96,17 @@ public class UserRepositoryImpl implements UserRepository {
                 UPDATE_STATUS,
                 params
         ) > 0;
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+
+        Map<String, Object> params = new HashMap<>();
+        paramHelper.putParam(params, "email", email);
+        return jdbcTemplate.query(
+                FIND_BY_EMAIL,
+                params,
+                rowMapper
+        ).stream().findFirst().isPresent();
     }
 }
