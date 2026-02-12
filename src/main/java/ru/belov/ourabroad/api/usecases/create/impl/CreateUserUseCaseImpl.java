@@ -1,14 +1,12 @@
-package ru.belov.ourabroad.api.usecases.impl;
+package ru.belov.ourabroad.api.usecases.create.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.belov.ourabroad.api.usecases.create.CreateUserUseCase;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.core.domain.UserFactory;
-import ru.belov.ourabroad.api.usecases.CreateUserUsecase;
-import ru.belov.ourabroad.poi.storage.ProfileRepository;
-import ru.belov.ourabroad.poi.storage.ReputationRepository;
 import ru.belov.ourabroad.poi.storage.UserRepository;
 import ru.belov.ourabroad.poi.storage.exceptions.UserAlreadyExistsException;
 import ru.belov.ourabroad.poi.storage.exceptions.ValidationException;
@@ -21,7 +19,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CreateUserUseCaseImpl implements CreateUserUsecase {
+public class CreateUserUseCaseImpl implements CreateUserUseCase {
 
     private final UserRepository userRepository;
     private final UserValidator userValidator;
@@ -44,7 +42,11 @@ public class CreateUserUseCaseImpl implements CreateUserUsecase {
                 userId,
                 request.getEmail(),
                 request.getPhone(),
-                request.getPassword());
+                request.getPassword(),
+                request.getTelegramUsername(),
+                request.getWhatsAppNumber(),
+                request.getActivity()
+        );
 
         boolean userEmailExists = userRepository.existsByEmail(request.getEmail());
 

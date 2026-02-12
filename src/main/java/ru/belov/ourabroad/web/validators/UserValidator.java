@@ -12,13 +12,11 @@ import static ru.belov.ourabroad.web.validators.ValidationError.*;
 public class UserValidator {
 
     private static final Pattern EMAIL_PATTERN =
-            Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+            Pattern.compile("^[A-Za-z\\d+_.-]+@[A-Za-z\\d.-]+\\.[A-Za-z]{2,}$");
 
     private static final Pattern PHONE_PATTERN =
-            Pattern.compile("^\\+[0-9]{10,15}$");
+            Pattern.compile("^\\+\\d{10,15}$");
 
-    private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^(?=.*[A-Z])(?=.*\\d).{8,16}$");
 
     public ValidationResult validateCreateUserRequest(CreateUserRequest request) {
         ValidationResult result = new ValidationResult();
@@ -67,10 +65,28 @@ public class UserValidator {
             return result;
         }
 
-        if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            result.addError(PASSWORD_WEAK);
-        }
+        return result;
+    }
 
+    public ValidationResult validateTelegram(String username) {
+        ValidationResult result = ValidationResult.ok();
+
+        if (StringUtils.hasText(username)) {
+            if (!username.matches("^@\\w{5,32}$")) {
+                result.addError(TELEGRAM_INVALID);
+            }
+        }
+        return result;
+    }
+
+    public ValidationResult validateWhatsapp(String phone) {
+        ValidationResult result = ValidationResult.ok();
+
+        if (StringUtils.hasText(phone)) {
+            if (!PHONE_PATTERN.matcher(phone).matches()) {
+                result.addError(WHATSAPP_INVALID);
+            }
+        }
         return result;
     }
 }

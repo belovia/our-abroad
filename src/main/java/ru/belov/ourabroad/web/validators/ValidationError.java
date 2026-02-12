@@ -13,6 +13,9 @@ public enum ValidationError {
     // Телефон ошибки
     PHONE_INVALID_FORMAT("Телефон должен быть в формате +79123456789 (10-15 цифр после +)"),
     PHONE_ALREADY_EXISTS("Пользователь с таким телефоном уже существует"),
+    TELEGRAM_INVALID("Ошибка валидации Telegram-аккаунта"),
+    WHATSAPP_INVALID("Ошибка валидации WhatsApp-аккаунта"),
+
 
     // Пароль ошибки
     PASSWORD_REQUIRED("Пароль обязателен"),
@@ -21,6 +24,7 @@ public enum ValidationError {
     PASSWORD_DIGIT_REQUIRED("Пароль должен содержать хотя бы одну цифру"),
     PASSWORD_INVALID_CHARACTERS("Разрешены только латинские буквы, цифры и специальные символы @$!%*?&"),
     PASSWORD_WEAK("Пароль не соответствует требованиям безопасности"),
+    PASSWORDS_ARE_NOT_EQUAL("Старый пароль не соответствует введённому"),
 
     // Имя/отображение профиля
     DISPLAY_NAME_TOO_SHORT("Имя для отображения должно содержать минимум 2 символа"),

@@ -3,11 +3,11 @@ package ru.belov.ourabroad.web.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.belov.ourabroad.api.usecases.UserUpdateUsecase;
+import ru.belov.ourabroad.api.usecases.create.CreateUserUseCase;
+import ru.belov.ourabroad.api.usecases.get.GetUserByEmailUseCase;
+import ru.belov.ourabroad.api.usecases.get.GetUserByIdUsecase;
+import ru.belov.ourabroad.api.usecases.update.UserUpdateUsecase;
 import ru.belov.ourabroad.core.domain.User;
-import ru.belov.ourabroad.api.usecases.CreateUserUsecase;
-import ru.belov.ourabroad.api.usecases.GetUserProfileUseCase;
-import ru.belov.ourabroad.api.usecases.GetUserUsecase;
 import ru.belov.ourabroad.web.dto.create.CreateUserRequest;
 import ru.belov.ourabroad.web.dto.update.UpdateEmailRequest;
 import ru.belov.ourabroad.web.dto.update.UpdatePasswordRequest;
@@ -20,10 +20,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final CreateUserUsecase createUserUseCase;
-    private final GetUserProfileUseCase getUserProfileUseCase;
+    private final CreateUserUseCase createUserUseCase;
     private final UserUpdateUsecase userUpdateUsecase;
-    private final GetUserUsecase getUserUsecase;
+    private final GetUserByIdUsecase getUserByIdUsecase;
+    private final GetUserByEmailUseCase getUserByEmailIdUseCase;
 
     @PostMapping
     public ResponseEntity<Map<String, String>> create(
@@ -37,7 +37,7 @@ public class UserController {
     // ======= GET ========
     @GetMapping("/id/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable String userId) {
-        User user = getUserUsecase.getUserById(userId);
+        User user = getUserByIdUsecase.getUserById(userId);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
@@ -46,7 +46,7 @@ public class UserController {
 
     @GetMapping("/email/{email}")
     public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-        User user = getUserUsecase.getUserByEmail(email);
+        User user = getUserByEmailIdUseCase.getUserByEmail(email);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
@@ -54,28 +54,28 @@ public class UserController {
     }
 
 
-    // ======= UPDATE ========
-    @PatchMapping("/{userId}/email")
-    public ResponseEntity<Void> updateEmail(
-            @RequestBody UpdateEmailRequest request
-    ) {
-        userUpdateUsecase.updateEmail(request.getUserId(), request.getEmail());
-        return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/{userId}/password")
-    public ResponseEntity<Void> updatePassword(
-            @RequestBody UpdatePasswordRequest request
-    ) {
-        userUpdateUsecase.updatePassword(request.getUserId(), request.getPassword());
-        return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/{userId}/phone")
-    public ResponseEntity<Void> updateEmail(
-            @RequestBody UpdatePhoneRequest request
-    ) {
-        userUpdateUsecase.updatePhone(request.getUserId(), request.getPhone());
-        return ResponseEntity.noContent().build();
-    }
+//    // ======= UPDATE ========
+//    @PatchMapping("/{userId}/email")
+//    public ResponseEntity<Void> updateEmail(
+//            @RequestBody UpdateEmailRequest request
+//    ) {
+//        userUpdateUsecase.updateEmail(request.getUserId(), request.getEmail());
+//        return ResponseEntity.noContent().build();
+//    }
+//
+//    @PatchMapping("/{userId}/password")
+//    public ResponseEntity<Void> updatePassword(
+//            @RequestBody UpdatePasswordRequest request
+//    ) {
+//        userUpdateUsecase.updatePassword(request.getUserId(), request.getPassword());
+//        return ResponseEntity.noContent().build();
+//    }
+//
+//    @PatchMapping("/{userId}/phone")
+//    public ResponseEntity<Void> updateEmail(
+//            @RequestBody UpdatePhoneRequest request
+//    ) {
+//        userUpdateUsecase.updatePhone(request.getUserId(), request.getPhone());
+//        return ResponseEntity.noContent().build();
+//    }
 }
