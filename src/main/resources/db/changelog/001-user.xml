@@ -20,4 +20,14 @@
         </sql>
     </changeSet>
 
+    <changeSet id="001-add-user-social-and-activity" author="iabelov">
+
+        <addColumn tableName="users">
+            <column name="telegram_username" type="varchar(64)"/>
+            <column name="whatsapp_number" type="varchar(20)"/>
+            <column name="activity" type="varchar(255)"/>
+        </addColumn>
+
+    </changeSet>
+
 </databaseChangeLog>

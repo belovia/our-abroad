@@ -1,11 +1,11 @@
-package ru.belov.ourabroad.api.usecases.impl;
+package ru.belov.ourabroad.api.usecases.get.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import ru.belov.ourabroad.api.usecases.get.GetUserProfileUseCase;
 import ru.belov.ourabroad.core.domain.Profile;
-import ru.belov.ourabroad.api.usecases.GetUserProfileUseCase;
 import ru.belov.ourabroad.poi.storage.ProfileRepository;
 
 import java.util.Optional;

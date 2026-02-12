@@ -3,13 +3,12 @@ package ru.belov.ourabroad.web.dto.create;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Builder;
+import lombok.*;
 
 @Getter
 @Setter
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CreateUserRequest {
 
     @Email(message = "Email имеет неверный формат")
@@ -29,4 +28,7 @@ public class CreateUserRequest {
             message = "Пароль должен содержать минимум 1 заглавную букву и 1 цифру"
     )
     private String password;
+    private String telegramUsername;
+    private String whatsAppNumber;
+    private String activity;
 }

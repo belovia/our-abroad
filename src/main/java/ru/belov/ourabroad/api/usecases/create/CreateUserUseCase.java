@@ -1,8 +1,8 @@
-package ru.belov.ourabroad.api.usecases;
+package ru.belov.ourabroad.api.usecases.create;
 
 import ru.belov.ourabroad.web.dto.create.CreateUserRequest;
 
-public interface CreateUserUsecase {
+public interface CreateUserUseCase {
 
     String create(CreateUserRequest command);
 }
