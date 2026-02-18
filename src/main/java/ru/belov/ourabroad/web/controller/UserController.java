@@ -3,15 +3,12 @@ package ru.belov.ourabroad.web.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.belov.ourabroad.api.usecases.create.CreateUserUseCase;
-import ru.belov.ourabroad.api.usecases.get.GetUserByEmailUseCase;
-import ru.belov.ourabroad.api.usecases.get.GetUserByIdUsecase;
+import ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase;
+import ru.belov.ourabroad.api.usecases.get.user.GetUserByEmailUseCase;
+import ru.belov.ourabroad.api.usecases.get.user.GetUserByIdUsecase;
 import ru.belov.ourabroad.api.usecases.update.UserUpdateUsecase;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.web.dto.create.CreateUserRequest;
-import ru.belov.ourabroad.web.dto.update.UpdateEmailRequest;
-import ru.belov.ourabroad.web.dto.update.UpdatePasswordRequest;
-import ru.belov.ourabroad.web.dto.update.UpdatePhoneRequest;
 
 import java.util.Map;
 

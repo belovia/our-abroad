@@ -11,5 +11,6 @@
     <include file="db/changelog/003-specialist-profile.xml"/>
     <include file="db/changelog/004-reputation.xml"/>
     <include file="db/changelog/005-verification.xml"/>
+    <include file="db/changelog/006-specialist-service.xml"/>
 
 </databaseChangeLog>

@@ -71,10 +71,7 @@ public class SpecialistProfileRepositoryImpl implements SpecialistProfileReposit
     }
 
     private void putCommonParams(SpecialistProfile profile, Map<String, Object> params) {
-        paramHelper.putParam(params, "category", profile.getCategory(), profile.getUserId());
         paramHelper.putParam(params, "description", profile.getDescription(), profile.getUserId());
-        paramHelper.putParam(params, "priceFrom", profile.getPriceFrom(), profile.getUserId());
-        paramHelper.putParam(params, "priceTo", profile.getPriceTo(), profile.getUserId());
         paramHelper.putParam(params, "active", profile.isActive(), profile.getUserId());
         paramHelper.putParam(params, "rating", profile.getRating(), profile.getUserId());
         paramHelper.putParam(params, "reviewsCount", profile.getReviewsCount(), profile.getUserId());
