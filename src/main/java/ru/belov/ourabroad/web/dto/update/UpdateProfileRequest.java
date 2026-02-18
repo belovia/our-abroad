@@ -1,4 +1,4 @@
-package ru.belov.ourabroad.web.dto;
+package ru.belov.ourabroad.web.dto.update;
 
 import lombok.Getter;
 

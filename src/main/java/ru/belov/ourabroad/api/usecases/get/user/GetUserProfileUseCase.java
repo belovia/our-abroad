@@ -1,4 +1,4 @@
-package ru.belov.ourabroad.core.usecases;
+package ru.belov.ourabroad.api.usecases.get.user;
 
 import ru.belov.ourabroad.core.domain.Profile;
 import ru.belov.ourabroad.web.dto.UserProfileView;

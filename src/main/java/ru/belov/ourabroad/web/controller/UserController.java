@@ -3,11 +3,12 @@ package ru.belov.ourabroad.web.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase;
+import ru.belov.ourabroad.api.usecases.get.user.GetUserByEmailUseCase;
+import ru.belov.ourabroad.api.usecases.get.user.GetUserByIdUsecase;
+import ru.belov.ourabroad.api.usecases.update.UserUpdateUsecase;
 import ru.belov.ourabroad.core.domain.User;
-import ru.belov.ourabroad.core.usecases.CreateUserUsecase;
-import ru.belov.ourabroad.core.usecases.GetUserProfileUseCase;
-import ru.belov.ourabroad.core.usecases.GetUserUsecase;
-import ru.belov.ourabroad.web.dto.CreateUserRequest;
+import ru.belov.ourabroad.web.dto.create.CreateUserRequest;
 
 import java.util.Map;
 
@@ -16,9 +17,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final CreateUserUsecase createUserUseCase;
-    private final GetUserProfileUseCase getUserProfileUseCase;
-    private final GetUserUsecase getUserUsecase;
+    private final CreateUserUseCase createUserUseCase;
+    private final UserUpdateUsecase userUpdateUsecase;
+    private final GetUserByIdUsecase getUserByIdUsecase;
+    private final GetUserByEmailUseCase getUserByEmailIdUseCase;
 
     @PostMapping
     public ResponseEntity<Map<String, String>> create(
@@ -29,12 +31,48 @@ public class UserController {
         return ResponseEntity.ok(Map.of("userId", userId));
     }
 
-    @GetMapping("/{userId}")
+    // ======= GET ========
+    @GetMapping("/id/{userId}")
     public ResponseEntity<User> getUserById(@PathVariable String userId) {
-        User user = getUserUsecase.getUserById(userId);
+        User user = getUserByIdUsecase.getUserById(userId);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(user);
     }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+        User user = getUserByEmailIdUseCase.getUserByEmail(email);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(user);
+    }
+
+
+//    // ======= UPDATE ========
+//    @PatchMapping("/{userId}/email")
+//    public ResponseEntity<Void> updateEmail(
+//            @RequestBody UpdateEmailRequest request
+//    ) {
+//        userUpdateUsecase.updateEmail(request.getUserId(), request.getEmail());
+//        return ResponseEntity.noContent().build();
+//    }
+//
+//    @PatchMapping("/{userId}/password")
+//    public ResponseEntity<Void> updatePassword(
+//            @RequestBody UpdatePasswordRequest request
+//    ) {
+//        userUpdateUsecase.updatePassword(request.getUserId(), request.getPassword());
+//        return ResponseEntity.noContent().build();
+//    }
+//
+//    @PatchMapping("/{userId}/phone")
+//    public ResponseEntity<Void> updateEmail(
+//            @RequestBody UpdatePhoneRequest request
+//    ) {
+//        userUpdateUsecase.updatePhone(request.getUserId(), request.getPhone());
+//        return ResponseEntity.noContent().build();
+//    }
 }

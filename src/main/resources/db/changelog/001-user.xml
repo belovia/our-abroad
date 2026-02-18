@@ -6,35 +6,27 @@
            http://www.liquibase.org/xml/ns/dbchangelog
            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
 
-    <changeSet id="001-create-user" author="you">
+    <changeSet id="001-user" author="iabelov">
+        <sql>
+            CREATE TABLE IF NOT EXISTS users (
+                                                 id              VARCHAR PRIMARY KEY,
+                                                 email           VARCHAR NOT NULL UNIQUE,
+                                                 phone           VARCHAR UNIQUE,
+                                                 password_hash   VARCHAR NOT NULL,
+                                                 status          VARCHAR NOT NULL,
+                                                 created_at      TIMESTAMP NOT NULL,
+                                                 last_login_at   TIMESTAMP
+            );
+        </sql>
+    </changeSet>
 
-        <createTable tableName="users">
-            <column name="id" type="varchar">
-                <constraints primaryKey="true"/>
-            </column>
+    <changeSet id="001-add-user-social-and-activity" author="iabelov">
 
-            <column name="email" type="varchar">
-                <constraints nullable="false" unique="true"/>
-            </column>
-
-            <column name="phone" type="varchar">
-                <constraints unique="true"/>
-            </column>
-
-            <column name="password_hash" type="varchar">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="status" type="varchar">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="created_at" type="timestamp">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="last_login_at" type="timestamp"/>
-        </createTable>
+        <addColumn tableName="users">
+            <column name="telegram_username" type="varchar(64)"/>
+            <column name="whatsapp_number" type="varchar(20)"/>
+            <column name="activity" type="varchar(255)"/>
+        </addColumn>
 
     </changeSet>
 

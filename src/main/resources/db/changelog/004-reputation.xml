@@ -6,22 +6,14 @@
            http://www.liquibase.org/xml/ns/dbchangelog
            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
 
-    <changeSet id="004-create-reputation" author="you">
-
-        <createTable tableName="reputation">
-            <column name="user_id" type="varchar(36)">
-                <constraints primaryKey="true"/>
-            </column>
-
-            <column name="score" type="integer">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="level" type="integer">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
+    <changeSet id="004-reputation" author="iabelov">
+        <sql>
+            CREATE TABLE IF NOT EXISTS reputation (
+                user_id VARCHAR(36) PRIMARY KEY,
+                score   INTEGER NOT NULL,
+                level   INTEGER NOT NULL
+                );
+        </sql>
     </changeSet>
 
 </databaseChangeLog>

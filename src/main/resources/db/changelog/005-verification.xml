@@ -6,45 +6,24 @@
            http://www.liquibase.org/xml/ns/dbchangelog
            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
 
-    <changeSet id="005-create-verification" author="you">
+    <changeSet id="005-verification" author="iabelov">
+        <sql>
+            CREATE TABLE IF NOT EXISTS verification (
+                id                  VARCHAR(36) PRIMARY KEY,
+                user_id             VARCHAR(36) NOT NULL,
+                type                VARCHAR(64) NOT NULL,
+                related_entity_id   VARCHAR(36),
+                status              VARCHAR(32) NOT NULL,
+                created_at          TIMESTAMP NOT NULL,
+                verified_at         TIMESTAMP
+                );
 
-        <createTable tableName="verification">
-            <column name="id" type="varchar(36)">
-                <constraints primaryKey="true"/>
-            </column>
+            CREATE INDEX IF NOT EXISTS idx_verification_user
+                ON verification (user_id);
 
-            <column name="user_id" type="varchar(36)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="type" type="varchar(64)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="related_entity_id" type="varchar(36)"/>
-
-            <column name="status" type="varchar(32)">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="created_at" type="timestamp">
-                <constraints nullable="false"/>
-            </column>
-
-            <column name="verified_at" type="timestamp"/>
-        </createTable>
-
-        <createIndex indexName="idx_verification_user"
-                     tableName="verification">
-            <column name="user_id"/>
-        </createIndex>
-
-        <createIndex indexName="idx_verification_user_status"
-                     tableName="verification">
-            <column name="user_id"/>
-            <column name="status"/>
-        </createIndex>
-
+            CREATE INDEX IF NOT EXISTS idx_verification_user_status
+                ON verification (user_id, status);
+        </sql>
     </changeSet>
 
 </databaseChangeLog>

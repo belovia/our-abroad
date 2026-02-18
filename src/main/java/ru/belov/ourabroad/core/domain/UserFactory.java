@@ -1,6 +1,5 @@
 package ru.belov.ourabroad.core.domain;
 
-import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.core.enums.UserStatus;
 
 import java.time.LocalDateTime;
@@ -17,15 +16,21 @@ public final class UserFactory {
             String phone,
             String passwordHash,
             UserStatus status,
+            String telegramUsername,
+            String whatAppNumber,
+            String activity,
             LocalDateTime createdAt,
             LocalDateTime lastLoginAt
     ) {
-        return User.restore(
+        return User.create(
                 id,
                 email,
                 phone,
                 passwordHash,
                 status,
+                telegramUsername,
+                whatAppNumber,
+                activity,
                 createdAt,
                 lastLoginAt
         );
@@ -35,18 +40,24 @@ public final class UserFactory {
             String id,
             String email,
             String phone,
-            String passwordHash
+            String passwordHash,
+            String telegramUsername,
+            String whatAppNumber,
+            String activity
     ) {
         Objects.requireNonNull(id);
         Objects.requireNonNull(email);
         Objects.requireNonNull(passwordHash);
 
-        return User.restore(
+        return User.create(
                 id,
                 email,
                 phone,
                 passwordHash,
                 UserStatus.ACTIVE,
+                telegramUsername,
+                whatAppNumber,
+                activity,
                 LocalDateTime.now(),
                 null
         );

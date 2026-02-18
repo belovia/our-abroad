@@ -15,6 +15,10 @@ public class User {
     private String phone;
     private String password;
     private UserStatus status;
+
+    private String telegramUsername;
+    private String whatsappNumber;
+    private String activity;
     private final LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
 
@@ -23,12 +27,15 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    public static User restore(
+    public static User create(
             String id,
             String email,
             String phone,
             String password,
             UserStatus status,
+            String telegramUsername,
+            String whatsappNumber,
+            String activity,
             LocalDateTime createdAt,
             LocalDateTime lastLoginAt
     ) {
@@ -40,6 +47,9 @@ public class User {
         user.phone = phone;
         user.password = password;
         user.status = status;
+        user.telegramUsername = telegramUsername;
+        user.whatsappNumber = whatsappNumber;
+        user.activity = activity;
         user.lastLoginAt = lastLoginAt;
         return user;
     }

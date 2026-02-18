@@ -6,21 +6,18 @@
            http://www.liquibase.org/xml/ns/dbchangelog
            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
 
-    <changeSet id="002-create-profile" author="you">
-
-        <createTable tableName="profile">
-            <column name="user_id" type="varchar(36)">
-                <constraints primaryKey="true"/>
-            </column>
-
-            <column name="display_name" type="varchar(255)"/>
-            <column name="avatar_url" type="varchar(512)"/>
-            <column name="bio" type="text"/>
-            <column name="country" type="varchar(64)"/>
-            <column name="city" type="varchar(64)"/>
-            <column name="languages" type="varchar(512)"/>
-        </createTable>
-
+    <changeSet id="002-profile" author="iabelov">
+        <sql>
+            CREATE TABLE IF NOT EXISTS profile (
+                user_id        VARCHAR(36) PRIMARY KEY,
+                display_name   VARCHAR(255),
+                avatar_url     VARCHAR(512),
+                bio            TEXT,
+                country        VARCHAR(64),
+                city           VARCHAR(64),
+                languages      VARCHAR(512)
+                );
+        </sql>
     </changeSet>
 
 </databaseChangeLog>

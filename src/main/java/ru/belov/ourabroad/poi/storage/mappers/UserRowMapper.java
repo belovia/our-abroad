@@ -15,12 +15,15 @@ public class UserRowMapper implements RowMapper<User> {
 
     @Override
     public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return User.restore(
+        return User.create(
                 rs.getString("id"),
                 rs.getString("email"),
                 rs.getString("phone"),
                 rs.getString("password_hash"),
                 UserStatus.valueOf(rs.getString("status")),
+                rs.getString("telegram_username"),
+                rs.getString("whatsapp_number"),
+                rs.getString("activity"),
                 toLocalDateTime(rs, "created_at"),
                 toLocalDateTime(rs, "last_login_at")
         );

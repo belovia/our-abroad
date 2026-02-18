@@ -39,10 +39,10 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByEmail(String email, String userId) {
+    public Optional<User> findByEmail(String email) {
 
         Map<String, Object> params = new HashMap<>();
-        paramHelper.putParam(params, "email", email, userId);
+        paramHelper.putParam(params, "email", email);
         return jdbcTemplate.query(
                 FIND_BY_EMAIL,
                 params,
@@ -59,6 +59,9 @@ public class UserRepositoryImpl implements UserRepository {
         paramHelper.putParam(params, "email", user.getEmail(), user.getId());
         paramHelper.putParam(params, "phone", user.getPhone(), user.getId());
         paramHelper.putParam(params, "passwordHash", user.getPassword(), user.getId());
+        paramHelper.putParam(params, "telegram_username", user.getTelegramUsername(), user.getId());
+        paramHelper.putParam(params, "whatsapp_number", user.getWhatsappNumber(), user.getId());
+        paramHelper.putParam(params, "activity", user.getActivity(), user.getId());
         paramHelper.putParam(params, "status", user.getStatus().name(), user.getId());
         paramHelper.putParam(params, "createdAt", user.getCreatedAt(), user.getId());
         paramHelper.putParam(params, "lastLoginAt", user.getLastLoginAt(), user.getId());
@@ -96,5 +99,17 @@ public class UserRepositoryImpl implements UserRepository {
                 UPDATE_STATUS,
                 params
         ) > 0;
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+
+        Map<String, Object> params = new HashMap<>();
+        paramHelper.putParam(params, "email", email);
+        return jdbcTemplate.query(
+                FIND_BY_EMAIL,
+                params,
+                rowMapper
+        ).stream().findFirst().isPresent();
     }
 }
