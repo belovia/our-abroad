@@ -18,12 +18,23 @@ public class GetUserProfileUseCaseImpl implements GetUserProfileUseCase {
     private final ProfileRepository profileRepository;
     @Override
     public Profile getByUserId(String userId) {
+
         if (userId == null || StringUtils.isBlank(userId)) {
-            // todo: переделать на более логичный вариант + log
+            log.warn("GetProfileByUserId called with empty userId");
             return null;
         }
+
+        log.info("[userId: {}] Start get profile by userId", userId);
+
         Optional<Profile> profileOpt = profileRepository.findByUserId(userId);
 
-        return profileOpt.orElse(null);
+        if (profileOpt.isEmpty()) {
+            log.info("[userId: {}] Profile not found", userId);
+            return null;
+        }
+
+        log.info("[userId: {}] Profile loaded", userId);
+        return profileOpt.get();
     }
+
 }

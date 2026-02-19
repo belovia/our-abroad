@@ -21,12 +21,13 @@ public class CreateSpecialistProfileUseCaseImpl
     @Override
     public SpecialistProfile create(String userId, String description) {
 
-        if (!StringUtils.hasText(userId)) {
-            throw new IllegalArgumentException("userId is empty");
-        }
+        log.info("[userId: {}] Start to create specialistProfileId", userId);
+
+        validate(userId);
 
         profileRepository.findByUserId(userId)
                 .ifPresent(p -> {
+                    log.error("[userId: {}] SpecialistProfileId with ID: {} already exists", userId, userId);
                     throw new SpecialistProfileAlreadyExistsException(userId);
                 });
 
@@ -35,8 +36,17 @@ public class CreateSpecialistProfileUseCaseImpl
 
         profileRepository.save(profile);
 
-        log.info("[userId={}] specialist profile created", userId);
+        log.info("[userId: {}] specialist profile created", userId);
 
         return profile;
+    }
+
+    private void validate(String userId) {
+        log.info("[userId: {}] Validating inputID", userId);
+
+        if (!StringUtils.hasText(userId)) {
+            throw new IllegalArgumentException("userId is empty");
+        }
+        log.info("[userId: {}] Validating success", userId);
     }
 }

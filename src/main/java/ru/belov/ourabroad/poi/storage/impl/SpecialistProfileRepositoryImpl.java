@@ -65,9 +65,14 @@ public class SpecialistProfileRepositoryImpl implements SpecialistProfileReposit
 
         return jdbcTemplate.update(
                 SpecialistProfileSql.UPDATE,
-                params
+                params) > 0;
+    }
 
-        ) > 0;
+    @Override
+    public boolean deleteById(String specialistProfileId) {
+        Map<String, Object> params = new HashMap<>();
+        paramHelper.putParam(params, "id", specialistProfileId);
+        return jdbcTemplate.update(SpecialistProfileSql.DELETE, params) > 0;
     }
 
     private void putCommonParams(SpecialistProfile profile, Map<String, Object> params) {

@@ -17,15 +17,19 @@ public class GetUserByEmailUseCaseImpl implements GetUserByEmailUseCase {
 
     @Override
     public User getUserByEmail(String email) {
+
         if (!StringUtils.isNotBlank(email)) {
             log.warn("GetUserByEmail called with empty email");
             return null;
         }
 
+        log.info("[email: {}] Start get user by email", email);
+
         return userRepository.findByEmail(email)
                 .orElseGet(() -> {
-                    log.info("User not found by email={}", email);
+                    log.info("[email: {}] User not found", email);
                     return null;
                 });
     }
+
 }

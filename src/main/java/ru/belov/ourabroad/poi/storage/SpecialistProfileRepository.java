@@ -12,4 +12,6 @@ public interface SpecialistProfileRepository {
     void save(SpecialistProfile profile);
 
     boolean update(SpecialistProfile profile);
+
+    boolean deleteById(String specialistProfileId);
 }

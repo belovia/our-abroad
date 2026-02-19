@@ -17,14 +17,17 @@ public class GetUserByIdUseCaseImpl implements GetUserByIdUsecase {
 
     @Override
     public User getUserById(String userId) {
+
         if (!StringUtils.isNotBlank(userId)) {
             log.warn("GetUserById called with empty userId");
             return null;
         }
 
+        log.info("[userId: {}] Start get user by id", userId);
+
         return userRepository.findById(userId)
                 .orElseGet(() -> {
-                    log.info("User not found by id={}", userId);
+                    log.info("[userId: {}] User not found", userId);
                     return null;
                 });
     }
