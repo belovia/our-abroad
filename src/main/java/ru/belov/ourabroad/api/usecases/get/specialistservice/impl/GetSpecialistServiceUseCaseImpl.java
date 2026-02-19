@@ -22,16 +22,32 @@ public class GetSpecialistServiceUseCaseImpl
     @Override
     public Set<SpecialistService> getBySpecialist(String specialistProfileId) {
 
-        return new HashSet<>(
+        log.info("[profileId: {}] Start get services by specialist", specialistProfileId);
+
+        Set<SpecialistService> services = new HashSet<>(
                 repository.findBySpecialistProfileId(specialistProfileId)
         );
+
+        log.info("[profileId: {}] Services loaded, count={}",
+                specialistProfileId, services.size());
+
+        return services;
     }
+
 
     @Override
     public SpecialistService getById(String serviceId) {
 
-        return repository.findById(serviceId)
-                .orElseThrow(() ->
-                        new SpecialistServiceNotFoundException(serviceId));
+        log.info("[serviceId: {}] Start get service by id", serviceId);
+
+        SpecialistService service = repository.findById(serviceId)
+                .orElseThrow(() -> {
+                    log.info("[serviceId: {}] Service not found", serviceId);
+                    return new SpecialistServiceNotFoundException(serviceId);
+                });
+
+        log.info("[serviceId: {}] Service loaded", serviceId);
+        return service;
     }
+
 }

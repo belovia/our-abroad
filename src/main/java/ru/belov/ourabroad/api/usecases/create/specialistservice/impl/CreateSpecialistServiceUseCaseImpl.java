@@ -26,7 +26,11 @@ public class CreateSpecialistServiceUseCaseImpl
             SpecialistServiceDto dto
     ) {
 
-        validate(dto);
+        log.info("[specialistProfileId={}] Start to create service with id={}",
+                specialistProfileId,
+                dto.getId());
+
+        validate(specialistProfileId,dto);
 
         SpecialistService service =
                 SpecialistServiceFactory.create(
@@ -35,7 +39,7 @@ public class CreateSpecialistServiceUseCaseImpl
                         dto.getDescription(),
                         dto.getTitle(),
                         dto.getPrice(),
-                        null
+                        "USD"
                 );
 
         repository.save(service);
@@ -47,8 +51,8 @@ public class CreateSpecialistServiceUseCaseImpl
         return service;
     }
 
-    private void validate(SpecialistServiceDto dto) {
-
+    private void validate(String specialistProfileId, SpecialistServiceDto dto) {
+        log.info("[specialistProfileId: {}] Validating requestDto", specialistProfileId);
         if (!StringUtils.hasText(dto.getTitle())) {
             throw new IllegalArgumentException("Service title is empty");
         }
@@ -56,5 +60,6 @@ public class CreateSpecialistServiceUseCaseImpl
         if (dto.getPrice() == null || dto.getPrice() < 0) {
             throw new IllegalArgumentException("Invalid price");
         }
+        log.info("[specialistProfileId: {}] Validating success", dto.getId());
     }
 }

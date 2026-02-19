@@ -51,7 +51,7 @@ public class SpecialistServiceFactory {
                 description,
                 price,
                 currency,
-                true // new services active by default
+                true
         );
     }
 }
