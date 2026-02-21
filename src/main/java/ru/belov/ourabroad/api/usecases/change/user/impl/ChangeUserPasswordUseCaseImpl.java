@@ -5,14 +5,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.belov.ourabroad.api.usecases.AbstractUserUseCase;
 import ru.belov.ourabroad.api.usecases.change.user.ChangeUserPasswordUseCase;
+import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.poi.storage.UserRepository;
-import ru.belov.ourabroad.poi.storage.exceptions.ValidationException;
-import ru.belov.ourabroad.web.validators.IdValidator;
 import ru.belov.ourabroad.web.validators.UserValidator;
-import ru.belov.ourabroad.web.validators.ValidationResult;
 
-import static ru.belov.ourabroad.web.validators.ValidationError.PASSWORDS_ARE_NOT_EQUAL;
+import static ru.belov.ourabroad.web.validators.ErrorCode.PASSWORDS_ARE_NOT_EQUAL;
 
 @Service
 @Slf4j
@@ -28,30 +26,65 @@ public class ChangeUserPasswordUseCaseImpl extends AbstractUserUseCase implement
         super(userRepository);
         this.userValidator = userValidator;
     }
+
     @Override
-    public void changePassword(String userId, String oldPassword, String newPassword) {
+    public Response execute(Request request) {
+        Context context = new Context();
+        String userId = request.userId();
 
-        IdValidator.requireUserId(userId);
+        log.info("[userId: {}] Start changing phone", userId);
+        validateInputFields(userId, request.oldPassword(), request.newPassword(), context);
 
-        ValidationResult result = userValidator.validatePassword(newPassword);
+        User user = findExistsUser(userId, context);
 
-        if (!result.isValid()) {
-            throw new ValidationException(result);
-        }
-
-        User user = getUserOrThrow(userId);
-
-        boolean passwordsAreEqual = validateOldPassword(user.getPassword(), oldPassword);
+        boolean passwordsAreEqual = validateOldPassword(user.getPassword(), request.oldPassword());
         if (passwordsAreEqual) {
-            user.setPassword(newPassword);
-            userRepository.save(user);
+            updateUserPassword(request.newPassword(), user);
+            return successResponse(userId);
         }
-        log.info("Passwords are not equal");
-        ValidationResult passwordValidation = ValidationResult.withError(PASSWORDS_ARE_NOT_EQUAL);
-        throw new ValidationException(passwordValidation);
+
+        log.error("Passwords are not equal");
+        context.setError(PASSWORDS_ARE_NOT_EQUAL);
+
+        return errorResponse(context, userId);
+    }
+
+    private void updateUserPassword(String newPassword, User user) {
+        user.setPassword(newPassword);
+        userRepository.save(user);
+    }
+
+    private void validateInputFields(
+            String userId,
+            String oldPassword,
+            String newPassword,
+            Context context
+    ) {
+        userValidator.validateId(userId, context);
+        userValidator.validatePassword(oldPassword, context);
+        userValidator.validatePassword(newPassword, context);
     }
 
     protected boolean validateOldPassword(String passwordFromDb, String passwordFromRequest) {
         return passwordFromDb.equals(passwordFromRequest);
+    }
+
+
+
+    private Response errorResponse(Context context, String userId) {
+        log.error("[userId: {}] Returning error response", userId);
+        return new Response(
+                userId,
+                context.isSuccess(),
+                context.getErrorCode().getMessage());
+    }
+
+    private Response successResponse(String userId) {
+        log.info("[userId: {}] Returning success response", userId);
+        return new Response(
+                userId,
+                true,
+                null
+        );
     }
 }

@@ -5,12 +5,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.belov.ourabroad.api.usecases.AbstractUserUseCase;
 import ru.belov.ourabroad.api.usecases.change.user.ChangeUserPhoneUseCase;
+import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.poi.storage.UserRepository;
-import ru.belov.ourabroad.poi.storage.exceptions.ValidationException;
-import ru.belov.ourabroad.web.validators.IdValidator;
 import ru.belov.ourabroad.web.validators.UserValidator;
-import ru.belov.ourabroad.web.validators.ValidationResult;
 
 @Service
 @Slf4j
@@ -28,20 +26,59 @@ public class ChangeUserPhoneUseCaseImpl extends AbstractUserUseCase implements C
     }
 
     @Override
-    public void changePhone(String userId, String newPhone) {
+    public Response execute(Request request) {
 
-        IdValidator.requireUserId(userId);
+        Context context = new Context();
+        validateRequest(request, context);
 
-        ValidationResult result = userValidator.validatePhone(newPhone);
+        String userId = request.userId();
 
-        if (!result.isValid()) {
-            throw new ValidationException(result);
+        log.info("[userId: {}] Start changing phone", userId);
+
+        User user = findExistsUser(userId, context);
+
+        if (!context.isSuccess()) {
+            return errorResponse(context, userId);
         }
 
-        User user = getUserOrThrow(userId);
+        updateUser(request, user);
 
-        user.setPhone(newPhone);
+        return successResponse(userId);
+    }
 
+    protected void validateRequest(Request request, Context context) {
+        log.info("Validating request");
+        userValidator.validateId(request.userId(), context);
+        userValidator.validatePhone(request.newPhone(), context);
+        if (context.isSuccess()) {
+            log.info("Validation success");
+        } else {
+            log.error("Validation failed");
+        }
+    }
+
+    private void updateUser(Request request, User user) {
+        if (user == null) {
+            return;
+        }
+        user.setPhone(request.newPhone());
         userRepository.save(user);
+    }
+
+    private Response errorResponse(Context context, String userId) {
+        log.error("[userId: {}] Returning error response", userId);
+        return new Response(
+                userId,
+                context.isSuccess(),
+                context.getErrorCode().getMessage());
+    }
+
+    private Response successResponse(String userId) {
+        log.info("[userId: {}] Returning success response", userId);
+        return new Response(
+                userId,
+                true,
+                null
+        );
     }
 }

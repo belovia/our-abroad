@@ -1,20 +1,27 @@
 package ru.belov.ourabroad.web.validators;
 
-public enum ValidationError {
+public enum ErrorCode {
 
     // Общие ошибки
     FIELD_REQUIRED("Поле обязательно для заполнения"),
 
     // Email ошибки
     EMAIL_REQUIRED("Email обязателен"),
+    USER_ID_REQUIRED("userId обязателен"),
+    USER_NOT_FOUND("Пользователь не найден"),
+    SPECIALIST_SERVICE_NOT_FOUND("Услуга не найдена"),
     EMAIL_INVALID_FORMAT("Email имеет неверный формат. Пример: user@example.com"),
     EMAIL_ALREADY_EXISTS("Пользователь с таким email уже существует"),
+    USER_ALREADY_EXISTS("Пользователь с таким id уже существует"),
+    SPECIALIST_ALREADY_EXISTS("Специалист с таким id уже существует"),
+    VALIDATION_ERROR("Ошибка валидации поля"),
 
     // Телефон ошибки
     PHONE_INVALID_FORMAT("Телефон должен быть в формате +79123456789 (10-15 цифр после +)"),
     PHONE_ALREADY_EXISTS("Пользователь с таким телефоном уже существует"),
     TELEGRAM_INVALID("Ошибка валидации Telegram-аккаунта"),
     WHATSAPP_INVALID("Ошибка валидации WhatsApp-аккаунта"),
+    PRICE_MUST_BE_BIGGER_THAN_ZERO("Должно быть больше нуля"),
 
 
     // Пароль ошибки
@@ -43,7 +50,7 @@ public enum ValidationError {
 
     private final String message;
 
-    ValidationError(String message) {
+    ErrorCode(String message) {
         this.message = message;
     }
 

@@ -1,8 +1,22 @@
 package ru.belov.ourabroad.api.usecases.create.user;
 
-import ru.belov.ourabroad.web.dto.create.CreateUserRequest;
-
 public interface CreateUserUseCase {
 
-    String create(CreateUserRequest command);
+    Response execute(Request request);
+
+    record Request(
+            String email,
+            String phone,
+            String password,
+            String telegramUsername,
+            String whatsAppNumber,
+            String activity
+    ) {
+    }
+
+    record Response(
+            String userId,
+            boolean success,
+            String errorMessage
+    ) {}
 }

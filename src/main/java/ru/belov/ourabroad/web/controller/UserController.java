@@ -8,7 +8,6 @@ import ru.belov.ourabroad.api.usecases.get.user.GetUserByEmailUseCase;
 import ru.belov.ourabroad.api.usecases.get.user.GetUserByIdUsecase;
 import ru.belov.ourabroad.api.usecases.update.UserUpdateUsecase;
 import ru.belov.ourabroad.core.domain.User;
-import ru.belov.ourabroad.web.dto.create.CreateUserRequest;
 
 import java.util.Map;
 

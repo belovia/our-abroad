@@ -1,11 +1,20 @@
 package ru.belov.ourabroad.api.usecases.create.specialistservice;
 
-import ru.belov.ourabroad.core.domain.SpecialistService;
-import ru.belov.ourabroad.web.dto.change.SpecialistServiceDto;
-
 public interface CreateSpecialistServiceUseCase {
-    SpecialistService create(
+    Response execute(Request request);
+
+    public record Request(
             String specialistProfileId,
-            SpecialistServiceDto dto
-    );
+            String title,
+            String description,
+            Integer price,
+            String currency) {
+    }
+
+    public record Response(
+            String specialistProfileId,
+            boolean success,
+            String message
+    ) {
+    }
 }

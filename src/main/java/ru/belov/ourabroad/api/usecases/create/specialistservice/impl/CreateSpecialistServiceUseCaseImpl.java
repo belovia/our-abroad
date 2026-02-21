@@ -5,12 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.create.specialistservice.CreateSpecialistServiceUseCase;
+import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistService;
 import ru.belov.ourabroad.core.domain.SpecialistServiceFactory;
 import ru.belov.ourabroad.poi.storage.SpecialistServiceRepository;
-import ru.belov.ourabroad.web.dto.change.SpecialistServiceDto;
-
-import java.util.UUID;
+import ru.belov.ourabroad.web.validators.ErrorCode;
 
 @Service
 @RequiredArgsConstructor
@@ -21,45 +20,69 @@ public class CreateSpecialistServiceUseCaseImpl
     private final SpecialistServiceRepository repository;
 
     @Override
-    public SpecialistService create(
-            String specialistProfileId,
-            SpecialistServiceDto dto
-    ) {
+    public Response execute(Request request) {
 
-        log.info("[specialistProfileId={}] Start to create service with id={}",
-                specialistProfileId,
-                dto.getId());
+        Context context = new Context();
+        String specialistProfileId = request.specialistProfileId();
 
-        validate(specialistProfileId,dto);
+
+        log.info("[specialistProfileId: {}] Start to create service",
+                specialistProfileId);
+
+        validateRequest(specialistProfileId, request, context);
 
         SpecialistService service =
-                SpecialistServiceFactory.create(
-                        dto.getId(),
-                        specialistProfileId,
-                        dto.getDescription(),
-                        dto.getTitle(),
-                        dto.getPrice(),
-                        "USD"
-                );
+                makeServiceFromRequest(specialistProfileId, request, context);
 
-        repository.save(service);
+        if (!context.isSuccess()) {
+            return errorResponse(specialistProfileId, context);
+        }
 
-        log.info("[profileId={}] service created id={}",
-                specialistProfileId,
-                service.getId());
+        saveSpecialistService(specialistProfileId, service);
 
-        return service;
+
+        return successResponse(specialistProfileId, service);
     }
 
-    private void validate(String specialistProfileId, SpecialistServiceDto dto) {
+    protected void validateRequest(String specialistProfileId, Request request, Context context) {
         log.info("[specialistProfileId: {}] Validating requestDto", specialistProfileId);
-        if (!StringUtils.hasText(dto.getTitle())) {
-            throw new IllegalArgumentException("Service title is empty");
-        }
 
-        if (dto.getPrice() == null || dto.getPrice() < 0) {
-            throw new IllegalArgumentException("Invalid price");
+        if (!StringUtils.hasText(request.title())) {
+            log.error("[specialistProfileId: {}] Validation failed: title is empty", specialistProfileId);
+            context.setError(ErrorCode.VALIDATION_ERROR);
+            return;
         }
-        log.info("[specialistProfileId: {}] Validating success", dto.getId());
+        if (request.price() == null || request.price() < 0) {
+            log.error("[specialistProfileId: {}] Validation failed price is null or less zero", specialistProfileId);
+            context.setError(ErrorCode.VALIDATION_ERROR);
+            return;
+        }
+        log.info("[specialistProfileId: {}] Validating success", specialistProfileId);
+    }
+
+
+    private SpecialistService makeServiceFromRequest(String specialistProfileId, Request request, Context context) {
+        return SpecialistServiceFactory.create(
+                specialistProfileId,
+                request.title(),
+                request.description(),
+                request.price(),
+                "USD"
+        );
+    }
+
+    private void saveSpecialistService(String specialistProfileId, SpecialistService service) {
+        log.info("[specialistProfileId: {}] Start saving specialistService", specialistProfileId);
+        repository.save(service);
+    }
+
+    protected Response errorResponse(String specialistProfileId, Context ctx) {
+        log.error("[specialistProfileId: {}] Returning error response", specialistProfileId);
+        return new Response(specialistProfileId, ctx.isSuccess(), ctx.getErrorCode().getMessage());
+    }
+
+    protected Response successResponse(String specialistProfileId, SpecialistService service) {
+        log.info("[specialistProfileId: {}] Returning success response", specialistProfileId);
+        return new Response(specialistProfileId, true, null);
     }
 }

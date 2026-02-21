@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static ru.belov.ourabroad.core.domain.NameSpaces.*;
 import static ru.belov.ourabroad.poi.storage.sql.UserSql.*;
 
 @Repository
@@ -28,7 +29,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> findById(String userId) {
         Map<String, Object> params = new HashMap<>();
-        paramHelper.putParam(params, "id", userId, userId);
+        paramHelper.putParam(params, ID, userId, userId);
         log.info("[userId: {}] Prepare to find user by id: {}", userId, userId);
 
         return jdbcTemplate.query(
@@ -42,7 +43,7 @@ public class UserRepositoryImpl implements UserRepository {
     public Optional<User> findByEmail(String email) {
 
         Map<String, Object> params = new HashMap<>();
-        paramHelper.putParam(params, "email", email);
+        paramHelper.putParam(params, EMAIL, email);
         return jdbcTemplate.query(
                 FIND_BY_EMAIL,
                 params,
@@ -53,18 +54,29 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void save(User user) {
 
+        if (user == null) {
+            log.error("User is null, cancel saving");
+            return;
+        }
+
+        log.info("[userId: {}] Try to save user", user.getId());
+
         Map<String, Object> params = new HashMap<>();
+
         log.info("[userId: {}] Prepare user to saving", user.getId());
-        paramHelper.putParam(params, "id", user.getId(), user.getId());
-        paramHelper.putParam(params, "email", user.getEmail(), user.getId());
-        paramHelper.putParam(params, "phone", user.getPhone(), user.getId());
-        paramHelper.putParam(params, "passwordHash", user.getPassword(), user.getId());
-        paramHelper.putParam(params, "telegram_username", user.getTelegramUsername(), user.getId());
-        paramHelper.putParam(params, "whatsapp_number", user.getWhatsappNumber(), user.getId());
-        paramHelper.putParam(params, "activity", user.getActivity(), user.getId());
-        paramHelper.putParam(params, "status", user.getStatus().name(), user.getId());
-        paramHelper.putParam(params, "createdAt", user.getCreatedAt(), user.getId());
-        paramHelper.putParam(params, "lastLoginAt", user.getLastLoginAt(), user.getId());
+
+        paramHelper.putParam(params, ID, user.getId(), user.getId());
+        paramHelper.putParam(params, EMAIL, user.getEmail(), user.getId());
+        paramHelper.putParam(params, PHONE, user.getPhone(), user.getId());
+        paramHelper.putParam(params, PASSWORD_HASH, user.getPassword(), user.getId());
+        paramHelper.putParam(params, TELEGRAM_USERNAME, user.getTelegramUsername(), user.getId());
+        paramHelper.putParam(params, WHATSAPP_USERNAME, user.getWhatsappNumber(), user.getId());
+        paramHelper.putParam(params, ACTIVITY, user.getActivity(), user.getId());
+        paramHelper.putParam(params, STATUS, user.getStatus().name(), user.getId());
+        paramHelper.putParam(params, CREATED_AT, user.getCreatedAt(), user.getId());
+        paramHelper.putParam(params, LAST_LOGIN_AT, user.getLastLoginAt(), user.getId());
+
+        log.info("[userId: {}] Save user", user.getId());
 
         jdbcTemplate.update(
                 INSERT,
@@ -78,8 +90,8 @@ public class UserRepositoryImpl implements UserRepository {
         Map<String, Object> params = new HashMap<>();
         log.info("[userId: {}] Prepare user to update login at", userId);
 
-        paramHelper.putParam(params, "id", userId, userId);
-        paramHelper.putParam(params, "lastLoginAt", lastLoginAt, userId);
+        paramHelper.putParam(params, ID, userId, userId);
+        paramHelper.putParam(params, LAST_LOGIN_AT, lastLoginAt, userId);
         log.info("[userId: {}] Update user last login at", userId);
         return jdbcTemplate.update(
                 UPDATE_LAST_LOGIN,
@@ -91,8 +103,8 @@ public class UserRepositoryImpl implements UserRepository {
     public boolean updateStatus(String userId, UserStatus status) {
         Map<String, Object> params = new HashMap<>();
         log.info("[userId: {}] Prepare user to update status", userId);
-        paramHelper.putParam(params, "id", userId, userId);
-        paramHelper.putParam(params, "status", status, userId);
+        paramHelper.putParam(params, ID, userId, userId);
+        paramHelper.putParam(params, STATUS, status, userId);
 
         log.info("[userId: {}] Update user status. New status: {}", userId, status);
         return jdbcTemplate.update(
@@ -102,10 +114,10 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public boolean existsByEmail(String email) {
-
+    public boolean existsByEmail(String userId, String email) {
+        log.info("[userId: {}] Start checking exist email", userId);
         Map<String, Object> params = new HashMap<>();
-        paramHelper.putParam(params, "email", email);
+        paramHelper.putParam(params, EMAIL, email);
         return jdbcTemplate.query(
                 FIND_BY_EMAIL,
                 params,
