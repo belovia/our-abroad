@@ -2,11 +2,12 @@ package ru.belov.ourabroad.web.validators;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import ru.belov.ourabroad.web.dto.create.CreateUserRequest;
+import ru.belov.ourabroad.core.domain.Context;
 
 import java.util.regex.Pattern;
 
-import static ru.belov.ourabroad.web.validators.ValidationError.*;
+import static ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase.Request;
+import static ru.belov.ourabroad.web.validators.ErrorCode.*;
 
 @Component
 public class UserValidator {
@@ -18,75 +19,72 @@ public class UserValidator {
             Pattern.compile("^\\+\\d{10,15}$");
 
 
-    public ValidationResult validateCreateUserRequest(CreateUserRequest request) {
-        ValidationResult result = new ValidationResult();
-
-        result.merge(validateEmail(request.getEmail()));
-        result.merge(validatePhone(request.getPhone()));
-        result.merge(validatePassword(request.getPassword()));
-
-        return result;
+    public void validateCreateUserRequest(Request request, Context context) {
+        validateEmail(request.email(), context);
+        validatePhone(request.phone(), context);
+        validatePassword(request.password(), context);
     }
 
-    public boolean isValidCreateUserRequest(CreateUserRequest request) {
-        return validateCreateUserRequest(request).isValid();
+    public void validateId(String id, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
+        if (!StringUtils.hasText(id)) {
+            context.setError(USER_ID_REQUIRED);
+        }
     }
 
-    public ValidationResult validateEmail(String email) {
-        ValidationResult result = new ValidationResult();
-
+    public void validateEmail(String email, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
         if (!StringUtils.hasText(email)) {
-            result.addError(EMAIL_REQUIRED);
-            return result;
+            context.setError(EMAIL_REQUIRED);
+            return;
         }
 
         if (!EMAIL_PATTERN.matcher(email).matches()) {
-            result.addError(EMAIL_INVALID_FORMAT);
+            context.setError(EMAIL_INVALID_FORMAT);
         }
-
-        return result;
     }
 
-    public ValidationResult validatePhone(String phone) {
-        ValidationResult result = new ValidationResult();
-
+    public void validatePhone(String phone, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
         if (StringUtils.hasText(phone) && !PHONE_PATTERN.matcher(phone).matches()) {
-            result.addError(PHONE_INVALID_FORMAT);
+            context.setError(PHONE_INVALID_FORMAT);
         }
-
-        return result;
     }
 
-    public ValidationResult validatePassword(String password) {
-        ValidationResult result = new ValidationResult();
-
+    public void validatePassword(String password, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
         if (!StringUtils.hasText(password)) {
-            result.addError(PASSWORD_REQUIRED);
-            return result;
+            context.setError(PASSWORD_REQUIRED);
         }
-
-        return result;
     }
 
-    public ValidationResult validateTelegram(String username) {
-        ValidationResult result = ValidationResult.ok();
-
+    public void validateTelegram(String username, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
         if (StringUtils.hasText(username)) {
             if (!username.matches("^@\\w{5,32}$")) {
-                result.addError(TELEGRAM_INVALID);
+                context.setError(TELEGRAM_INVALID);
             }
         }
-        return result;
     }
 
-    public ValidationResult validateWhatsapp(String phone) {
-        ValidationResult result = ValidationResult.ok();
-
+    public void validateWhatsapp(String phone, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
         if (StringUtils.hasText(phone)) {
             if (!PHONE_PATTERN.matcher(phone).matches()) {
-                result.addError(WHATSAPP_INVALID);
+                context.setError(WHATSAPP_INVALID);
             }
         }
-        return result;
     }
 }

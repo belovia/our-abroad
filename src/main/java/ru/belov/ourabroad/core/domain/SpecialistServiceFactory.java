@@ -1,6 +1,7 @@
 package ru.belov.ourabroad.core.domain;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class SpecialistServiceFactory {
 
@@ -27,22 +28,18 @@ public class SpecialistServiceFactory {
     }
 
     public static SpecialistService create(
-            String id,
             String specialistId,
             String title,
             String description,
             Integer price,
             String currency
     ) {
-        Objects.requireNonNull(id, "id must not be null");
         Objects.requireNonNull(specialistId, "specialistId must not be null");
         Objects.requireNonNull(title, "title must not be null");
         Objects.requireNonNull(price, "price must not be null");
         Objects.requireNonNull(currency, "currency must not be null");
 
-        if (price < 0) {
-            throw new IllegalArgumentException("price must be positive");
-        }
+        String id = UUID.randomUUID().toString();
 
         return new SpecialistService(
                 id,
@@ -51,7 +48,7 @@ public class SpecialistServiceFactory {
                 description,
                 price,
                 currency,
-                true // new services active by default
+                true
         );
     }
 }

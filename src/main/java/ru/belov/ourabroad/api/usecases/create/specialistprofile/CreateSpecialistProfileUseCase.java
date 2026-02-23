@@ -1,8 +1,18 @@
 package ru.belov.ourabroad.api.usecases.create.specialistprofile;
 
-import ru.belov.ourabroad.core.domain.SpecialistProfile;
-
 public interface CreateSpecialistProfileUseCase {
 
-    SpecialistProfile create(String userId, String description);
+    Response execute(Request request);
+
+    record Request(
+            String userId,
+            String description) {
+    }
+
+    record Response(
+            String userId,
+            boolean success,
+            String errorMessage
+    ) {
+    }
 }

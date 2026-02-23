@@ -5,10 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.create.specialistprofile.CreateSpecialistProfileUseCase;
+import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.core.domain.SpecialistProfileFactory;
 import ru.belov.ourabroad.poi.storage.SpecialistProfileRepository;
-import ru.belov.ourabroad.poi.storage.exceptions.SpecialistProfileAlreadyExistsException;
+
+import static ru.belov.ourabroad.web.validators.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -19,24 +21,58 @@ public class CreateSpecialistProfileUseCaseImpl
     private final SpecialistProfileRepository profileRepository;
 
     @Override
-    public SpecialistProfile create(String userId, String description) {
+    public Response execute(Request request) {
+        Context context = new Context();
+        String userId = request.userId();
+        log.info("[userId: {}] Start to create specialistProfileId", userId);
 
-        if (!StringUtils.hasText(userId)) {
-            throw new IllegalArgumentException("userId is empty");
+        validate(userId, context);
+
+        SpecialistProfile profile = makeSpecialistProfile(request, userId, context);
+
+        createSpecialistProfile(profile, context);
+        if (!context.isSuccess()) {
+            return errorResponse(userId, context);
         }
 
-        profileRepository.findByUserId(userId)
-                .ifPresent(p -> {
-                    throw new SpecialistProfileAlreadyExistsException(userId);
-                });
+        log.info("[userId: {}] specialist profile created", userId);
 
-        SpecialistProfile profile =
-                SpecialistProfileFactory.create(userId, description);
+        return successResponse(userId);
+    }
 
+
+    private void validate(String userId, Context context) {
+        log.info("Validating inputID");
+
+        if (!StringUtils.hasText(userId)) {
+            log.info("Validation failed");
+            context.setError(USER_ID_REQUIRED);
+        }
+        log.info("[userId: {}] Validating success", userId);
+    }
+
+    protected SpecialistProfile makeSpecialistProfile(Request request, String userId, Context context) {
+        if (!context.isSuccess()) {
+            log.error("[userId: {}] Error while creating specialistProfile", userId);
+            return null;
+        }
+        return SpecialistProfileFactory.create(userId, request.description());
+    }
+
+    protected void createSpecialistProfile(SpecialistProfile profile, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
         profileRepository.save(profile);
+    }
 
-        log.info("[userId={}] specialist profile created", userId);
+    protected Response errorResponse(String userId, Context context) {
+        log.error("[userId: {}] Returning error response", userId);
+        return new Response(userId, context.isSuccess(), context.getErrorCode().getMessage());
+    }
 
-        return profile;
+    protected Response successResponse(String userId) {
+        log.info("[userId: {}] Returning success response", userId);
+        return new Response(userId, true, null);
     }
 }

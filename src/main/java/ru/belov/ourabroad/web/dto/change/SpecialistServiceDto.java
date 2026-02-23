@@ -7,8 +7,5 @@ import lombok.Setter;
 @Setter
 public class SpecialistServiceDto {
 
-    private String id;
-    private String title;
-    private Integer price;
-    private String description;
+
 }

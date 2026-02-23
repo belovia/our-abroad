@@ -18,5 +18,5 @@ public interface UserRepository {
 
     boolean updateStatus(String userId, UserStatus status);
 
-    boolean existsByEmail(String email);
+    boolean existsByEmail(String userId, String email);
 }

@@ -5,16 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase;
+import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.core.domain.UserFactory;
 import ru.belov.ourabroad.poi.storage.UserRepository;
-import ru.belov.ourabroad.poi.storage.exceptions.UserAlreadyExistsException;
-import ru.belov.ourabroad.poi.storage.exceptions.ValidationException;
-import ru.belov.ourabroad.web.dto.create.CreateUserRequest;
 import ru.belov.ourabroad.web.validators.UserValidator;
-import ru.belov.ourabroad.web.validators.ValidationResult;
 
 import java.util.UUID;
+
+import static ru.belov.ourabroad.web.validators.ErrorCode.EMAIL_ALREADY_EXISTS;
 
 @Service
 @RequiredArgsConstructor
@@ -26,39 +25,61 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
 
     @Override
     @Transactional
-    public String create(CreateUserRequest request) {
+    public Response execute(Request request) {
 
-        ValidationResult result = userValidator.validateCreateUserRequest(request);
-        if (!result.isValid()) {
-            throw new ValidationException(result);
-        }
+        Context context = new Context();
+
+        validateRequest(request, context);
 
         String userId = UUID.randomUUID().toString();
         log.info("[userId: {}] Creating user with id: {}",
                 userId,
                 userId);
 
+        String email = request.email();
+
         User user = UserFactory.newUser(
                 userId,
-                request.getEmail(),
-                request.getPhone(),
-                request.getPassword(),
-                request.getTelegramUsername(),
-                request.getWhatsAppNumber(),
-                request.getActivity()
+                email,
+                request.phone(),
+                request.password(),
+                request.telegramUsername(),
+                request.whatsAppNumber(),
+                request.activity()
         );
 
-        boolean userEmailExists = userRepository.existsByEmail(request.getEmail());
+        boolean userEmailExists = checkExistEmail(userId, email);
 
         if (userEmailExists) {
             log.info("[userId: {}] User already exists with email: {}",
                     userId,
-                    request.getEmail());
-            throw new UserAlreadyExistsException(request.getEmail());
+                    email);
+            context.setError(EMAIL_ALREADY_EXISTS);
+            return errorResponse(context, userId);
         }
 
         userRepository.save(user);
 
-        return userId;
+        return successResponse(userId);
+    }
+
+
+    private void validateRequest(Request request, Context context) {
+        userValidator.validateCreateUserRequest(request, context);
+    }
+
+    private boolean checkExistEmail(String userId, String email) {
+        log.info("[userId: {}] Checking exist email: {}", userId, email);
+        return userRepository.existsByEmail(userId, email);
+    }
+
+    protected Response errorResponse(Context context, String userId) {
+        log.error("[userId: {}] Returning error response", userId);
+        return new Response(userId, context.isSuccess(), context.getErrorCode().getMessage());
+    }
+
+    protected Response successResponse(String userId) {
+        log.info("[userId: {}] Returning success response", userId);
+        return new Response(userId, true, null);
     }
 }

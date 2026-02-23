@@ -3,17 +3,13 @@ package ru.belov.ourabroad.api.usecases.update.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.AbstractUserUseCase;
 import ru.belov.ourabroad.api.usecases.update.UserUpdateUsecase;
+import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.poi.storage.UserRepository;
-import ru.belov.ourabroad.poi.storage.exceptions.UserAlreadyExistsException;
-import ru.belov.ourabroad.poi.storage.exceptions.ValidationException;
 import ru.belov.ourabroad.web.dto.update.UpdateUserRequest;
-import ru.belov.ourabroad.web.validators.IdValidator;
 import ru.belov.ourabroad.web.validators.UserValidator;
-import ru.belov.ourabroad.web.validators.ValidationResult;
 
 @Service
 @Slf4j
@@ -33,30 +29,37 @@ public class UserUpdateUseCaseImpl extends AbstractUserUseCase implements UserUp
     @Override
     public void updateUser(String userId, UpdateUserRequest request) {
 
-        IdValidator.requireUserId(userId);
+        Context context = new Context();
 
-        ValidationResult result = ValidationResult.ok();
+        validateInputFields(request, context);
 
-        if (request.getEmail() != null) {
-            result.merge(userValidator.validateEmail(request.getEmail()));
+        User user = findExistsUser(userId, context);
+
+        prepareUserToUpdate(request, user, userId);
+
+        updateUser(user, userId, context);
+    }
+
+    private void updateUser(User user, String userId, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
+        userRepository.save(user);
+    }
+
+    private void validateInputFields(UpdateUserRequest request, Context context) {
+        if (!context.isSuccess()) {
+            return;
         }
 
-        if (request.getPhone() != null) {
-            result.merge(userValidator.validatePhone(request.getPhone()));
-        }
+        userValidator.validateEmail(request.getEmail(), context);
+        userValidator.validatePhone(request.getPhone(), context);
+        userValidator.validateTelegram(request.getTelegramUsername(), context);
+        userValidator.validateWhatsapp(request.getWhatsappNumber(), context);
+    }
 
-        if (request.getTelegramUsername() != null) {
-            result.merge(userValidator.validateTelegram(request.getTelegramUsername()));
-        }
-
-        if (request.getWhatsappNumber() != null) {
-            result.merge(userValidator.validateWhatsapp(request.getWhatsappNumber()));
-        }
-
-        result.throwIfInvalid();
-
-        User user = getUserOrThrow(userId);
-
+    private void prepareUserToUpdate(UpdateUserRequest request, User user, String userId) {
+        log.info("[userId: {}] Preparing user to update", userId);
         if (request.getEmail() != null) {
             user.setEmail(request.getEmail());
         }
@@ -72,7 +75,5 @@ public class UserUpdateUseCaseImpl extends AbstractUserUseCase implements UserUp
         if (request.getActivity() != null) {
             user.setActivity(request.getActivity());
         }
-
-        userRepository.save(user);
     }
 }

@@ -1,7 +1,20 @@
 package ru.belov.ourabroad.api.usecases.change.specialistservice;
 
-import ru.belov.ourabroad.web.dto.change.SpecialistServiceDto;
-
 public interface ChangeSpecialistServiceUseCase {
-    void change(String serviceId, SpecialistServiceDto dto);
+    Response execute(Request request);
+
+    public record Request(
+            String serviceId,
+            String title,
+            Integer price,
+            String description
+    ) {}
+
+    public record Response(
+            String serviceId,
+            boolean success,
+            String message
+    ) {}
+
+
 }

@@ -1,5 +1,16 @@
 package ru.belov.ourabroad.api.usecases.change.user;
 
 public interface ChangeUserEmailUseCase {
-    void changeEmail(String userId, String newEmail);
+    Response execute(Request request);
+
+    public record Request(
+            String userId,
+            String newEmail
+    ) {}
+
+    public record Response(
+            String userId,
+            boolean success,
+            String errorMessage
+    ) {}
 }
