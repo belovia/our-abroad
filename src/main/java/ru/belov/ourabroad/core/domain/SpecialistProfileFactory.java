@@ -1,7 +1,5 @@
 package ru.belov.ourabroad.core.domain;
 
-import ru.belov.ourabroad.core.domain.SpecialistProfile;
-
 import java.util.UUID;
 
 public final class SpecialistProfileFactory {
@@ -17,22 +15,27 @@ public final class SpecialistProfileFactory {
             double rating,
             int reviewsCount
     ) {
-        return SpecialistProfile.create(
-                id,
-                userId,
-                description,
-                active,
-                rating,
-                reviewsCount
-        );
-    }
-    public static SpecialistProfile create(String id, String description) {
         return SpecialistProfile.builder()
-                .userId(id)
-                .id(UUID.randomUUID().toString())
+                .id(id)
+                .userId(userId)
                 .description(description)
-                .rating(0.0)
+                .active(active)
+                .rating(rating)
+                .reviewsCount(reviewsCount)
+                .build();
+    }
+
+    public static SpecialistProfile create(
+            String userId,
+            String description
+    ) {
+        return SpecialistProfile.builder()
+                .id(UUID.randomUUID().toString())
+                .userId(userId)
+                .description(description)
                 .active(true)
+                .rating(0.0)
+                .reviewsCount(0)
                 .build();
     }
 
