@@ -9,7 +9,8 @@ import ru.belov.ourabroad.api.usecases.get.user.GetUserByIdUsecase;
 import ru.belov.ourabroad.api.usecases.update.UserUpdateUsecase;
 import ru.belov.ourabroad.core.domain.User;
 
-import java.util.Map;
+import static ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase.Request;
+import static ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase.Response;
 
 @RestController
 @RequestMapping("/api/users")
@@ -22,12 +23,12 @@ public class UserController {
     private final GetUserByEmailUseCase getUserByEmailIdUseCase;
 
     @PostMapping
-    public ResponseEntity<Map<String, String>> create(
-            @RequestBody CreateUserRequest request
+    public ResponseEntity<Response> create(
+            @RequestBody Request request
     ) {
-        String userId = createUserUseCase.create(request);
+        Response response = createUserUseCase.execute(request);
 
-        return ResponseEntity.ok(Map.of("userId", userId));
+        return ResponseEntity.ok(response);
     }
 
     // ======= GET ========
