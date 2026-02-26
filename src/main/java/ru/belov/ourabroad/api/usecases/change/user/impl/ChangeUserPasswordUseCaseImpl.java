@@ -60,9 +60,15 @@ public class ChangeUserPasswordUseCaseImpl extends AbstractUserUseCase implement
             String newPassword,
             Context context
     ) {
+        log.info("Validating request");
         userValidator.validateId(userId, context);
         userValidator.validatePassword(oldPassword, context);
         userValidator.validatePassword(newPassword, context);
+        if (context.isSuccess()) {
+            log.info("Validation success");
+        } else {
+            log.error("Validation failed");
+        }
     }
 
     protected boolean validateOldPassword(String passwordFromDb, String passwordFromRequest) {
