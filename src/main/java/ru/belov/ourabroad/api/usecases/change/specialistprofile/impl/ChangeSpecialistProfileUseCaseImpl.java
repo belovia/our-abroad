@@ -4,18 +4,29 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.belov.ourabroad.api.usecases.change.specialistprofile.ChangeSpecialistProfileUseCase;
+import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
+import ru.belov.ourabroad.core.domain.Context;
+import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.poi.storage.SpecialistProfileRepository;
-import ru.belov.ourabroad.web.dto.change.ChangeSpecialistProfileRequest;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ChangeSpecialistProfileUseCaseImpl implements ChangeSpecialistProfileUseCase {
 
-    private final SpecialistProfileRepository repository;
+    private final SpecialistProfileService service;
 
     @Override
-    public void changeProfile(String profileId, ChangeSpecialistProfileRequest request) {
-        
+    public Response execute(Request request) {
+        Context context = new Context();
+        String profileId = request.profileId();
+
+        SpecialistProfile fromDb = service.findById(profileId, context);
+
+        fromDb.setDescription(request.description());
+
+        service.update(fromDb);
+
+
     }
 }

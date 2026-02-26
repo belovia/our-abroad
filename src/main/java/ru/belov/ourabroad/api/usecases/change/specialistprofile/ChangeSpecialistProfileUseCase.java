@@ -1,10 +1,23 @@
 package ru.belov.ourabroad.api.usecases.change.specialistprofile;
 
-import ru.belov.ourabroad.web.dto.change.ChangeSpecialistProfileRequest;
+import ru.belov.ourabroad.web.dto.change.SpecialistServiceDto;
+
+import java.util.Set;
 
 public interface ChangeSpecialistProfileUseCase {
 
-    void changeProfile(String profileId, ChangeSpecialistProfileRequest request);
+    Response execute(Request request);
 
-    // todo: refactoring
+    record Request(
+            String profileId,
+            String description,
+            Set<SpecialistServiceDto> services
+    ) {
+    }
+
+    record Response(
+            String serviceId,
+            boolean success,
+            String message) {
+    }
 }

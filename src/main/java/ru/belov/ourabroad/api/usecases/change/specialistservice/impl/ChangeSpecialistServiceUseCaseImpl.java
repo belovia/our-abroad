@@ -79,6 +79,11 @@ public class ChangeSpecialistServiceUseCaseImpl implements ChangeSpecialistServi
         validator.validateRequiredField(request.title(), context);
         validator.validateRequiredField(request.price(), context);
         validator.validateRequiredField(request.description(), context);
+        if (context.isSuccess()) {
+            log.info("Validation success");
+        } else {
+            log.error("Validation failed");
+        }
     }
 
     private SpecialistService retrieveService(String serviceId, Context context) {
