@@ -5,31 +5,29 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ru.belov.ourabroad.api.usecases.get.user.GetUserByEmailUseCase;
+import ru.belov.ourabroad.api.usecases.services.user.UserService;
+import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
-import ru.belov.ourabroad.poi.storage.UserRepository;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class GetUserByEmailUseCaseImpl implements GetUserByEmailUseCase {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
-    public User getUserByEmail(String email) {
+    public User getUserByEmail(String userId, String email) {
 
+        Context context = new Context();
         if (!StringUtils.isNotBlank(email)) {
-            log.warn("GetUserByEmail called with empty email");
+            log.warn("[userId: {}] GetUserByEmail called with empty email", userId);
             return null;
         }
 
-        log.info("[email: {}] Start get user by email", email);
+        log.info("[userId: {}] Start get user by email", userId);
 
-        return userRepository.findByEmail(email)
-                .orElseGet(() -> {
-                    log.info("[email: {}] User not found", email);
-                    return null;
-                });
+        return userService.findByEmail(userId, email, context);
     }
 
 }
