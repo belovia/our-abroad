@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ru.belov.ourabroad.api.usecases.get.user.GetUserByIdUsecase;
+import ru.belov.ourabroad.api.usecases.services.user.UserService;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.poi.storage.UserRepository;
 
@@ -13,7 +14,7 @@ import ru.belov.ourabroad.poi.storage.UserRepository;
 @Slf4j
 public class GetUserByIdUseCaseImpl implements GetUserByIdUsecase {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public User getUserById(String userId) {
