@@ -2,12 +2,14 @@ package ru.belov.ourabroad.web.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase;
 import ru.belov.ourabroad.api.usecases.get.user.GetUserByEmailUseCase;
 import ru.belov.ourabroad.api.usecases.get.user.GetUserByIdUsecase;
 import ru.belov.ourabroad.api.usecases.update.UserUpdateUsecase;
-import ru.belov.ourabroad.core.domain.User;
 
 import static ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase.Request;
 import static ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase.Response;
@@ -32,23 +34,23 @@ public class UserController {
     }
 
     // ======= GET ========
-    @GetMapping("/id/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable String userId) {
-        User user = getUserByIdUsecase.getUserById(userId);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(user);
-    }
+//    @GetMapping("/id/{userId}")
+//    public ResponseEntity<User> getUserById(@PathVariable String userId) {
+//        User user = getUserByIdUsecase.getUserById(userId);
+//        if (user == null) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        return ResponseEntity.ok(user);
+//    }
 
-    @GetMapping("/email/{email}")
-    public ResponseEntity<User> getUserByEmail(@RequestParam String userId, @RequestParam String email) {
-        User user = getUserByEmailIdUseCase.execute(userId, email);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(user);
-    }
+//    @GetMapping("/email/{email}")
+//    public ResponseEntity<User> getUserByEmail(@RequestParam String userId, @RequestParam String email) {
+//        User user = getUserByEmailIdUseCase.execute(userId, email);
+//        if (user == null) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        return ResponseEntity.ok(user);
+//    }
 
 
 //    // ======= UPDATE ========
