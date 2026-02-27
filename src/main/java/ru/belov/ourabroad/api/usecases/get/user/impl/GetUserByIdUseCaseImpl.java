@@ -28,6 +28,7 @@ public class GetUserByIdUseCaseImpl implements GetUserByIdUsecase {
         User user = retrieveUserById(userId, context);
 
         if (user == null) {
+            log.warn("[userId: {}] Returning error response", request.userId());
             return errorResponse(context);
         }
         log.info("[userId: {}] Returning success response", userId);

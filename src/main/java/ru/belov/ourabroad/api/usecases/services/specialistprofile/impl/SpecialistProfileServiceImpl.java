@@ -38,6 +38,24 @@ public class SpecialistProfileServiceImpl implements SpecialistProfileService {
     }
 
     @Override
+    public SpecialistProfile findByUserId(String userId, Context context) {
+
+        log.info("[userId: {}] Try to find specialistProfile", userId);
+
+        Optional<SpecialistProfile> fromDbOpt = repository.findByUserId(userId);
+
+        if (fromDbOpt.isEmpty()) {
+            log.warn("[userId: {}] SpecialistProfile not found", userId);
+            context.setError(SPECIALIST_PROFILE_NOT_FOUND);
+            return null;
+        }
+        SpecialistProfile specialistProfile = fromDbOpt.get();
+        log.info("[userId: {}] Found: {}", userId, specialistProfile);
+
+        return specialistProfile;
+    }
+
+    @Override
     public void update(SpecialistProfile specialist) {
         repository.update(specialist);
     }
