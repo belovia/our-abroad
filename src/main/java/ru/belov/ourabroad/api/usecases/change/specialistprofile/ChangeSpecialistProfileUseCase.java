@@ -3,7 +3,7 @@ package ru.belov.ourabroad.api.usecases.change.specialistprofile;
 import ru.belov.ourabroad.web.dto.change.SpecialistServiceDto;
 
 import java.util.Set;
-
+@FunctionalInterface
 public interface ChangeSpecialistProfileUseCase {
 
     Response execute(Request request);
@@ -16,7 +16,7 @@ public interface ChangeSpecialistProfileUseCase {
     }
 
     record Response(
-            String serviceId,
+            String profileId,
             boolean success,
             String message) {
     }
