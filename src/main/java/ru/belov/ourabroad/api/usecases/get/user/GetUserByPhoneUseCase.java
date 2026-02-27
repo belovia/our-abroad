@@ -2,6 +2,20 @@ package ru.belov.ourabroad.api.usecases.get.user;
 
 import ru.belov.ourabroad.core.domain.User;
 
+@FunctionalInterface
 public interface GetUserByPhoneUseCase {
-    User getByUserId(String userId, String userPhone);
+
+    Response execute(Request request);
+
+    record Request(
+            String userId,
+            String phone) {
+    }
+
+    record Response(
+            User user,
+            boolean success,
+            String errorMessage
+    ) {
+    }
 }

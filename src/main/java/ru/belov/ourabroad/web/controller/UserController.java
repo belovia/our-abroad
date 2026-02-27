@@ -43,7 +43,7 @@ public class UserController {
 
     @GetMapping("/email/{email}")
     public ResponseEntity<User> getUserByEmail(@RequestParam String userId, @RequestParam String email) {
-        User user = getUserByEmailIdUseCase.getUserByEmail(userId, email);
+        User user = getUserByEmailIdUseCase.execute(userId, email);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
