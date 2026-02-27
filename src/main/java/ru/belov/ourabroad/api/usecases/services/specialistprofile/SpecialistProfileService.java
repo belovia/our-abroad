@@ -6,6 +6,7 @@ import ru.belov.ourabroad.core.domain.SpecialistProfile;
 public interface SpecialistProfileService {
 
     SpecialistProfile findById(String profileId, Context context);
+    SpecialistProfile findByUserId(String userId, Context context);
 
     void update(SpecialistProfile specialist);
 }

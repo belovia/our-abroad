@@ -17,6 +17,7 @@ public enum ErrorCode {
     SPECIALIST_ALREADY_EXISTS("Специалист с таким id уже существует"),
     VALIDATION_ERROR("Ошибка валидации поля"),
     DB_ERROR("Проблема при работе БД"),
+    REQUEST_VALIDATION_ERROR("Ошибка валидации запроса"),
 
     // Телефон ошибки
     PHONE_INVALID_FORMAT("Телефон должен быть в формате +79123456789 (10-15 цифр после +)"),

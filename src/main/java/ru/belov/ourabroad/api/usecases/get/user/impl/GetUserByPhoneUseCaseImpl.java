@@ -26,6 +26,7 @@ public class GetUserByPhoneUseCaseImpl implements GetUserByPhoneUseCase {
         log.info("[userId: {}] Found: {}", request.userId(), user);
 
         if (user == null) {
+            log.warn("[userId: {}] Returning error response", request.userId());
             return errorResponse(context);
         }
         log.info("[userId: {}] Returning success response", request.userId());

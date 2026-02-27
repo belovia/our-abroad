@@ -5,8 +5,10 @@ import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.core.domain.Context;
 
 import static ru.belov.ourabroad.web.validators.ErrorCode.FIELD_REQUIRED;
+import static ru.belov.ourabroad.web.validators.ErrorCode.REQUEST_VALIDATION_ERROR;
 
 @Component
+
 public class SpecialistProfileValidator {
 
     public void validateRequiredField(String field, Context context) {
@@ -15,6 +17,12 @@ public class SpecialistProfileValidator {
         }
         if (!StringUtils.hasText(field)) {
             context.setError(FIELD_REQUIRED);
+        }
+    }
+
+    public void validateRequest(Object request, Context context) {
+        if (request == null) {
+            context.setError(REQUEST_VALIDATION_ERROR);
         }
     }
 
