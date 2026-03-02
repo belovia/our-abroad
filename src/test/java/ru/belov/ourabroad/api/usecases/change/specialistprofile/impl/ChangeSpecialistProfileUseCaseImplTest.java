@@ -15,7 +15,7 @@ import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.core.domain.SpecialistService;
 import ru.belov.ourabroad.poi.storage.SpecialistProfileRepository;
 import ru.belov.ourabroad.web.validators.ErrorCode;
-import ru.belov.ourabroad.web.validators.SpecialistProfileValidator;
+import ru.belov.ourabroad.web.validators.FieldValidator;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 @ContextConfiguration(
         classes = {
                 ChangeSpecialistProfileUseCaseImpl.class,
-                SpecialistProfileValidator.class
+                FieldValidator.class
         }
 )
 class ChangeSpecialistProfileUseCaseImplTest {
