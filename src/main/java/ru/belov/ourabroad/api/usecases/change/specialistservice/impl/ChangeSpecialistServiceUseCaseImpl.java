@@ -7,7 +7,7 @@ import ru.belov.ourabroad.api.usecases.change.specialistservice.ChangeSpecialist
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistService;
 import ru.belov.ourabroad.poi.storage.SpecialistServiceRepository;
-import ru.belov.ourabroad.web.validators.SpecialistServiceValidator;
+import ru.belov.ourabroad.web.validators.FieldValidator;
 
 import java.util.Optional;
 
@@ -20,7 +20,7 @@ import static ru.belov.ourabroad.web.validators.ErrorCode.SPECIALIST_SERVICE_NOT
 public class ChangeSpecialistServiceUseCaseImpl implements ChangeSpecialistServiceUseCase {
 
     private final SpecialistServiceRepository repository;
-    private final SpecialistServiceValidator validator;
+    private final FieldValidator validator;
 
     @Override
     public Response execute(Request request) {

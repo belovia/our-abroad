@@ -7,7 +7,7 @@ import ru.belov.ourabroad.api.usecases.change.specialistprofile.ChangeSpecialist
 import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
-import ru.belov.ourabroad.web.validators.SpecialistProfileValidator;
+import ru.belov.ourabroad.web.validators.FieldValidator;
 
 import static ru.belov.ourabroad.web.validators.ErrorCode.DB_ERROR;
 
@@ -17,7 +17,7 @@ import static ru.belov.ourabroad.web.validators.ErrorCode.DB_ERROR;
 public class ChangeSpecialistProfileUseCaseImpl implements ChangeSpecialistProfileUseCase {
 
     private final SpecialistProfileService service;
-    private final SpecialistProfileValidator validator;
+    private final FieldValidator validator;
 
     @Override
     public Response execute(Request request) {

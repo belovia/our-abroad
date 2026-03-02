@@ -9,7 +9,7 @@ import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProf
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.core.domain.SpecialistService;
-import ru.belov.ourabroad.web.validators.SpecialistProfileValidator;
+import ru.belov.ourabroad.web.validators.FieldValidator;
 
 import java.util.Set;
 
@@ -21,7 +21,7 @@ public class GetSpecialistProfileByIdUseCaseImpl
 
     private final SpecialistProfileService service;
     private final GetSpecialistServiceUseCase getServiceUseCase;
-    private final SpecialistProfileValidator validator;
+    private final FieldValidator validator;
 
     @Override
     public Response execute(Request request) {
