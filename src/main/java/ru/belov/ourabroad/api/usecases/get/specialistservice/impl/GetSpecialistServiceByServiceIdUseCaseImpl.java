@@ -3,10 +3,12 @@ package ru.belov.ourabroad.api.usecases.get.specialistservice.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.belov.ourabroad.api.usecases.get.specialistservice.GetSpecialistServiceUseCase;
+import ru.belov.ourabroad.api.usecases.get.specialistservice.GetSpecialistServiceByServiceIdUseCase;
+import ru.belov.ourabroad.api.usecases.services.specialistservice.GetSpecialistServiceService;
+import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistService;
-import ru.belov.ourabroad.poi.storage.SpecialistServiceRepository;
 import ru.belov.ourabroad.poi.storage.exceptions.SpecialistServiceNotFoundException;
+import ru.belov.ourabroad.web.validators.FieldValidator;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -14,10 +16,12 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class GetSpecialistServiceUseCaseImpl
-        implements GetSpecialistServiceUseCase {
+public class GetSpecialistServiceByServiceIdUseCaseImpl
+        implements GetSpecialistServiceByServiceIdUseCase {
 
-    private final SpecialistServiceRepository repository;
+
+    private final FieldValidator validator;
+    private final GetSpecialistServiceService service;
 
     @Override
     public Set<SpecialistService> getBySpecialist(String specialistProfileId) {
@@ -36,9 +40,17 @@ public class GetSpecialistServiceUseCaseImpl
 
 
     @Override
-    public SpecialistService getById(String serviceId) {
+    public Response execute(Request request) {
+
+        Context context = new Context();
+        String serviceId = request.serviceId();
 
         log.info("[serviceId: {}] Start get service by id", serviceId);
+
+        validator.validateRequiredField(
+                serviceId, context
+        );
+
 
         SpecialistService service = repository.findById(serviceId)
                 .orElseThrow(() -> {

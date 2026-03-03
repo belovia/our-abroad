@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.belov.ourabroad.api.usecases.get.specialistprofile.GetSpecialistProfileByUserIdUseCase;
-import ru.belov.ourabroad.api.usecases.get.specialistservice.GetSpecialistServiceUseCase;
+import ru.belov.ourabroad.api.usecases.get.specialistservice.GetSpecialistServiceByServiceIdUseCase;
 import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
@@ -19,7 +19,7 @@ import java.util.Set;
 public class GetSpecialistProfileByUserIdUseCaseImpl implements GetSpecialistProfileByUserIdUseCase {
 
     private final SpecialistProfileService service;
-    private final GetSpecialistServiceUseCase getServiceUseCase;
+    private final GetSpecialistServiceByServiceIdUseCase getServiceUseCase;
     private final FieldValidator validator;
 
     @Override
