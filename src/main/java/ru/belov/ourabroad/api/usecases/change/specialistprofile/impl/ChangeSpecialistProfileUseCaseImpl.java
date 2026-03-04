@@ -40,7 +40,7 @@ public class ChangeSpecialistProfileUseCaseImpl implements ChangeSpecialistProfi
 
 
     protected void validateRequiredFields(Request request, Context context) {
-        log.info("[profileId: {}] validate required fields", request.profileId());
+        log.info("Validating request");
         validator.validateRequiredField(request.profileId(), context);
         validator.validateRequiredField(request.description(), context);
         if (context.isSuccess()) {

@@ -8,5 +8,5 @@ import java.util.Set;
 public interface GetSpecialistServiceService {
 
     SpecialistService findById(String serviceId, Context context);
-    Set<SpecialistService> findAllById(String specialistProfileId);
+    Set<SpecialistService> findAllById(String specialistProfileId, Context context);
 }

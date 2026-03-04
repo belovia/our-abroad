@@ -33,13 +33,20 @@ public class GetSpecialistServiceServiceImpl implements GetSpecialistServiceServ
             return null;
         }
         SpecialistService specialistService = fromDbOpt.get();
-        log.info("[specialistProfileId: {}] Found: {}", serviceId, specialistService);
+        log.info("[serviceId: {}] Found: {}", serviceId, specialistService);
 
         return specialistService;
     }
 
     @Override
-    public Set<SpecialistService> findAllById(String specialistProfileId) {
-        return Set.of();
+    public Set<SpecialistService> findAllById(String specialistProfileId, Context context) {
+        if (!context.isSuccess()) {
+            return Set.of();
+        }
+        log.info("[specialistProfileId: {}] Try to find specialistService by specialistProfileId", specialistProfileId);
+
+        Set<SpecialistService> services = repository.findBySpecialistProfileId(specialistProfileId);
+        log.info("[specialistProfileId: {}] Found services size: {}", specialistProfileId, services.size());
+        return services;
     }
 }
