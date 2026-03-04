@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.belov.ourabroad.api.usecases.get.specialistprofile.GetSpecialistProfileByUserIdUseCase;
 import ru.belov.ourabroad.api.usecases.get.specialistservice.GetSpecialistServiceByServiceIdUseCase;
 import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
+import ru.belov.ourabroad.api.usecases.get.specialistservice.GetServicesByProfileIdUseCase;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.core.domain.SpecialistService;
@@ -19,7 +20,8 @@ import java.util.Set;
 public class GetSpecialistProfileByUserIdUseCaseImpl implements GetSpecialistProfileByUserIdUseCase {
 
     private final SpecialistProfileService service;
-    private final GetSpecialistServiceByServiceIdUseCase getServiceUseCase;
+    private final GetSpecialistServiceByServiceIdUseCase getServiceByIdUsecase;
+    private final GetServicesByProfileIdUseCase getSpecialistServicesUsecase;
     private final FieldValidator validator;
 
     @Override
@@ -63,13 +65,19 @@ public class GetSpecialistProfileByUserIdUseCaseImpl implements GetSpecialistPro
     protected void loadServices(SpecialistProfile profile) {
         log.info("[userId: {}] Loading services", profile.getUserId());
 
-        Set<SpecialistService> services =
-                getServiceUseCase.getBySpecialist(profile.getId());
+        var request = prepareRequestForServices(profile.getId());
+
+        Set<SpecialistService> services
+                = getSpecialistServices(request);
 
         profile.setServices(services);
 
         log.info("[userId: {}] Services loaded, count: {}",
                 profile.getId(), services.size());
+    }
+
+    private Set<SpecialistService> getSpecialistServices(GetServicesByProfileIdUseCase.Request request) {
+        return getSpecialistServicesUsecase.execute(request).services();
     }
 
     protected Response errorResponse(Context context) {
@@ -78,6 +86,10 @@ public class GetSpecialistProfileByUserIdUseCaseImpl implements GetSpecialistPro
 
     protected Response successResponse(SpecialistProfile specialistProfile, Context context) {
         return new Response(specialistProfile, context.isSuccess(), null);
+    }
+
+    private GetServicesByProfileIdUseCase.Request prepareRequestForServices(String specialistProfileId) {
+        return new GetServicesByProfileIdUseCase.Request(specialistProfileId);
     }
 }
 

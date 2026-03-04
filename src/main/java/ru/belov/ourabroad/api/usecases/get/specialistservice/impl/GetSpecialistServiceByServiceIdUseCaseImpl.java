@@ -7,11 +7,7 @@ import ru.belov.ourabroad.api.usecases.get.specialistservice.GetSpecialistServic
 import ru.belov.ourabroad.api.usecases.services.specialistservice.GetSpecialistServiceService;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistService;
-import ru.belov.ourabroad.poi.storage.exceptions.SpecialistServiceNotFoundException;
 import ru.belov.ourabroad.web.validators.FieldValidator;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -23,43 +19,50 @@ public class GetSpecialistServiceByServiceIdUseCaseImpl
     private final FieldValidator validator;
     private final GetSpecialistServiceService service;
 
-    @Override
-    public Set<SpecialistService> getBySpecialist(String specialistProfileId) {
-
-        log.info("[profileId: {}] Start get services by specialist", specialistProfileId);
-
-        Set<SpecialistService> services = new HashSet<>(
-                repository.findBySpecialistProfileId(specialistProfileId)
-        );
-
-        log.info("[profileId: {}] Services loaded, count={}",
-                specialistProfileId, services.size());
-
-        return services;
-    }
-
 
     @Override
     public Response execute(Request request) {
 
         Context context = new Context();
+        validateRequest(request, context);
         String serviceId = request.serviceId();
 
         log.info("[serviceId: {}] Start get service by id", serviceId);
 
-        validator.validateRequiredField(
-                serviceId, context
-        );
+        SpecialistService specialistService = findById(serviceId, context);
+        log.info("[serviceId: {}] Service found", specialistService);
 
+        if (!context.isSuccess()) {
+            log.warn("[serviceId: {}] Returning error response", serviceId);
+            return errorResponse(context);
+        }
+        log.info("[serviceId: {}] Returning success response", serviceId);
+        return successResponse(specialistService, context);
+    }
 
-        SpecialistService service = repository.findById(serviceId)
-                .orElseThrow(() -> {
-                    log.info("[serviceId: {}] Service not found", serviceId);
-                    return new SpecialistServiceNotFoundException(serviceId);
-                });
+    private SpecialistService findById(String serviceId, Context context) {
+        if (!context.isSuccess()) {
+            return null;
+        }
+        return service.findById(serviceId, context);
+    }
 
-        log.info("[serviceId: {}] Service loaded", serviceId);
-        return service;
+    protected void validateRequest(Request request, Context context) {
+        log.info("Validating request");
+        validator.validateRequiredField(request.serviceId(), context);
+        if (context.isSuccess()) {
+            log.info("Validation success");
+        } else {
+            log.error("Validation failed");
+        }
+    }
+
+    protected Response errorResponse(Context context){
+        return new Response(null, context.isSuccess(), context.getErrorCode().getMessage());
+    }
+
+    protected Response successResponse(SpecialistService specialistService, Context context){
+        return new Response(specialistService, context.isSuccess(), null);
     }
 
 }
