@@ -35,7 +35,7 @@ public class GetServicesByProfileIdServiceImpl implements GetServicesByProfileId
             return errorResponse(context);
         } else {
             log.info("[specialistProfileId: {}] Returning success response", specialistProfileId);
-            return successResponse(services, context);
+            return successResponse(services);
         }
     }
 
@@ -59,10 +59,10 @@ public class GetServicesByProfileIdServiceImpl implements GetServicesByProfileId
     }
 
     protected Response errorResponse(Context context) {
-        return new Response(null, context.isSuccess(), context.getErrorCode().getMessage());
+        return new Response(null, false, context.getErrorCode().getMessage());
     }
 
-    protected Response successResponse(Set<SpecialistService> services, Context context) {
-        return new Response(services, context.isSuccess(), null);
+    protected Response successResponse(Set<SpecialistService> services) {
+        return new Response(services, true, null);
     }
 }

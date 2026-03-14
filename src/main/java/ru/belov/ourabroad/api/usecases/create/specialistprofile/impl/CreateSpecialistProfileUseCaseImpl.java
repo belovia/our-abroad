@@ -27,13 +27,14 @@ public class CreateSpecialistProfileUseCaseImpl
         log.info("[userId: {}] Start to create specialistProfileId", userId);
 
         validate(userId, context);
-
-        SpecialistProfile profile = makeSpecialistProfile(request, userId, context);
-
-        createSpecialistProfile(profile, context);
         if (!context.isSuccess()) {
+            log.info("[userId: {}] Validation failed", userId);
             return errorResponse(userId, context);
         }
+
+        SpecialistProfile profile = makeSpecialistProfile(request, userId);
+
+        createSpecialistProfile(profile);
 
         log.info("[userId: {}] specialist profile created", userId);
 
@@ -47,28 +48,22 @@ public class CreateSpecialistProfileUseCaseImpl
         if (!StringUtils.hasText(userId)) {
             log.info("Validation failed");
             context.setError(USER_ID_REQUIRED);
+            return;
         }
         log.info("[userId: {}] Validating success", userId);
     }
 
-    protected SpecialistProfile makeSpecialistProfile(Request request, String userId, Context context) {
-        if (!context.isSuccess()) {
-            log.error("[userId: {}] Error while creating specialistProfile", userId);
-            return null;
-        }
+    protected SpecialistProfile makeSpecialistProfile(Request request, String userId) {
         return SpecialistProfileFactory.create(userId, request.description());
     }
 
-    protected void createSpecialistProfile(SpecialistProfile profile, Context context) {
-        if (!context.isSuccess()) {
-            return;
-        }
+    protected void createSpecialistProfile(SpecialistProfile profile) {
         profileRepository.save(profile);
     }
 
     protected Response errorResponse(String userId, Context context) {
         log.error("[userId: {}] Returning error response", userId);
-        return new Response(userId, context.isSuccess(), context.getErrorCode().getMessage());
+        return new Response(userId, false, context.getErrorCode().getMessage());
     }
 
     protected Response successResponse(String userId) {

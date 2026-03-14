@@ -13,6 +13,7 @@ import static ru.belov.ourabroad.web.validators.ErrorCode.USER_NOT_FOUND;
 @RequiredArgsConstructor
 @Slf4j
 public class AbstractUserUseCase {
+    
     protected final UserRepository userRepository;
 
     protected User findExistsUser(String userId, Context context) {

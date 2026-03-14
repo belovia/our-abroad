@@ -29,11 +29,16 @@
         <spring-cloud.version>2024.0.0</spring-cloud.version>
 
         <!-- Library versions -->
-        <lombok.version>1.18.36</lombok.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- Spring Boot Web (для контроллеров) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -68,12 +73,12 @@
 
 
         <!-- Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-            <scope>provided</scope>
-        </dependency>
+<dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <version>1.18.34</version>
+    <scope>provided</scope>
+</dependency>
 
 
         <!-- Валидация -->
