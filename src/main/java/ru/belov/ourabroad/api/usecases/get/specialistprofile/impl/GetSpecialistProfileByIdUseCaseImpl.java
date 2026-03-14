@@ -26,23 +26,25 @@ public class GetSpecialistProfileByIdUseCaseImpl
     @Override
     public Response execute(Request request) {
         Context context = new Context();
-        validateRequest(request, context);
-
         String specialistProfileId = request.specialistProfileId();
-        log.info("[specialistProfileId: {}] Start get specialist profile by userId", specialistProfileId);
+        log.info("[specialistProfileId: {}] Start get specialist profile by id", specialistProfileId);
 
-        SpecialistProfile fromDb = retrieveSpecialistProfile(specialistProfileId, context);
+        validateRequest(request, context);
         if (!context.isSuccess()) {
-            log.info("[specialistProfileId: {}] Context is failed, return error response", specialistProfileId);
+            log.info("[specialistProfileId: {}] Validation failed", specialistProfileId);
             return errorResponse(context);
         }
 
-        loadServices(fromDb);
+        SpecialistProfile profile = retrieveSpecialistProfile(specialistProfileId, context);
+        if (!context.isSuccess() || profile == null) {
+            log.info("[specialistProfileId: {}] Failed to retrieve specialist profile", specialistProfileId);
+            return errorResponse(context);
+        }
 
-        log.info("[specialistProfileId: {}] Specialist profile loaded", specialistProfileId);
-        log.info("[specialistProfileId: {}] Return success response", specialistProfileId);
+        loadServices(profile);
 
-        return successResponse(fromDb, context);
+        log.info("[specialistProfileId: {}] Specialist profile loaded successfully", specialistProfileId);
+        return successResponse(profile);
     }
 
     private SpecialistProfile retrieveSpecialistProfile(String specialistProfileId, Context context) {
@@ -76,11 +78,11 @@ public class GetSpecialistProfileByIdUseCaseImpl
     }
 
     protected Response errorResponse(Context context) {
-        return new Response(null, context.isSuccess(), context.getErrorCode().getMessage());
+        return new Response(null, false, context.getErrorCode().getMessage());
     }
 
-    protected Response successResponse(SpecialistProfile specialistProfile, Context context) {
-        return new Response(specialistProfile, context.isSuccess(), null);
+    protected Response successResponse(SpecialistProfile specialistProfile) {
+        return new Response(specialistProfile, true, null);
     }
 
     private Set<SpecialistService> getSpecialistServices(GetServicesByProfileIdUseCase.Request request) {

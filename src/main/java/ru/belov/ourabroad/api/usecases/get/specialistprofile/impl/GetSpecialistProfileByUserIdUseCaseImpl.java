@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.belov.ourabroad.api.usecases.get.specialistprofile.GetSpecialistProfileByUserIdUseCase;
-import ru.belov.ourabroad.api.usecases.get.specialistservice.GetSpecialistServiceByServiceIdUseCase;
 import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
 import ru.belov.ourabroad.api.usecases.get.specialistservice.GetServicesByProfileIdUseCase;
 import ru.belov.ourabroad.core.domain.Context;
@@ -20,29 +19,31 @@ import java.util.Set;
 public class GetSpecialistProfileByUserIdUseCaseImpl implements GetSpecialistProfileByUserIdUseCase {
 
     private final SpecialistProfileService service;
-    private final GetSpecialistServiceByServiceIdUseCase getServiceByIdUsecase;
     private final GetServicesByProfileIdUseCase getSpecialistServicesUsecase;
     private final FieldValidator validator;
 
     @Override
     public Response execute(Request request) {
         Context context = new Context();
-        validateRequest(request, context);
-
         String userId = request.userId();
         log.info("[userId: {}] Start get specialist profile by userId", userId);
 
-        SpecialistProfile fromDb = retrieveSpecialistProfile(userId, context);
+        validateRequest(request, context);
         if (!context.isSuccess()) {
-            log.info("[userId: {}] Context is failed, return error response", userId);
+            log.info("[userId: {}] Validation failed", userId);
             return errorResponse(context);
         }
 
-        loadServices(fromDb);
-        log.info("[userId: {}] Specialist profile loaded", userId);
-        log.info("[userId: {}] Return success response", userId);
+        SpecialistProfile profile = retrieveSpecialistProfile(userId, context);
+        if (!context.isSuccess() || profile == null) {
+            log.info("[userId: {}] Failed to retrieve specialist profile", userId);
+            return errorResponse(context);
+        }
 
-        return successResponse(fromDb, context);
+        loadServices(profile);
+
+        log.info("[userId: {}] Specialist profile loaded successfully", userId);
+        return successResponse(profile);
     }
 
 
@@ -81,11 +82,11 @@ public class GetSpecialistProfileByUserIdUseCaseImpl implements GetSpecialistPro
     }
 
     protected Response errorResponse(Context context) {
-        return new Response(null, context.isSuccess(), context.getErrorCode().getMessage());
+        return new Response(null, false, context.getErrorCode().getMessage());
     }
 
-    protected Response successResponse(SpecialistProfile specialistProfile, Context context) {
-        return new Response(specialistProfile, context.isSuccess(), null);
+    protected Response successResponse(SpecialistProfile specialistProfile) {
+        return new Response(specialistProfile, true, null);
     }
 
     private GetServicesByProfileIdUseCase.Request prepareRequestForServices(String specialistProfileId) {

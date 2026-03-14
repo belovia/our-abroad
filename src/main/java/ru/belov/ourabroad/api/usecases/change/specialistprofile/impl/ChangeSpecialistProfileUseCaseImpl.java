@@ -22,13 +22,18 @@ public class ChangeSpecialistProfileUseCaseImpl implements ChangeSpecialistProfi
     @Override
     public Response execute(Request request) {
         Context context = new Context();
-        validateRequiredFields(request, context);
-
         String profileId = request.profileId();
+        log.info("[profileId: {}] Start change specialist profile", profileId);
+
+        validateRequiredFields(request, context);
+        if (!context.isSuccess()) {
+            log.info("[profileId: {}] Validation failed", profileId);
+            return errorResponse(profileId, context);
+        }
 
         SpecialistProfile fromDb = retrieveSpecialistProfile(profileId, context);
-
-        if (!context.isSuccess()) {
+        if (!context.isSuccess() || fromDb == null) {
+            log.info("[profileId: {}] Failed to retrieve specialist profile", profileId);
             return errorResponse(profileId, context);
         }
         log.info("[profileId: {}] Found: {}", profileId, fromDb);
@@ -52,17 +57,13 @@ public class ChangeSpecialistProfileUseCaseImpl implements ChangeSpecialistProfi
 
     protected SpecialistProfile retrieveSpecialistProfile(String profileId, Context context) {
         log.info("[profileId: {}] Try to find specialistProfile by id", profileId);
-        if (!context.isSuccess()) {
-            log.warn("[profileId: {}] Context is failed", profileId);
-            return null;
-        }
         return service.findById(profileId, context);
     }
 
     protected Response updateAndReturnResponse(SpecialistProfile fromDb, String profileId, Context context) {
         try {
             service.update(fromDb);
-            return successResponse(profileId, context);
+            return successResponse(profileId);
         } catch (Exception e) {
             log.error("[profileId: {}] Error while updating specialistProfile", profileId);
             context.setError(DB_ERROR);
@@ -71,10 +72,10 @@ public class ChangeSpecialistProfileUseCaseImpl implements ChangeSpecialistProfi
     }
 
     protected Response errorResponse(String profileId, Context context) {
-        return new Response(profileId, context.isSuccess(), context.getErrorCode().getMessage());
+        return new Response(profileId, false, context.getErrorCode().getMessage());
     }
 
-    protected Response successResponse(String profileId, Context context) {
-        return new Response(profileId, context.isSuccess(), null);
+    protected Response successResponse(String profileId) {
+        return new Response(profileId, true, null);
     }
 }

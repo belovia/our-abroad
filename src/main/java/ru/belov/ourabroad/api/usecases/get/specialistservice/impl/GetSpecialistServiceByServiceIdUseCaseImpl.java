@@ -37,7 +37,7 @@ public class GetSpecialistServiceByServiceIdUseCaseImpl
             return errorResponse(context);
         }
         log.info("[serviceId: {}] Returning success response", serviceId);
-        return successResponse(specialistService, context);
+        return successResponse(specialistService);
     }
 
     private SpecialistService findById(String serviceId, Context context) {
@@ -58,11 +58,11 @@ public class GetSpecialistServiceByServiceIdUseCaseImpl
     }
 
     protected Response errorResponse(Context context){
-        return new Response(null, context.isSuccess(), context.getErrorCode().getMessage());
+        return new Response(null, false, context.getErrorCode().getMessage());
     }
 
-    protected Response successResponse(SpecialistService specialistService, Context context){
-        return new Response(specialistService, context.isSuccess(), null);
+    protected Response successResponse(SpecialistService specialistService){
+        return new Response(specialistService, true, null);
     }
 
 }
