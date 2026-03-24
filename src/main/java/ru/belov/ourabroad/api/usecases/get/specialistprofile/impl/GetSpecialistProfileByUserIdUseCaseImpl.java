@@ -59,8 +59,8 @@ public class GetSpecialistProfileByUserIdUseCaseImpl implements GetSpecialistPro
     }
 
     private SpecialistProfile retrieveSpecialistProfile(String userId, Context context) {
-        log.info("[userId: {}] Try to find specialistProfile by id", userId);
-        return service.findById(userId, context);
+        log.info("[userId: {}] Try to find specialistProfile by userId", userId);
+        return service.findByUserId(userId, context);
     }
 
     protected void loadServices(SpecialistProfile profile) {

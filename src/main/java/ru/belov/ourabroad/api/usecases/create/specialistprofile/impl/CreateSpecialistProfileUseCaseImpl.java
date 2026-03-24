@@ -5,20 +5,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.create.specialistprofile.CreateSpecialistProfileUseCase;
+import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.core.domain.SpecialistProfileFactory;
-import ru.belov.ourabroad.poi.storage.SpecialistProfileRepository;
 
-import static ru.belov.ourabroad.web.validators.ErrorCode.*;
+import static ru.belov.ourabroad.web.validators.ErrorCode.USER_ID_REQUIRED;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CreateSpecialistProfileUseCaseImpl
-        implements CreateSpecialistProfileUseCase {
+public class CreateSpecialistProfileUseCaseImpl implements CreateSpecialistProfileUseCase {
 
-    private final SpecialistProfileRepository profileRepository;
+    private final SpecialistProfileService profileService;
 
     @Override
     public Response execute(Request request) {
@@ -34,13 +33,11 @@ public class CreateSpecialistProfileUseCaseImpl
 
         SpecialistProfile profile = makeSpecialistProfile(request, userId);
 
-        createSpecialistProfile(profile);
+        createSpecialistProfile(profile, context);
 
         log.info("[userId: {}] specialist profile created", userId);
-
         return successResponse(userId);
     }
-
 
     private void validate(String userId, Context context) {
         log.info("Validating inputID");
@@ -57,8 +54,8 @@ public class CreateSpecialistProfileUseCaseImpl
         return SpecialistProfileFactory.create(userId, request.description());
     }
 
-    protected void createSpecialistProfile(SpecialistProfile profile) {
-        profileRepository.save(profile);
+    protected void createSpecialistProfile(SpecialistProfile profile, Context context) {
+        profileService.save(profile, context);
     }
 
     protected Response errorResponse(String userId, Context context) {

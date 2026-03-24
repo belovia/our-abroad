@@ -4,10 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.belov.ourabroad.api.usecases.AbstractUserUseCase;
+import ru.belov.ourabroad.api.usecases.services.user.UserService;
 import ru.belov.ourabroad.api.usecases.update.UserUpdateUsecase;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
-import ru.belov.ourabroad.poi.storage.UserRepository;
 import ru.belov.ourabroad.web.dto.update.UpdateUserRequest;
 import ru.belov.ourabroad.web.validators.UserValidator;
 
@@ -19,10 +19,10 @@ public class UserUpdateUseCaseImpl extends AbstractUserUseCase implements UserUp
     private final UserValidator userValidator;
 
     public UserUpdateUseCaseImpl(
-            UserRepository userRepository,
+            UserService userService,
             UserValidator userValidator
     ) {
-        super(userRepository);
+        super(userService);
         this.userValidator = userValidator;
     }
 
@@ -37,14 +37,14 @@ public class UserUpdateUseCaseImpl extends AbstractUserUseCase implements UserUp
 
         prepareUserToUpdate(request, user, userId);
 
-        updateUser(user, userId, context);
+        persistUser(user, userId, context);
     }
 
-    private void updateUser(User user, String userId, Context context) {
+    private void persistUser(User user, String userId, Context context) {
         if (!context.isSuccess()) {
             return;
         }
-        userRepository.save(user);
+        userService.update(user, context);
     }
 
     private void validateInputFields(UpdateUserRequest request, Context context) {

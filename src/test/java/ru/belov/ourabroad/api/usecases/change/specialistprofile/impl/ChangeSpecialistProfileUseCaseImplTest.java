@@ -13,7 +13,6 @@ import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProf
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.core.domain.SpecialistService;
-import ru.belov.ourabroad.poi.storage.SpecialistProfileRepository;
 import ru.belov.ourabroad.web.validators.ErrorCode;
 import ru.belov.ourabroad.web.validators.FieldValidator;
 
@@ -36,16 +35,10 @@ import static org.mockito.Mockito.*;
 class ChangeSpecialistProfileUseCaseImplTest {
 
     @MockitoBean
-    private SpecialistProfileRepository repository;
-
-    @MockitoBean
     private SpecialistProfileService service;
 
     @Autowired
     private ChangeSpecialistProfileUseCaseImpl usecase;
-
-    @Captor
-    private ArgumentCaptor<Context> contextCaptor;
 
     @Captor
     private ArgumentCaptor<SpecialistProfile> profileCaptor;
@@ -59,7 +52,6 @@ class ChangeSpecialistProfileUseCaseImplTest {
     void contextCreated() {
         assertNotNull(usecase);
         assertNotNull(service);
-        assertNotNull(repository);
     }
 
     @Test
@@ -70,7 +62,7 @@ class ChangeSpecialistProfileUseCaseImplTest {
 
         when(service.findById(eq(PROFILE_ID), any(Context.class)))
                 .thenReturn(existingProfile);
-        doNothing().when(service).update(any(SpecialistProfile.class));
+        doNothing().when(service).update(any(SpecialistProfile.class), any(Context.class));
 
         // Action
         ChangeSpecialistProfileUseCase.Response response = usecase.execute(request);
@@ -81,7 +73,7 @@ class ChangeSpecialistProfileUseCaseImplTest {
         assertThat(response.message()).isNull();
 
         verify(service).findById(eq(PROFILE_ID), any(Context.class));
-        verify(service).update(profileCaptor.capture());
+        verify(service).update(profileCaptor.capture(), any(Context.class));
 
         SpecialistProfile updatedProfile = profileCaptor.getValue();
         assertThat(updatedProfile.getDescription()).isEqualTo(DESCRIPTION);
@@ -92,7 +84,7 @@ class ChangeSpecialistProfileUseCaseImplTest {
     void WHEN_execute_nullProfileId_THEN_returnValidationError() {
         // Arrange
         ChangeSpecialistProfileUseCase.Request request = new ChangeSpecialistProfileUseCase.Request(
-                null, // profileId is null
+                null,
                 DESCRIPTION,
                 new HashSet<>()
         );
@@ -105,9 +97,8 @@ class ChangeSpecialistProfileUseCaseImplTest {
         assertThat(response.profileId()).isNull();
         assertThat(response.message()).isEqualTo(ErrorCode.FIELD_REQUIRED.getMessage());
 
-
         verify(service, never()).findById(anyString(), any(Context.class));
-        verify(service, never()).update(any(SpecialistProfile.class));
+        verify(service, never()).update(any(SpecialistProfile.class), any(Context.class));
     }
 
     @Test
@@ -115,7 +106,7 @@ class ChangeSpecialistProfileUseCaseImplTest {
         // Arrange
         ChangeSpecialistProfileUseCase.Request request = new ChangeSpecialistProfileUseCase.Request(
                 PROFILE_ID,
-                null, // description is null
+                null,
                 new HashSet<>()
         );
 
@@ -128,7 +119,7 @@ class ChangeSpecialistProfileUseCaseImplTest {
         assertThat(response.message()).isEqualTo(ErrorCode.FIELD_REQUIRED.getMessage());
 
         verify(service, never()).findById(anyString(), any(Context.class));
-        verify(service, never()).update(any(SpecialistProfile.class));
+        verify(service, never()).update(any(SpecialistProfile.class), any(Context.class));
     }
 
     @Test
@@ -152,7 +143,7 @@ class ChangeSpecialistProfileUseCaseImplTest {
         assertThat(response.message()).isEqualTo(ErrorCode.SPECIALIST_PROFILE_NOT_FOUND.getMessage());
 
         verify(service).findById(eq(PROFILE_ID), any(Context.class));
-        verify(service, never()).update(any(SpecialistProfile.class));
+        verify(service, never()).update(any(SpecialistProfile.class), any(Context.class));
     }
 
     @Test
@@ -164,7 +155,7 @@ class ChangeSpecialistProfileUseCaseImplTest {
         when(service.findById(eq(PROFILE_ID), any(Context.class)))
                 .thenReturn(existingProfile);
         doThrow(new RuntimeException("Database error"))
-                .when(service).update(any(SpecialistProfile.class));
+                .when(service).update(any(SpecialistProfile.class), any(Context.class));
 
         // Action
         ChangeSpecialistProfileUseCase.Response response = usecase.execute(request);
@@ -175,7 +166,7 @@ class ChangeSpecialistProfileUseCaseImplTest {
         assertThat(response.message()).isEqualTo(ErrorCode.DB_ERROR.getMessage());
 
         verify(service).findById(eq(PROFILE_ID), any(Context.class));
-        verify(service).update(any(SpecialistProfile.class));
+        verify(service).update(any(SpecialistProfile.class), any(Context.class));
     }
 
     @Test
@@ -183,7 +174,7 @@ class ChangeSpecialistProfileUseCaseImplTest {
         // Arrange
         ChangeSpecialistProfileUseCase.Request request = new ChangeSpecialistProfileUseCase.Request(
                 PROFILE_ID,
-                "   ", // blank description
+                "   ",
                 new HashSet<>()
         );
 
@@ -191,7 +182,7 @@ class ChangeSpecialistProfileUseCaseImplTest {
 
         when(service.findById(eq(PROFILE_ID), any(Context.class)))
                 .thenReturn(existingProfile);
-        doNothing().when(service).update(any(SpecialistProfile.class));
+        doNothing().when(service).update(any(SpecialistProfile.class), any(Context.class));
 
         // Action
         ChangeSpecialistProfileUseCase.Response response = usecase.execute(request);
@@ -222,13 +213,13 @@ class ChangeSpecialistProfileUseCaseImplTest {
 
         when(service.findById(eq(PROFILE_ID), any(Context.class)))
                 .thenReturn(existingProfile);
-        doNothing().when(service).update(any(SpecialistProfile.class));
+        doNothing().when(service).update(any(SpecialistProfile.class), any(Context.class));
 
         // Action
         usecase.execute(request);
 
         // Asserts
-        verify(service).update(profileCaptor.capture());
+        verify(service).update(profileCaptor.capture(), any(Context.class));
         SpecialistProfile updatedProfile = profileCaptor.getValue();
 
         assertThat(updatedProfile.getId()).isEqualTo(PROFILE_ID);
@@ -256,7 +247,7 @@ class ChangeSpecialistProfileUseCaseImplTest {
         assertThat(response.success()).isFalse();
 
         verify(service, never()).findById(anyString(), any(Context.class));
-        verify(service, never()).update(any(SpecialistProfile.class));
+        verify(service, never()).update(any(SpecialistProfile.class), any(Context.class));
     }
 
     @Test

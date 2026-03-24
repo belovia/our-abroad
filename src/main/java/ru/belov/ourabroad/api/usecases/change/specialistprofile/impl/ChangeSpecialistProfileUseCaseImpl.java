@@ -62,7 +62,7 @@ public class ChangeSpecialistProfileUseCaseImpl implements ChangeSpecialistProfi
 
     protected Response updateAndReturnResponse(SpecialistProfile fromDb, String profileId, Context context) {
         try {
-            service.update(fromDb);
+            service.update(fromDb, context);
             return successResponse(profileId);
         } catch (Exception e) {
             log.error("[profileId: {}] Error while updating specialistProfile", profileId);

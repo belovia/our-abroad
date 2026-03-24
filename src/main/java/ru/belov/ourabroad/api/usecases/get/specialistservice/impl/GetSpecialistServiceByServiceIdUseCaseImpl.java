@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.belov.ourabroad.api.usecases.get.specialistservice.GetSpecialistServiceByServiceIdUseCase;
-import ru.belov.ourabroad.api.usecases.services.specialistservice.GetSpecialistServiceService;
+import ru.belov.ourabroad.api.usecases.services.specialistservice.SpecialistServiceService;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistService;
 import ru.belov.ourabroad.web.validators.FieldValidator;
@@ -17,33 +17,33 @@ public class GetSpecialistServiceByServiceIdUseCaseImpl
 
 
     private final FieldValidator validator;
-    private final GetSpecialistServiceService service;
+    private final SpecialistServiceService service;
 
 
     @Override
     public Response execute(Request request) {
-
         Context context = new Context();
-        validateRequest(request, context);
         String serviceId = request.serviceId();
-
         log.info("[serviceId: {}] Start get service by id", serviceId);
 
-        SpecialistService specialistService = findById(serviceId, context);
-        log.info("[serviceId: {}] Service found", specialistService);
-
+        validateRequest(request, context);
         if (!context.isSuccess()) {
-            log.warn("[serviceId: {}] Returning error response", serviceId);
+            log.info("[serviceId: {}] Validation failed", serviceId);
             return errorResponse(context);
         }
-        log.info("[serviceId: {}] Returning success response", serviceId);
+
+        SpecialistService specialistService = findById(serviceId, context);
+        if (!context.isSuccess() || specialistService == null) {
+            log.info("[serviceId: {}] Failed to retrieve service", serviceId);
+            return errorResponse(context);
+        }
+
+        log.info("[serviceId: {}] Service loaded successfully", serviceId);
         return successResponse(specialistService);
     }
 
     private SpecialistService findById(String serviceId, Context context) {
-        if (!context.isSuccess()) {
-            return null;
-        }
+        log.info("[serviceId: {}] Try to find service by id", serviceId);
         return service.findById(serviceId, context);
     }
 

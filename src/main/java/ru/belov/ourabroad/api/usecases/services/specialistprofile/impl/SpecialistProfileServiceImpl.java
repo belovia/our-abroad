@@ -7,6 +7,7 @@ import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProf
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.poi.storage.SpecialistProfileRepository;
+import ru.belov.ourabroad.poi.storage.exceptions.SpecialistServiceNotFoundException;
 
 import java.util.Optional;
 
@@ -21,7 +22,6 @@ public class SpecialistProfileServiceImpl implements SpecialistProfileService {
 
     @Override
     public SpecialistProfile findById(String profileId, Context context) {
-
         log.info("[specialistProfileId: {}] Try to find specialistProfile", profileId);
 
         Optional<SpecialistProfile> fromDbOpt = repository.findById(profileId);
@@ -31,15 +31,14 @@ public class SpecialistProfileServiceImpl implements SpecialistProfileService {
             context.setError(SPECIALIST_PROFILE_NOT_FOUND);
             return null;
         }
+
         SpecialistProfile specialistProfile = fromDbOpt.get();
         log.info("[specialistProfileId: {}] Found: {}", profileId, specialistProfile);
-
         return specialistProfile;
     }
 
     @Override
     public SpecialistProfile findByUserId(String userId, Context context) {
-
         log.info("[userId: {}] Try to find specialistProfile", userId);
 
         Optional<SpecialistProfile> fromDbOpt = repository.findByUserId(userId);
@@ -49,14 +48,37 @@ public class SpecialistProfileServiceImpl implements SpecialistProfileService {
             context.setError(SPECIALIST_PROFILE_NOT_FOUND);
             return null;
         }
+
         SpecialistProfile specialistProfile = fromDbOpt.get();
         log.info("[userId: {}] Found: {}", userId, specialistProfile);
-
         return specialistProfile;
     }
 
     @Override
-    public void update(SpecialistProfile specialist) {
-        repository.update(specialist);
+    public void save(SpecialistProfile profile, Context context) {
+        log.info("[userId: {}] Saving specialistProfile", profile.getUserId());
+        repository.save(profile);
+        log.info("[userId: {}] SpecialistProfile saved successfully", profile.getUserId());
+    }
+
+    @Override
+    public void update(SpecialistProfile profile, Context context) {
+        log.info("[specialistProfileId: {}] Updating specialistProfile", profile.getId());
+        repository.update(profile);
+        log.info("[specialistProfileId: {}] SpecialistProfile updated successfully", profile.getId());
+    }
+
+    @Override
+    public void delete(String profileId) {
+        log.info("[specialistProfileId: {}] Deleting specialistProfile", profileId);
+
+        boolean deleted = repository.deleteById(profileId);
+
+        if (!deleted) {
+            log.warn("[specialistProfileId: {}] SpecialistProfile not found for deletion", profileId);
+            throw new SpecialistServiceNotFoundException(profileId);
+        }
+
+        log.info("[specialistProfileId: {}] SpecialistProfile deleted successfully", profileId);
     }
 }
