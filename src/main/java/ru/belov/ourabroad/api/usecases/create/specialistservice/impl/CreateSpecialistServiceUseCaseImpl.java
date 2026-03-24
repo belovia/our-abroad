@@ -21,31 +21,26 @@ public class CreateSpecialistServiceUseCaseImpl
 
     @Override
     public Response execute(Request request) {
-
         Context context = new Context();
         String specialistProfileId = request.specialistProfileId();
+        log.info("[specialistProfileId: {}] Start to create service", specialistProfileId);
 
-
-        log.info("[specialistProfileId: {}] Start to create service",
-                specialistProfileId);
-
-        validateRequest(specialistProfileId, request, context);
-
-        SpecialistService service =
-                makeServiceFromRequest(specialistProfileId, request, context);
-
+        validateRequest(request, context);
         if (!context.isSuccess()) {
+            log.info("[specialistProfileId: {}] Validation failed", specialistProfileId);
             return errorResponse(specialistProfileId, context);
         }
 
+        SpecialistService service = makeServiceFromRequest(specialistProfileId, request);
         saveSpecialistService(specialistProfileId, service);
 
-
-        return successResponse(specialistProfileId, service);
+        log.info("[specialistProfileId: {}] Service created successfully", specialistProfileId);
+        return successResponse(specialistProfileId);
     }
 
-    protected void validateRequest(String specialistProfileId, Request request, Context context) {
-        log.info("[specialistProfileId: {}] Validating requestDto", specialistProfileId);
+    protected void validateRequest(Request request, Context context) {
+        String specialistProfileId = request.specialistProfileId();
+        log.info("[specialistProfileId: {}] Validating request", specialistProfileId);
 
         if (!StringUtils.hasText(request.title())) {
             log.error("[specialistProfileId: {}] Validation failed: title is empty", specialistProfileId);
@@ -53,15 +48,14 @@ public class CreateSpecialistServiceUseCaseImpl
             return;
         }
         if (request.price() == null || request.price() < 0) {
-            log.error("[specialistProfileId: {}] Validation failed price is null or less zero", specialistProfileId);
+            log.error("[specialistProfileId: {}] Validation failed: price is null or negative", specialistProfileId);
             context.setError(ErrorCode.VALIDATION_ERROR);
             return;
         }
-        log.info("[specialistProfileId: {}] Validating success", specialistProfileId);
+        log.info("[specialistProfileId: {}] Validation success", specialistProfileId);
     }
 
-
-    private SpecialistService makeServiceFromRequest(String specialistProfileId, Request request, Context context) {
+    private SpecialistService makeServiceFromRequest(String specialistProfileId, Request request) {
         return SpecialistServiceFactory.create(
                 specialistProfileId,
                 request.title(),
@@ -72,16 +66,16 @@ public class CreateSpecialistServiceUseCaseImpl
     }
 
     private void saveSpecialistService(String specialistProfileId, SpecialistService service) {
-        log.info("[specialistProfileId: {}] Start saving specialistService", specialistProfileId);
+        log.info("[specialistProfileId: {}] Saving specialist service", specialistProfileId);
         repository.save(service);
     }
 
-    protected Response errorResponse(String specialistProfileId, Context ctx) {
+    protected Response errorResponse(String specialistProfileId, Context context) {
         log.error("[specialistProfileId: {}] Returning error response", specialistProfileId);
-        return new Response(specialistProfileId, ctx.isSuccess(), ctx.getErrorCode().getMessage());
+        return new Response(specialistProfileId, false, context.getErrorCode().getMessage());
     }
 
-    protected Response successResponse(String specialistProfileId, SpecialistService service) {
+    protected Response successResponse(String specialistProfileId) {
         log.info("[specialistProfileId: {}] Returning success response", specialistProfileId);
         return new Response(specialistProfileId, true, null);
     }

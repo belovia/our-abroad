@@ -10,11 +10,14 @@ public enum ErrorCode {
     USER_ID_REQUIRED("userId обязателен"),
     USER_NOT_FOUND("Пользователь не найден"),
     SPECIALIST_SERVICE_NOT_FOUND("Услуга не найдена"),
+    SPECIALIST_PROFILE_NOT_FOUND("Специалист не найден"),
     EMAIL_INVALID_FORMAT("Email имеет неверный формат. Пример: user@example.com"),
     EMAIL_ALREADY_EXISTS("Пользователь с таким email уже существует"),
     USER_ALREADY_EXISTS("Пользователь с таким id уже существует"),
     SPECIALIST_ALREADY_EXISTS("Специалист с таким id уже существует"),
     VALIDATION_ERROR("Ошибка валидации поля"),
+    DB_ERROR("Проблема при работе БД"),
+    REQUEST_VALIDATION_ERROR("Ошибка валидации запроса"),
 
     // Телефон ошибки
     PHONE_INVALID_FORMAT("Телефон должен быть в формате +79123456789 (10-15 цифр после +)"),

@@ -5,15 +5,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.belov.ourabroad.api.usecases.delete.specialistprofile.DeleteSpecialistProfileUseCase;
-import ru.belov.ourabroad.poi.storage.SpecialistProfileRepository;
-import ru.belov.ourabroad.poi.storage.exceptions.SpecialistServiceNotFoundException;
+import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class DeleteSpecialistProfileUseCaseImpl implements DeleteSpecialistProfileUseCase {
 
-    private SpecialistProfileRepository repository;
+    private final SpecialistProfileService profileService;
 
     @Override
     public void delete(String specialistProfileId) {
@@ -21,14 +20,9 @@ public class DeleteSpecialistProfileUseCaseImpl implements DeleteSpecialistProfi
             log.error("Input id is null or empty");
             throw new IllegalArgumentException();
         }
-        log.info("[specialistProfileId: {}] Start to delete specialistProfile with ID: {}", specialistProfileId, specialistProfileId);
-        boolean deleted = repository.deleteById(specialistProfileId);
 
-        if (!deleted) {
-            log.error("[specialistProfileId: {}] Exception while deleting specialistProfile", specialistProfileId);
-            throw new SpecialistServiceNotFoundException(specialistProfileId);
-        }
-
+        log.info("[specialistProfileId: {}] Start to delete specialistProfile", specialistProfileId);
+        profileService.delete(specialistProfileId);
         log.info("[specialistProfileId: {}] deleted", specialistProfileId);
     }
 }

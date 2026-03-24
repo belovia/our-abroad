@@ -5,10 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase;
+import ru.belov.ourabroad.api.usecases.services.user.UserService;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.core.domain.UserFactory;
-import ru.belov.ourabroad.poi.storage.UserRepository;
 import ru.belov.ourabroad.web.validators.UserValidator;
 
 import java.util.UUID;
@@ -20,62 +20,66 @@ import static ru.belov.ourabroad.web.validators.ErrorCode.EMAIL_ALREADY_EXISTS;
 @Slf4j
 public class CreateUserUseCaseImpl implements CreateUserUseCase {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final UserValidator userValidator;
 
     @Override
     @Transactional
     public Response execute(Request request) {
-
         Context context = new Context();
+        String userId = UUID.randomUUID().toString();
+        log.info("[userId: {}] Start creating user", userId);
 
         validateRequest(request, context);
+        if (!context.isSuccess()) {
+            log.info("[userId: {}] Validation failed", userId);
+            return errorResponse(context, userId);
+        }
 
-        String userId = UUID.randomUUID().toString();
-        log.info("[userId: {}] Creating user with id: {}",
+        boolean emailAlreadyExists = checkExistEmail(userId, request.email(), context);
+        if (emailAlreadyExists) {
+            log.info("[userId: {}] User already exists with email: {}", userId, request.email());
+            context.setError(EMAIL_ALREADY_EXISTS);
+            return errorResponse(context, userId);
+        }
+
+        User user = buildUser(userId, request);
+        userService.save(user, context);
+
+        log.info("[userId: {}] User created successfully", userId);
+        return successResponse(userId);
+    }
+
+    private void validateRequest(Request request, Context context) {
+        log.info("Validating request");
+        userValidator.validateCreateUserRequest(request, context);
+        if (context.isSuccess()) {
+            log.info("Validation success");
+        } else {
+            log.error("Validation failed");
+        }
+    }
+
+    private boolean checkExistEmail(String userId, String email, Context context) {
+        log.info("[userId: {}] Checking if email already exists: {}", userId, email);
+        return userService.existsByEmail(userId, email, context);
+    }
+
+    private User buildUser(String userId, Request request) {
+        return UserFactory.newUser(
                 userId,
-                userId);
-
-        String email = request.email();
-
-        User user = UserFactory.newUser(
-                userId,
-                email,
+                request.email(),
                 request.phone(),
                 request.password(),
                 request.telegramUsername(),
                 request.whatsAppNumber(),
                 request.activity()
         );
-
-        boolean userEmailExists = checkExistEmail(userId, email);
-
-        if (userEmailExists) {
-            log.info("[userId: {}] User already exists with email: {}",
-                    userId,
-                    email);
-            context.setError(EMAIL_ALREADY_EXISTS);
-            return errorResponse(context, userId);
-        }
-
-        userRepository.save(user);
-
-        return successResponse(userId);
-    }
-
-
-    private void validateRequest(Request request, Context context) {
-        userValidator.validateCreateUserRequest(request, context);
-    }
-
-    private boolean checkExistEmail(String userId, String email) {
-        log.info("[userId: {}] Checking exist email: {}", userId, email);
-        return userRepository.existsByEmail(userId, email);
     }
 
     protected Response errorResponse(Context context, String userId) {
         log.error("[userId: {}] Returning error response", userId);
-        return new Response(userId, context.isSuccess(), context.getErrorCode().getMessage());
+        return new Response(userId, false, context.getErrorCode().getMessage());
     }
 
     protected Response successResponse(String userId) {
