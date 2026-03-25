@@ -58,7 +58,11 @@ public enum ErrorCode {
     VERIFICATION_TYPE_INVALID("Неверный тип верификации"),
     VERIFICATION_ALREADY_EXISTS("Верификация уже существует"),
     VERIFICATION_NOT_FOUND("Верификация не найдена"),
-    VERIFICATION_NOT_PENDING("Верификация не ожидает подтверждения");
+    VERIFICATION_NOT_PENDING("Верификация не ожидает подтверждения"),
+
+    // Q&A
+    QUESTION_NOT_FOUND("Вопрос не найден"),
+    ANSWER_NOT_FOUND("Ответ не найден");
 
     private final String message;
 

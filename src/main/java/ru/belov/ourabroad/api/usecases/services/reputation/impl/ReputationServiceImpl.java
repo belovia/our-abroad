@@ -47,4 +47,25 @@ public class ReputationServiceImpl implements ReputationService {
         log.info("[userId: {}] Updating reputation", reputation.getUserId());
         repository.update(reputation);
     }
+
+    @Override
+    public void addPoints(String userId, int pointsDelta, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
+        if (pointsDelta == 0) {
+            log.info("[userId: {}] Reputation delta is zero, skip", userId);
+            return;
+        }
+        log.info("[userId: {}] Apply reputation delta {}", userId, pointsDelta);
+        Optional<Reputation> fromDb = repository.findByUserId(userId);
+        if (fromDb.isEmpty()) {
+            log.warn("[userId: {}] Reputation not found for delta", userId);
+            context.setError(REPUTATION_NOT_FOUND);
+            return;
+        }
+        Reputation reputation = fromDb.get();
+        reputation.applyScoreDelta(pointsDelta);
+        repository.update(reputation);
+    }
 }

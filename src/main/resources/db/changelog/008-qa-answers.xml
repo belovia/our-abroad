@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.liquibase.org/xml/ns/dbchangelog
+           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="008-qa-answers-table" author="assistant">
+        <comment>Q&amp;A: ответы (изолированная таблица)</comment>
+        <sql>
+            CREATE TABLE IF NOT EXISTS qa_answers (
+                id VARCHAR(36) PRIMARY KEY,
+                question_id VARCHAR(36) NOT NULL,
+                author_id VARCHAR(36) NOT NULL,
+                content CLOB NOT NULL,
+                votes INTEGER NOT NULL DEFAULT 0,
+                accepted BOOLEAN NOT NULL DEFAULT FALSE,
+                created_at TIMESTAMP NOT NULL
+            );
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

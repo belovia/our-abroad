@@ -12,5 +12,8 @@
     <include file="db/changelog/004-reputation.xml"/>
     <include file="db/changelog/005-verification.xml"/>
     <include file="db/changelog/006-specialist-service.xml"/>
+    <include file="db/changelog/007-qa-questions.xml"/>
+    <include file="db/changelog/008-qa-answers.xml"/>
+    <include file="db/changelog/009-qa-votes.xml"/>
 
 </databaseChangeLog>

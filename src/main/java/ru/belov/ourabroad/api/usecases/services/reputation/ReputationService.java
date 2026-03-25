@@ -12,4 +12,9 @@ public interface ReputationService {
     void save(Reputation reputation, Context context);
 
     void update(Reputation reputation, Context context);
+
+    /**
+     * Начисляет или списывает очки репутации (дельта может быть отрицательной). Ноль — без изменений.
+     */
+    void addPoints(String userId, int pointsDelta, Context context);
 }

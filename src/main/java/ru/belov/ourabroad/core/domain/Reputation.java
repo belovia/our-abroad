@@ -48,4 +48,15 @@ public class Reputation {
         int computed = 1 + score / 100;
         return Math.min(10, Math.max(1, computed));
     }
+
+    /**
+     * Изменяет счёт на произвольную дельту (например отмена upvote). Счёт не уходит ниже нуля.
+     */
+    public void applyScoreDelta(int delta) {
+        this.score += delta;
+        if (this.score < 0) {
+            this.score = 0;
+        }
+        this.level = levelForScore(this.score);
+    }
 }

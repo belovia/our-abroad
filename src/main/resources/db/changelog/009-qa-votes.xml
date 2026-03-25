@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.liquibase.org/xml/ns/dbchangelog
+           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="009-qa-votes-table" author="assistant">
+        <comment>Q&amp;A: голоса пользователей по сущностям (изолированная таблица)</comment>
+        <sql>
+            CREATE TABLE IF NOT EXISTS qa_votes (
+                id VARCHAR(36) PRIMARY KEY,
+                user_id VARCHAR(36) NOT NULL,
+                entity_id VARCHAR(36) NOT NULL,
+                vote_type VARCHAR(10) NOT NULL,
+                CONSTRAINT uq_qa_votes_user_entity UNIQUE (user_id, entity_id)
+            );
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
