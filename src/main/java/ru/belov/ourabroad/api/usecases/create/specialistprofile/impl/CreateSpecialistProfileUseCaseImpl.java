@@ -10,6 +10,7 @@ import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.core.domain.SpecialistProfileFactory;
 
+import static ru.belov.ourabroad.web.validators.ErrorCode.SUCCESS;
 import static ru.belov.ourabroad.web.validators.ErrorCode.USER_ID_REQUIRED;
 
 @Service
@@ -60,11 +61,11 @@ public class CreateSpecialistProfileUseCaseImpl implements CreateSpecialistProfi
 
     protected Response errorResponse(String userId, Context context) {
         log.error("[userId: {}] Returning error response", userId);
-        return new Response(userId, false, context.getErrorCode().getMessage());
+        return new Response(userId, false, context.getErrorMessage());
     }
 
     protected Response successResponse(String userId) {
         log.info("[userId: {}] Returning success response", userId);
-        return new Response(userId, true, null);
+        return new Response(userId, true, SUCCESS.getMessage());
     }
 }

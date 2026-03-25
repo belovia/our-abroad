@@ -60,7 +60,7 @@ class GetServicesByProfileIdServiceImplTest {
 
         // Asserts
         assertThat(response.success()).isTrue();
-        assertThat(response.errorMessage()).isNull();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.SUCCESS.getMessage());
         assertThat(response.services()).hasSize(2);
 
         verify(service).findAllById(eq(PROFILE_ID), any(Context.class));

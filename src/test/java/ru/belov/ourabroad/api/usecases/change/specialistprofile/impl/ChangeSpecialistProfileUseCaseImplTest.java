@@ -70,7 +70,7 @@ class ChangeSpecialistProfileUseCaseImplTest {
         // Asserts
         assertThat(response.success()).isTrue();
         assertThat(response.profileId()).isEqualTo(PROFILE_ID);
-        assertThat(response.message()).isNull();
+        assertThat(response.message()).isEqualTo(ErrorCode.SUCCESS.getMessage());
 
         verify(service).findById(eq(PROFILE_ID), any(Context.class));
         verify(service).update(profileCaptor.capture(), any(Context.class));

@@ -64,4 +64,13 @@ public class Verification {
         this.status = VerificationStatus.VERIFIED;
         this.verifiedAt = LocalDateTime.now();
     }
+
+    public void reject() {
+        this.status = VerificationStatus.REJECTED;
+        this.verifiedAt = LocalDateTime.now();
+    }
+
+    public boolean isPending() {
+        return status == VerificationStatus.PENDING;
+    }
 }

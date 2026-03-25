@@ -55,11 +55,12 @@ public class GetUserByPhoneUseCaseImpl implements GetUserByPhoneUseCase {
     }
 
     private Response errorResponse(Context context) {
-        return new Response(null, context.isSuccess(), context.getErrorCode().getMessage());
+        return new Response(null, context.isSuccess(), context.getErrorMessage());
     }
 
     private Response succesResponse(User foundedUser, Context context) {
-        return new Response(foundedUser, context.isSuccess(), null);
+        context.setSuccessResult();
+        return new Response(foundedUser, context.isSuccess(), context.getErrorMessage());
     }
 
 }
