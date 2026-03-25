@@ -77,11 +77,11 @@ public class ChangeUserPasswordUseCaseImpl extends AbstractUserUseCase implement
 
     private Response errorResponse(Context context, String userId) {
         log.error("[userId: {}] Returning error response", userId);
-        return new Response(userId, false, context.getErrorCode().getMessage());
+        return new Response(userId, false, context.getErrorMessage());
     }
 
     private Response successResponse(String userId) {
         log.info("[userId: {}] Returning success response", userId);
-        return new Response(userId, true, null);
+        return new Response(userId, true, ErrorCode.SUCCESS.getMessage());
     }
 }

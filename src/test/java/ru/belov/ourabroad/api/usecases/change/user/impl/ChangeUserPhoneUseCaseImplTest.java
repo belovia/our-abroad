@@ -66,7 +66,7 @@ class ChangeUserPhoneUseCaseImplTest {
         // Asserts
         assertThat(response.success()).isTrue();
         assertThat(response.userId()).isEqualTo(USER_ID);
-        assertThat(response.message()).isNull();
+        assertThat(response.message()).isEqualTo(ErrorCode.SUCCESS.getMessage());
 
         verify(userService).findById(eq(USER_ID), any(Context.class));
         verify(userService).update(userCaptor.capture(), any(Context.class));

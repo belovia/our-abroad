@@ -68,7 +68,7 @@ class ChangeSpecialistServiceUseCaseImplTest {
         // Asserts
         assertThat(response.success()).isTrue();
         assertThat(response.serviceId()).isEqualTo(SERVICE_ID);
-        assertThat(response.message()).isNull();
+        assertThat(response.message()).isEqualTo(ErrorCode.SUCCESS.getMessage());
 
         verify(specialistServiceService).findById(eq(SERVICE_ID), any(Context.class));
         verify(specialistServiceService).update(serviceCaptor.capture());

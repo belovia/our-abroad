@@ -10,6 +10,7 @@ import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.web.validators.FieldValidator;
 
 import static ru.belov.ourabroad.web.validators.ErrorCode.DB_ERROR;
+import static ru.belov.ourabroad.web.validators.ErrorCode.SUCCESS;
 
 @Service
 @RequiredArgsConstructor
@@ -72,10 +73,10 @@ public class ChangeSpecialistProfileUseCaseImpl implements ChangeSpecialistProfi
     }
 
     protected Response errorResponse(String profileId, Context context) {
-        return new Response(profileId, false, context.getErrorCode().getMessage());
+        return new Response(profileId, false, context.getErrorMessage());
     }
 
     protected Response successResponse(String profileId) {
-        return new Response(profileId, true, null);
+        return new Response(profileId, true, SUCCESS.getMessage());
     }
 }

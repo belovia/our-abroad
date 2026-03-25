@@ -56,7 +56,7 @@ class GetSpecialistServiceByServiceIdUseCaseImplTest {
 
         // Asserts
         assertThat(response.success()).isTrue();
-        assertThat(response.errorMessage()).isNull();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.SUCCESS.getMessage());
         assertThat(response.service()).isNotNull();
         assertThat(response.service().getId()).isEqualTo(SERVICE_ID);
 

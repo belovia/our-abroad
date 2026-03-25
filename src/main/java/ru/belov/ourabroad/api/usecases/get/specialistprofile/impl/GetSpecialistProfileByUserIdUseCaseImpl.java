@@ -9,6 +9,7 @@ import ru.belov.ourabroad.api.usecases.get.specialistservice.GetServicesByProfil
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.core.domain.SpecialistService;
+import ru.belov.ourabroad.web.validators.ErrorCode;
 import ru.belov.ourabroad.web.validators.FieldValidator;
 
 import java.util.Set;
@@ -82,11 +83,11 @@ public class GetSpecialistProfileByUserIdUseCaseImpl implements GetSpecialistPro
     }
 
     protected Response errorResponse(Context context) {
-        return new Response(null, false, context.getErrorCode().getMessage());
+        return new Response(null, false, context.getErrorMessage());
     }
 
     protected Response successResponse(SpecialistProfile specialistProfile) {
-        return new Response(specialistProfile, true, null);
+        return new Response(specialistProfile, true, ErrorCode.SUCCESS.getMessage());
     }
 
     private GetServicesByProfileIdUseCase.Request prepareRequestForServices(String specialistProfileId) {

@@ -56,11 +56,12 @@ public class GetUserByEmailUseCaseImpl implements GetUserByEmailUseCase {
     }
 
     protected Response successResponse(User user, Context context) {
-        return new Response(user, context.isSuccess(), context.getErrorCode().getMessage());
+        context.setSuccessResult();
+        return new Response(user, context.isSuccess(), context.getErrorMessage());
     }
 
     protected Response errorResponse(Context context) {
-        return new Response(null, context.isSuccess(), context.getErrorCode().getMessage());
+        return new Response(null, context.isSuccess(), context.getErrorMessage());
     }
 }
 

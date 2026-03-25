@@ -7,6 +7,7 @@ import ru.belov.ourabroad.api.usecases.get.specialistservice.GetSpecialistServic
 import ru.belov.ourabroad.api.usecases.services.specialistservice.SpecialistServiceService;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistService;
+import ru.belov.ourabroad.web.validators.ErrorCode;
 import ru.belov.ourabroad.web.validators.FieldValidator;
 
 @Service
@@ -58,11 +59,11 @@ public class GetSpecialistServiceByServiceIdUseCaseImpl
     }
 
     protected Response errorResponse(Context context){
-        return new Response(null, false, context.getErrorCode().getMessage());
+        return new Response(null, false, context.getErrorMessage());
     }
 
     protected Response successResponse(SpecialistService specialistService){
-        return new Response(specialistService, true, null);
+        return new Response(specialistService, true, ErrorCode.SUCCESS.getMessage());
     }
 
 }

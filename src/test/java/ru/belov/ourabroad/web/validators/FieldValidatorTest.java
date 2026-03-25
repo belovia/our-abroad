@@ -37,7 +37,7 @@ class FieldValidatorTest {
 
         // Asserts
         assertThat(context.isSuccess()).isTrue();
-        assertThat(context.getErrorCode()).isNull();
+        assertThat(context.getErrorMessage()).isNull();
     }
 
     @ParameterizedTest
@@ -97,7 +97,7 @@ class FieldValidatorTest {
 
         // Asserts
         assertThat(context.isSuccess()).isTrue();
-        assertThat(context.getErrorCode()).isNull();
+        assertThat(context.getErrorMessage()).isNull();
     }
 
     @Test
@@ -156,7 +156,7 @@ class FieldValidatorTest {
 
         // Asserts
         assertThat(context.isSuccess()).isTrue();
-        assertThat(context.getErrorCode()).isNull();
+        assertThat(context.getErrorMessage()).isNull();
     }
 
     @Test
@@ -219,7 +219,7 @@ class FieldValidatorTest {
 
         // Asserts
         assertThat(context.isSuccess()).isTrue();
-        assertThat(context.getErrorCode()).isNull();
+        assertThat(context.getErrorMessage()).isNull();
     }
 
     @Test
@@ -267,7 +267,7 @@ class FieldValidatorTest {
 
         // Asserts
         assertThat(context.isSuccess()).isTrue();
-        assertThat(context.getErrorCode()).isNull();
+        assertThat(context.getErrorMessage()).isNull();
     }
 
     @Test
@@ -281,7 +281,7 @@ class FieldValidatorTest {
 
         // Asserts
         assertThat(context.isSuccess()).isTrue();
-        assertThat(context.getErrorCode()).isNull();
+        assertThat(context.getErrorMessage()).isNull();
     }
 
     @Test
@@ -295,7 +295,7 @@ class FieldValidatorTest {
 
         // Asserts
         assertThat(context.isSuccess()).isTrue();
-        assertThat(context.getErrorCode()).isNull();
+        assertThat(context.getErrorMessage()).isNull();
     }
 
 }
