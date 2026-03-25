@@ -1,0 +1,50 @@
+package ru.belov.ourabroad.poi.storage.impl;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+import ru.belov.ourabroad.core.domain.Vote;
+import ru.belov.ourabroad.poi.storage.VoteRepository;
+import ru.belov.ourabroad.poi.storage.mappers.QaVoteRowMapper;
+import ru.belov.ourabroad.poi.storage.sql.QaVoteSql;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+@Repository
+@RequiredArgsConstructor
+public class VoteRepositoryImpl implements VoteRepository {
+
+    private final NamedParameterJdbcTemplate jdbc;
+    private final QaVoteRowMapper rowMapper;
+
+    @Override
+    public Optional<Vote> findByUserIdAndEntityId(String userId, String entityId) {
+        Map<String, Object> params = Map.of("userId", userId, "entityId", entityId);
+        return jdbc.query(QaVoteSql.FIND_BY_USER_AND_ENTITY, params, rowMapper).stream().findFirst();
+    }
+
+    @Override
+    public void save(Vote vote) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", vote.getId());
+        params.put("userId", vote.getUserId());
+        params.put("entityId", vote.getEntityId());
+        params.put("voteType", vote.getType().name());
+        jdbc.update(QaVoteSql.INSERT, params);
+    }
+
+    @Override
+    public void updateType(Vote vote) {
+        jdbc.update(
+                QaVoteSql.UPDATE_TYPE,
+                Map.of("id", vote.getId(), "voteType", vote.getType().name())
+        );
+    }
+
+    @Override
+    public void deleteById(String voteId) {
+        jdbc.update(QaVoteSql.DELETE_BY_ID, Map.of("id", voteId));
+    }
+}
