@@ -12,4 +12,6 @@ public interface AnswerService {
     List<Answer> findByQuestionId(String questionId, Context context);
 
     Answer findById(String answerId, Context context);
+
+    AcceptAnswerResult acceptAnswer(String answerId, String userId, Context context);
 }

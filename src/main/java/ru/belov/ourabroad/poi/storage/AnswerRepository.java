@@ -13,5 +13,11 @@ public interface AnswerRepository {
 
     List<Answer> findByQuestionId(String questionId);
 
+    Optional<Answer> findAcceptedByQuestionId(String questionId);
+
+    void clearAcceptedByQuestionId(String questionId);
+
+    void setAccepted(String answerId, boolean accepted);
+
     boolean addVoteDelta(String answerId, int delta);
 }

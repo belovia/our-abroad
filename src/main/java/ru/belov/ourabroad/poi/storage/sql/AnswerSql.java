@@ -17,12 +17,31 @@ public final class AnswerSql {
         ORDER BY created_at ASC
         """;
 
+    public static final String FIND_ACCEPTED_BY_QUESTION_ID = """
+        SELECT id, question_id, author_id, content, votes, accepted, created_at
+        FROM qa_answers
+        WHERE question_id = :questionId AND accepted = TRUE
+        LIMIT 1
+        """;
+
     public static final String INSERT = """
         INSERT INTO qa_answers (
             id, question_id, author_id, content, votes, accepted, created_at
         ) VALUES (
             :id, :questionId, :authorId, :content, :votes, :accepted, :createdAt
         )
+        """;
+
+    public static final String CLEAR_ACCEPTED_BY_QUESTION_ID = """
+        UPDATE qa_answers
+        SET accepted = FALSE
+        WHERE question_id = :questionId AND accepted = TRUE
+        """;
+
+    public static final String SET_ACCEPTED = """
+        UPDATE qa_answers
+        SET accepted = :accepted
+        WHERE id = :id
         """;
 
     public static final String ADD_VOTE_DELTA = """
