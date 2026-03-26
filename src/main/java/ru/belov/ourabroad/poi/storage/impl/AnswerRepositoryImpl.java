@@ -45,6 +45,27 @@ public class AnswerRepositoryImpl implements AnswerRepository {
     }
 
     @Override
+    public Optional<Answer> findAcceptedByQuestionId(String questionId) {
+        return jdbc.query(
+                        AnswerSql.FIND_ACCEPTED_BY_QUESTION_ID,
+                        Map.of("questionId", questionId),
+                        rowMapper
+                )
+                .stream()
+                .findFirst();
+    }
+
+    @Override
+    public void clearAcceptedByQuestionId(String questionId) {
+        jdbc.update(AnswerSql.CLEAR_ACCEPTED_BY_QUESTION_ID, Map.of("questionId", questionId));
+    }
+
+    @Override
+    public void setAccepted(String answerId, boolean accepted) {
+        jdbc.update(AnswerSql.SET_ACCEPTED, Map.of("id", answerId, "accepted", accepted));
+    }
+
+    @Override
     public boolean addVoteDelta(String answerId, int delta) {
         return jdbc.update(
                 AnswerSql.ADD_VOTE_DELTA,

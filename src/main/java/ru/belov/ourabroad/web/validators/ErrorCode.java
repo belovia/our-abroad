@@ -62,7 +62,8 @@ public enum ErrorCode {
 
     // Q&A
     QUESTION_NOT_FOUND("Вопрос не найден"),
-    ANSWER_NOT_FOUND("Ответ не найден");
+    ANSWER_NOT_FOUND("Ответ не найден"),
+    PERMISSION_DENIED("Недостаточно прав");
 
     private final String message;
 
