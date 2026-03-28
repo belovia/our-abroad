@@ -10,6 +10,7 @@ import ru.belov.ourabroad.poi.storage.QuestionRepository;
 
 import java.util.Optional;
 
+import static ru.belov.ourabroad.web.validators.ErrorCode.ENTITY_VOTE_UPDATE_FAILED;
 import static ru.belov.ourabroad.web.validators.ErrorCode.QUESTION_NOT_FOUND;
 
 @Component
@@ -44,6 +45,11 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    public Question findByIdOrError(String questionId, Context context) {
+        return null;
+    }
+
+    @Override
     public void incrementAnswersCount(String questionId, Context context) {
         if (!context.isSuccess()) {
             return;
@@ -52,6 +58,18 @@ public class QuestionServiceImpl implements QuestionService {
         if (!questionRepository.incrementAnswersCount(questionId)) {
             log.warn("[questionId: {}] incrementAnswersCount affected no rows", questionId);
             context.setError(QUESTION_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public void applyVoteDelta(String questionId, int delta, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
+        log.info("[questionId: {}] Apply vote delta {}", questionId, delta);
+        if (!questionRepository.addVoteDelta(questionId, delta)) {
+            log.warn("[questionId: {}] addVoteDelta affected no rows", questionId);
+            context.setError(ENTITY_VOTE_UPDATE_FAILED);
         }
     }
 }

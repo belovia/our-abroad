@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static ru.belov.ourabroad.web.validators.ErrorCode.ANSWER_NOT_FOUND;
+import static ru.belov.ourabroad.web.validators.ErrorCode.ENTITY_VOTE_UPDATE_FAILED;
 import static ru.belov.ourabroad.web.validators.ErrorCode.PERMISSION_DENIED;
 import static ru.belov.ourabroad.web.validators.ErrorCode.QUESTION_NOT_FOUND;
 
@@ -57,6 +58,23 @@ public class AnswerServiceImpl implements AnswerService {
             return null;
         }
         return fromDb.get();
+    }
+
+    @Override
+    public Answer findByIdOrError(String answerId, Context context) {
+        return findById(answerId, context);
+    }
+
+    @Override
+    public void applyVoteDelta(String answerId, int delta, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
+        log.info("[answerId: {}] Apply vote delta {}", answerId, delta);
+        if (!answerRepository.addVoteDelta(answerId, delta)) {
+            log.warn("[answerId: {}] addVoteDelta affected no rows", answerId);
+            context.setError(ENTITY_VOTE_UPDATE_FAILED);
+        }
     }
 
     @Override

@@ -13,5 +13,9 @@ public interface AnswerService {
 
     Answer findById(String answerId, Context context);
 
+    Answer findByIdOrError(String answerId, Context context);
+
+    void applyVoteDelta(String answerId, int delta, Context context);
+
     AcceptAnswerResult acceptAnswer(String answerId, String userId, Context context);
 }

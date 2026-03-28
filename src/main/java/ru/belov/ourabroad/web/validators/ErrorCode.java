@@ -63,7 +63,13 @@ public enum ErrorCode {
     // Q&A
     QUESTION_NOT_FOUND("Вопрос не найден"),
     ANSWER_NOT_FOUND("Ответ не найден"),
-    PERMISSION_DENIED("Недостаточно прав");
+    PERMISSION_DENIED("Недостаточно прав"),
+    VOTE_UPDATE_FAILED("Не удалось сохранить голос"),
+    ENTITY_VOTE_UPDATE_FAILED("Не удалось обновить счётчик голосов"),
+
+    // Комментарии
+    COMMENT_NOT_FOUND("Комментарий не найден"),
+    COMMENT_NESTING_TOO_DEEP("Превышена глубина вложенности комментариев");
 
     private final String message;
 
