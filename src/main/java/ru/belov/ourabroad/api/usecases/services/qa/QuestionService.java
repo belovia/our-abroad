@@ -9,5 +9,12 @@ public interface QuestionService {
 
     Question findById(String questionId, Context context);
 
+    /**
+     * Загрузка вопроса для сценариев, где отсутствие записи — ошибка (аналог {@link #findById}).
+     */
+    Question findByIdOrError(String questionId, Context context);
+
     void incrementAnswersCount(String questionId, Context context);
+
+    void applyVoteDelta(String questionId, int delta, Context context);
 }

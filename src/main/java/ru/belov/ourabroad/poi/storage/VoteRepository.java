@@ -8,9 +8,9 @@ public interface VoteRepository {
 
     Optional<Vote> findByUserIdAndEntityId(String userId, String entityId);
 
-    void save(Vote vote);
+    boolean save(Vote vote);
 
-    void updateType(Vote vote);
+    boolean updateType(Vote vote);
 
     void deleteById(String voteId);
 }

@@ -26,21 +26,21 @@ public class VoteRepositoryImpl implements VoteRepository {
     }
 
     @Override
-    public void save(Vote vote) {
+    public boolean save(Vote vote) {
         Map<String, Object> params = new HashMap<>();
         params.put("id", vote.getId());
         params.put("userId", vote.getUserId());
         params.put("entityId", vote.getEntityId());
         params.put("voteType", vote.getType().name());
-        jdbc.update(QaVoteSql.INSERT, params);
+        return jdbc.update(QaVoteSql.INSERT, params) > 0;
     }
 
     @Override
-    public void updateType(Vote vote) {
-        jdbc.update(
+    public boolean updateType(Vote vote) {
+        return jdbc.update(
                 QaVoteSql.UPDATE_TYPE,
                 Map.of("id", vote.getId(), "voteType", vote.getType().name())
-        );
+        ) > 0;
     }
 
     @Override
