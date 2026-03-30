@@ -1,6 +1,7 @@
 package ru.belov.ourabroad.poi.storage.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.belov.ourabroad.core.domain.Answer;
@@ -27,6 +28,7 @@ public class AnswerRepositoryImpl implements AnswerRepository {
         params.put("id", answer.getId());
         params.put("questionId", answer.getQuestionId());
         params.put("authorId", answer.getAuthorId());
+        params.put("specialistProfileId", answer.getSpecialistProfileId());
         params.put("content", answer.getContent());
         params.put("votes", answer.getVotes());
         params.put("accepted", answer.isAccepted());
@@ -42,6 +44,19 @@ public class AnswerRepositoryImpl implements AnswerRepository {
     @Override
     public List<Answer> findByQuestionId(String questionId) {
         return jdbc.query(AnswerSql.FIND_BY_QUESTION_ID, Map.of("questionId", questionId), rowMapper);
+    }
+
+    @Override
+    public List<Answer> findByQuestionIdSorted(String questionId, Pageable pageable) {
+        String sql = AnswerSql.FIND_BY_QUESTION_ID_SORTED;
+        Map<String, Object> params = new HashMap<>();
+        params.put("questionId", questionId);
+        if (pageable != null && pageable.isPaged()) {
+            sql += " LIMIT :limit OFFSET :offset";
+            params.put("limit", pageable.getPageSize());
+            params.put("offset", pageable.getOffset());
+        }
+        return jdbc.query(sql, params, rowMapper);
     }
 
     @Override

@@ -79,7 +79,7 @@ class AnswerQuestionUseCaseImplTest {
             return null;
         });
 
-        var request = new AnswerQuestionUseCase.Request(QUESTION_ID, AUTHOR_ID, CONTENT);
+        var request = new AnswerQuestionUseCase.Request(QUESTION_ID, AUTHOR_ID, CONTENT, null);
         AnswerQuestionUseCase.Response response = useCase.execute(request);
 
         assertThat(response.success()).isFalse();
@@ -101,7 +101,7 @@ class AnswerQuestionUseCaseImplTest {
         doNothing().when(questionService).incrementAnswersCount(eq(QUESTION_ID), any(Context.class));
         doNothing().when(reputationService).addPoints(anyString(), anyInt(), any(Context.class));
 
-        var request = new AnswerQuestionUseCase.Request(QUESTION_ID, AUTHOR_ID, CONTENT);
+        var request = new AnswerQuestionUseCase.Request(QUESTION_ID, AUTHOR_ID, CONTENT, null);
         AnswerQuestionUseCase.Response response = useCase.execute(request);
 
         assertThat(response.success()).isTrue();

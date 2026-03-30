@@ -50,8 +50,8 @@ public class UserSql {
                 :phone,
                 :passwordHash,
                 :status,
-                :telegram_username,
-                :whatsapp_number,
+                :telegramUsername,
+                :whatsappNumber,
                 :activity,
                 :createdAt,
                 :lastLoginAt

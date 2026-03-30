@@ -61,6 +61,7 @@ public class AnswerQuestionUseCaseImpl implements AnswerQuestionUseCase {
                 answerId,
                 questionId,
                 authorId,
+                request.specialistProfileId(),
                 request.content().trim(),
                 0,
                 false,

@@ -13,6 +13,8 @@ public interface AnswerRepository {
 
     List<Answer> findByQuestionId(String questionId);
 
+    List<Answer> findByQuestionIdSorted(String questionId, org.springframework.data.domain.Pageable pageable);
+
     Optional<Answer> findAcceptedByQuestionId(String questionId);
 
     void clearAcceptedByQuestionId(String questionId);

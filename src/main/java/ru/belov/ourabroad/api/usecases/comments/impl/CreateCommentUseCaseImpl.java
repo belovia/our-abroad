@@ -35,11 +35,10 @@ public class CreateCommentUseCaseImpl implements CreateCommentUseCase {
                 request.entityType()
         );
 
-        userValidator.validateId(request.authorId(), context);
-        fieldValidator.validateRequiredField(request.entityId(), context);
-        fieldValidator.validateRequiredField(request.content(), context);
-        fieldValidator.validateRequiredField(request.entityType(), context);
+        validateRequest(request, context);
+
         CommentEntityType entityType = null;
+
         if (context.isSuccess()) {
             entityType = CommentEntityType.parse(request.entityType()).orElse(null);
             if (entityType == null) {
@@ -69,6 +68,13 @@ public class CreateCommentUseCaseImpl implements CreateCommentUseCase {
 
         context.setSuccessResult();
         return new Response(commentId, true, context.getErrorMessage());
+    }
+
+    protected void validateRequest(Request request, Context context) {
+        userValidator.validateId(request.authorId(), context);
+        fieldValidator.validateRequiredField(request.entityId(), context);
+        fieldValidator.validateRequiredField(request.content(), context);
+        fieldValidator.validateRequiredField(request.entityType(), context);
     }
 
     private static Response errorResponse(Context context) {

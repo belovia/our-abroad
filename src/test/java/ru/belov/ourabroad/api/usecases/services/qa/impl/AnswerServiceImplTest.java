@@ -8,6 +8,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.belov.ourabroad.api.usecases.services.qa.AcceptAnswerResult;
 import ru.belov.ourabroad.api.usecases.services.qa.AnswerService;
+import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
 import ru.belov.ourabroad.core.domain.Answer;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.Question;
@@ -15,11 +16,14 @@ import ru.belov.ourabroad.poi.storage.AnswerRepository;
 import ru.belov.ourabroad.poi.storage.QuestionRepository;
 import ru.belov.ourabroad.web.validators.ErrorCode;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
@@ -39,6 +43,9 @@ class AnswerServiceImplTest {
     @MockitoBean
     private QuestionRepository questionRepository;
 
+    @MockitoBean
+    private SpecialistProfileService specialistProfileService;
+
     @Autowired
     private AnswerService answerService;
 
@@ -49,7 +56,7 @@ class AnswerServiceImplTest {
 
     @Test
     void WHEN_acceptAnswer_successNoExistingAccepted_THEN_setsAcceptedTrue() {
-        Answer answer = Answer.create(ANSWER_ID, QUESTION_ID, ANSWER_AUTHOR, "c", 0, false, null);
+        Answer answer = Answer.create(ANSWER_ID, QUESTION_ID, ANSWER_AUTHOR, null, "c", 0, false, null);
         Question question = Question.create(QUESTION_ID, QUESTION_AUTHOR, "t", "c", Set.of(), 0, 0, null);
         when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(answer));
         when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
@@ -69,8 +76,8 @@ class AnswerServiceImplTest {
 
     @Test
     void WHEN_acceptAnswer_replaceAccepted_THEN_clearsOldAndSetsNew() {
-        Answer newAnswer = Answer.create(ANSWER_ID, QUESTION_ID, ANSWER_AUTHOR, "c", 0, false, null);
-        Answer oldAccepted = Answer.create(OTHER_ANSWER_ID, QUESTION_ID, "old-author", "old", 0, true, null);
+        Answer newAnswer = Answer.create(ANSWER_ID, QUESTION_ID, ANSWER_AUTHOR, null, "c", 0, false, null);
+        Answer oldAccepted = Answer.create(OTHER_ANSWER_ID, QUESTION_ID, "old-author", null, "old", 0, true, null);
         Question question = Question.create(QUESTION_ID, QUESTION_AUTHOR, "t", "c", Set.of(), 0, 0, null);
         when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(newAnswer));
         when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
@@ -88,7 +95,7 @@ class AnswerServiceImplTest {
 
     @Test
     void WHEN_acceptAnswer_permissionDenied_THEN_contextErrorAndNoUpdates() {
-        Answer answer = Answer.create(ANSWER_ID, QUESTION_ID, ANSWER_AUTHOR, "c", 0, false, null);
+        Answer answer = Answer.create(ANSWER_ID, QUESTION_ID, ANSWER_AUTHOR, null, "c", 0, false, null);
         Question question = Question.create(QUESTION_ID, QUESTION_AUTHOR, "t", "c", Set.of(), 0, 0, null);
         when(answerRepository.findById(ANSWER_ID)).thenReturn(Optional.of(answer));
         when(questionRepository.findById(QUESTION_ID)).thenReturn(Optional.of(question));
@@ -118,6 +125,25 @@ class AnswerServiceImplTest {
         verify(answerRepository, never()).findAcceptedByQuestionId(anyString());
         verify(answerRepository, never()).clearAcceptedByQuestionId(anyString());
         verify(answerRepository, never()).setAccepted(anyString(), anyBoolean());
+    }
+
+    @Test
+    void WHEN_getAnswersSorted_THEN_ordersAcceptedVotesAndCreatedAt() {
+        LocalDateTime t1 = LocalDateTime.of(2020, 1, 1, 0, 0);
+        LocalDateTime t2 = LocalDateTime.of(2020, 1, 2, 0, 0);
+        Answer a1 = Answer.create("a1", QUESTION_ID, "u1", null, "1", 5, false, t2);
+        Answer a2 = Answer.create("a2", QUESTION_ID, "u2", null, "2", 1, true, t2);
+        Answer a3 = Answer.create("a3", QUESTION_ID, "u3", null, "3", 10, false, t1);
+        Answer a4 = Answer.create("a4", QUESTION_ID, "u4", null, "4", 1, true, t1);
+
+        when(answerRepository.findByQuestionIdSorted(eq(QUESTION_ID), any())).thenReturn(List.of(a1, a2, a3, a4));
+
+        Context context = new Context();
+        List<Answer> sorted = answerService.getAnswersSorted(QUESTION_ID, context);
+
+        assertThat(context.isSuccess()).isTrue();
+        assertThat(sorted).extracting(Answer::getId).containsExactly("a4", "a2", "a3", "a1");
+        verify(answerRepository).findByQuestionIdSorted(eq(QUESTION_ID), any());
     }
 }
 

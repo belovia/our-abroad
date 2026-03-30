@@ -46,7 +46,7 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     public Question findByIdOrError(String questionId, Context context) {
-        return null;
+        return findById(questionId, context);
     }
 
     @Override

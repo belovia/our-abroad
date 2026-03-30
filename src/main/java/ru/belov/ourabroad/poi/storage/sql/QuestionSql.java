@@ -10,6 +10,17 @@ public final class QuestionSql {
         WHERE id = :id
         """;
 
+    public static final String FIND_ALL = """
+        SELECT id, author_id, title, content, tags, votes, answers_count, created_at
+        FROM qa_questions
+        """;
+
+    public static final String FIND_BY_TAG = """
+        SELECT id, author_id, title, content, tags, votes, answers_count, created_at
+        FROM qa_questions
+        WHERE LOWER(tags) LIKE :tagLike
+        """;
+
     public static final String INSERT = """
         INSERT INTO qa_questions (
             id, author_id, title, content, tags, votes, answers_count, created_at

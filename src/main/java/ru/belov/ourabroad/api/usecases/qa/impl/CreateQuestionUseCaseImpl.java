@@ -15,6 +15,7 @@ import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.web.validators.FieldValidator;
 import ru.belov.ourabroad.web.validators.UserValidator;
 
+import java.util.LinkedHashSet;
 import java.util.UUID;
 
 @Service
@@ -51,7 +52,7 @@ public class CreateQuestionUseCaseImpl implements CreateQuestionUseCase {
                 authorId,
                 request.title().trim(),
                 request.content().trim(),
-                request.tags(),
+                normalizeTags(request.tags()),
                 0,
                 0,
                 null
@@ -75,6 +76,23 @@ public class CreateQuestionUseCaseImpl implements CreateQuestionUseCase {
         userValidator.validateId(request.authorId(), context);
         fieldValidator.validateRequiredField(request.title(), context);
         fieldValidator.validateRequiredField(request.content(), context);
+    }
+
+    private static LinkedHashSet<String> normalizeTags(java.util.Set<String> tags) {
+        LinkedHashSet<String> result = new LinkedHashSet<>();
+        if (tags == null) {
+            return result;
+        }
+        for (String t : tags) {
+            if (t == null) {
+                continue;
+            }
+            String normalized = t.trim().toLowerCase();
+            if (!normalized.isEmpty()) {
+                result.add(normalized);
+            }
+        }
+        return result;
     }
 
     private Response errorResponse(Context context) {
