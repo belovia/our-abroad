@@ -41,7 +41,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findByEmail(String email) {
-
+        log.info("[userId: {}] Prepare to find user by id: {}", email);
         Map<String, Object> params = new HashMap<>();
         paramHelper.putParam(params, EMAIL, email);
         return jdbcTemplate.query(

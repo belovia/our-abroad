@@ -17,6 +17,7 @@ public final class QaTagsHelper {
         }
         return tags.stream()
                 .map(String::trim)
+                .map(String::toLowerCase)
                 .filter(s -> !s.isEmpty())
                 .collect(Collectors.joining(SEP));
     }

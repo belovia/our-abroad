@@ -13,6 +13,7 @@ public class Answer {
     private final String id;
     private final String questionId;
     private final String authorId;
+    private final String specialistProfileId;
     private String content;
     private int votes;
     private boolean accepted;
@@ -22,6 +23,7 @@ public class Answer {
             String id,
             String questionId,
             String authorId,
+            String specialistProfileId,
             String content,
             int votes,
             boolean accepted,
@@ -30,6 +32,7 @@ public class Answer {
         this.id = id;
         this.questionId = questionId;
         this.authorId = authorId;
+        this.specialistProfileId = specialistProfileId;
         this.content = content;
         this.votes = votes;
         this.accepted = accepted;
@@ -40,6 +43,7 @@ public class Answer {
             String id,
             String questionId,
             String authorId,
+            String specialistProfileId,
             String content,
             int votes,
             boolean accepted,
@@ -50,6 +54,6 @@ public class Answer {
         Objects.requireNonNull(authorId);
         Objects.requireNonNull(content);
         LocalDateTime ts = createdAt != null ? createdAt : LocalDateTime.now();
-        return new Answer(id, questionId, authorId, content, votes, accepted, ts);
+        return new Answer(id, questionId, authorId, specialistProfileId, content, votes, accepted, ts);
     }
 }

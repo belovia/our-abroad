@@ -36,24 +36,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByEmail(String userId, String email, Context context) {
-        log.info("[userId: {}] Try to find user by email: {}", userId, email);
+    public User findByEmail(String email, Context context) {
+        log.info("Try to find user by email: {}",email);
 
         Optional<User> fromDbOpt = userRepository.findByEmail(email);
         if (fromDbOpt.isEmpty()) {
-            log.warn("[userId: {}] User not found by email: {}", userId, email);
+            log.warn("User not found by email: {}", email);
             context.setError(USER_NOT_FOUND);
             return null;
         }
 
         User user = fromDbOpt.get();
-        log.info("[userId: {}] Found: {}", userId, user);
+        log.info("[userId: {}] Found: {}", user.getId(), user);
         return user;
     }
 
     @Override
     public User findByPhone(String userId, String phone, Context context) {
-        log.info("[userId: {}] Try to find user by phone", userId);
+        log.info("Try to find user by phone");
 
         Optional<User> fromDbOpt = userRepository.findById(userId);
         if (fromDbOpt.isEmpty()) {

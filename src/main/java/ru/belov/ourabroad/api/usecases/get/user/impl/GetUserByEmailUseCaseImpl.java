@@ -22,22 +22,20 @@ public class GetUserByEmailUseCaseImpl implements GetUserByEmailUseCase {
 
         Context context = new Context();
         validateRequest(request, context);
-        String userId = request.userId();
 
-        User user = retrieveUserByEmail(request, userId, context);
-        log.info("[userId: {}] Found: {}", request.userId(), user);
+        User user = retrieveUserByEmail(request, context);
+        log.info("[userId: {}] Found: {}", user.getId(), user);
 
         if (user == null) {
-            log.warn("[userId: {}] Returning error response", request.userId());
+            log.warn("Returning error response");
             return errorResponse(context);
         }
-        log.info("[userId: {}] Returning success response", request.userId());
+        log.info("Returning success response");
         return successResponse(user, context);
     }
 
     protected void validateRequest(Request request, Context context) {
         log.info("Validating request");
-        userValidator.validateId(request.userId(), context);
         userValidator.validateEmail(request.email(), context);
         if (context.isSuccess()) {
             log.info("Validation success");
@@ -46,13 +44,13 @@ public class GetUserByEmailUseCaseImpl implements GetUserByEmailUseCase {
         }
     }
 
-    protected User retrieveUserByEmail(Request request, String userId, Context context) {
+    protected User retrieveUserByEmail(Request request, Context context) {
         if (!context.isSuccess()) {
-            log.error("[userId: {}] Error while retrieving user by email", request.userId());
+            log.error("Error while retrieving user by email: {}", request.email());
             return null;
         }
-        log.info("[userId: {}] Try to find user by email", userId);
-        return userService.findByEmail(userId, request.email(), context);
+        log.info("Try to find user by email: {}", request.email());
+        return userService.findByEmail(request.email(), context);
     }
 
     protected Response successResponse(User user, Context context) {

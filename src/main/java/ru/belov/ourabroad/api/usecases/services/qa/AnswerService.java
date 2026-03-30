@@ -11,6 +11,8 @@ public interface AnswerService {
 
     List<Answer> findByQuestionId(String questionId, Context context);
 
+    List<Answer> getAnswersSorted(String questionId, Context context);
+
     Answer findById(String answerId, Context context);
 
     Answer findByIdOrError(String answerId, Context context);

@@ -5,12 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.belov.ourabroad.api.usecases.services.qa.AcceptAnswerResult;
 import ru.belov.ourabroad.api.usecases.services.qa.AnswerService;
+import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
 import ru.belov.ourabroad.core.domain.Answer;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.Question;
+import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.poi.storage.AnswerRepository;
 import ru.belov.ourabroad.poi.storage.QuestionRepository;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +29,7 @@ public class AnswerServiceImpl implements AnswerService {
 
     private final AnswerRepository answerRepository;
     private final QuestionRepository questionRepository;
+    private final SpecialistProfileService specialistProfileService;
 
     @Override
     public void createAnswer(Answer answer, Context context) {
@@ -33,6 +37,22 @@ public class AnswerServiceImpl implements AnswerService {
             return;
         }
         log.info("[answerId: {}] Saving answer for question {}", answer.getId(), answer.getQuestionId());
+        if (answer.getSpecialistProfileId() != null) {
+            SpecialistProfile profile = specialistProfileService.findById(answer.getSpecialistProfileId(), context);
+            if (!context.isSuccess() || profile == null) {
+                return;
+            }
+            if (!answer.getAuthorId().equals(profile.getUserId())) {
+                log.warn(
+                        "[answerId: {}][userId: {}][specialistProfileId: {}] SpecialistProfile doesn't belong to author",
+                        answer.getId(),
+                        answer.getAuthorId(),
+                        answer.getSpecialistProfileId()
+                );
+                context.setError(PERMISSION_DENIED);
+                return;
+            }
+        }
         answerRepository.save(answer);
     }
 
@@ -43,6 +63,23 @@ public class AnswerServiceImpl implements AnswerService {
         }
         log.info("[questionId: {}] Load answers", questionId);
         return answerRepository.findByQuestionId(questionId);
+    }
+
+    @Override
+    public List<Answer> getAnswersSorted(String questionId, Context context) {
+        if (!context.isSuccess()) {
+            return List.of();
+        }
+        log.info("[questionId: {}] Load sorted answers", questionId);
+        List<Answer> fromDb = answerRepository.findByQuestionIdSorted(questionId, null);
+        // Safety net: keep order contract even if storage changes
+        return fromDb.stream()
+                .sorted(
+                        Comparator.comparing(Answer::isAccepted).reversed()
+                                .thenComparing(Answer::getVotes, Comparator.reverseOrder())
+                                .thenComparing(Answer::getCreatedAt)
+                )
+                .toList();
     }
 
     @Override

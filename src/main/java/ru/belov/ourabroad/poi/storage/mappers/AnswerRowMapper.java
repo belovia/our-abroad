@@ -16,6 +16,7 @@ public class AnswerRowMapper implements RowMapper<Answer> {
                 rs.getString("id"),
                 rs.getString("question_id"),
                 rs.getString("author_id"),
+                rs.getString("specialist_profile_id"),
                 rs.getString("content"),
                 rs.getInt("votes"),
                 rs.getBoolean("accepted"),

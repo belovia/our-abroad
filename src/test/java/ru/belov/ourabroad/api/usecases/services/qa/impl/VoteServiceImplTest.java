@@ -3,7 +3,6 @@ package ru.belov.ourabroad.api.usecases.services.qa.impl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -109,7 +108,7 @@ class VoteServiceImplTest {
 
     @Test
     void WHEN_voteAnswer_THEN_usesAnswerAuthorAndAnswerDelta() {
-        Answer a = Answer.create(ANSWER_ID, QUESTION_ID, AUTHOR, "ans", 0, false, null);
+        Answer a = Answer.create(ANSWER_ID, QUESTION_ID, AUTHOR, null, "ans", 0, false, null);
         when(answerService.findByIdOrError(eq(ANSWER_ID), any(Context.class))).thenReturn(a);
         when(votePersistence.findVote(eq(VOTER), eq(ANSWER_ID), any(Context.class))).thenReturn(null);
 
@@ -149,7 +148,7 @@ class VoteServiceImplTest {
         Question q = Question.create(QUESTION_ID, AUTHOR, "t", "c", Set.of(), 0, 0, null);
         when(questionService.findByIdOrError(eq(QUESTION_ID), any(Context.class))).thenReturn(q);
         when(votePersistence.findVote(eq(VOTER), eq(QUESTION_ID), any(Context.class))).thenReturn(null);
-        doAnswer((Answer<Void>) invocation -> {
+        doAnswer((org.mockito.stubbing.Answer<Void>) invocation -> {
             Context ctx = invocation.getArgument(1);
             ctx.setError(ErrorCode.VOTE_UPDATE_FAILED);
             return null;
@@ -169,7 +168,7 @@ class VoteServiceImplTest {
         Question q = Question.create(QUESTION_ID, AUTHOR, "t", "c", Set.of(), 0, 0, null);
         when(questionService.findByIdOrError(eq(QUESTION_ID), any(Context.class))).thenReturn(q);
         when(votePersistence.findVote(eq(VOTER), eq(QUESTION_ID), any(Context.class))).thenReturn(null);
-        doAnswer((Answer<Void>) invocation -> {
+        doAnswer((org.mockito.stubbing.Answer<Void>) invocation -> {
             Context ctx = invocation.getArgument(2);
             ctx.setError(ErrorCode.ENTITY_VOTE_UPDATE_FAILED);
             return null;
