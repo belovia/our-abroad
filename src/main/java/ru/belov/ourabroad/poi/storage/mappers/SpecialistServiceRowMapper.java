@@ -1,12 +1,14 @@
 package ru.belov.ourabroad.poi.storage.mappers;
 
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 import ru.belov.ourabroad.core.domain.SpecialistService;
 import ru.belov.ourabroad.core.domain.SpecialistServiceFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@Component
 public class SpecialistServiceRowMapper implements RowMapper<SpecialistService> {
 
     @Override

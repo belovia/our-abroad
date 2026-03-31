@@ -12,6 +12,7 @@ import ru.belov.ourabroad.poi.storage.exceptions.SpecialistServiceNotFoundExcept
 import java.util.Optional;
 
 import static ru.belov.ourabroad.web.validators.ErrorCode.SPECIALIST_PROFILE_NOT_FOUND;
+import static ru.belov.ourabroad.web.validators.ErrorCode.REQUEST_VALIDATION_ERROR;
 
 @Component
 @RequiredArgsConstructor
@@ -56,6 +57,13 @@ public class SpecialistProfileServiceImpl implements SpecialistProfileService {
 
     @Override
     public void save(SpecialistProfile profile, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
+        if (profile == null) {
+            context.setError(REQUEST_VALIDATION_ERROR);
+            return;
+        }
         log.info("[userId: {}] Saving specialistProfile", profile.getUserId());
         repository.save(profile);
         log.info("[userId: {}] SpecialistProfile saved successfully", profile.getUserId());
@@ -63,6 +71,13 @@ public class SpecialistProfileServiceImpl implements SpecialistProfileService {
 
     @Override
     public void update(SpecialistProfile profile, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
+        if (profile == null) {
+            context.setError(REQUEST_VALIDATION_ERROR);
+            return;
+        }
         log.info("[specialistProfileId: {}] Updating specialistProfile", profile.getId());
         repository.update(profile);
         log.info("[specialistProfileId: {}] SpecialistProfile updated successfully", profile.getId());

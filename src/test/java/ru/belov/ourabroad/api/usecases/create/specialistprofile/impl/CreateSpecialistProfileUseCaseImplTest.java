@@ -57,7 +57,7 @@ class CreateSpecialistProfileUseCaseImplTest {
         // Asserts
         assertThat(response.success()).isTrue();
         assertThat(response.userId()).isEqualTo(USER_ID);
-        assertThat(response.errorMessage()).isNull();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.SUCCESS.getMessage());
 
         verify(profileService).save(profileCaptor.capture(), any(Context.class));
         SpecialistProfile savedProfile = profileCaptor.getValue();

@@ -14,6 +14,7 @@ import ru.belov.ourabroad.web.validators.UserValidator;
 import java.util.UUID;
 
 import static ru.belov.ourabroad.web.validators.ErrorCode.EMAIL_ALREADY_EXISTS;
+import static ru.belov.ourabroad.web.validators.ErrorCode.SUCCESS;
 
 @Service
 @RequiredArgsConstructor
@@ -79,11 +80,11 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
 
     protected Response errorResponse(Context context, String userId) {
         log.error("[userId: {}] Returning error response", userId);
-        return new Response(userId, false, context.getErrorCode().getMessage());
+        return new Response(userId, false, context.getErrorMessage());
     }
 
     protected Response successResponse(String userId) {
         log.info("[userId: {}] Returning success response", userId);
-        return new Response(userId, true, null);
+        return new Response(userId, true, SUCCESS.getMessage());
     }
 }

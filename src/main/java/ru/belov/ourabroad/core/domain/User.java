@@ -2,12 +2,14 @@ package ru.belov.ourabroad.core.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import ru.belov.ourabroad.core.enums.UserStatus;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 @Setter
 @Getter
+@ToString
 public class User {
 
     private final String id;

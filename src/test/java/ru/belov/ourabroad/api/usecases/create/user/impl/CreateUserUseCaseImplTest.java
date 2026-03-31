@@ -63,7 +63,7 @@ class CreateUserUseCaseImplTest {
         // Asserts
         assertThat(response.success()).isTrue();
         assertThat(response.userId()).isNotNull();
-        assertThat(response.errorMessage()).isNull();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.SUCCESS.getMessage());
 
         verify(userService).save(userCaptor.capture(), any(Context.class));
         assertThat(userCaptor.getValue().getEmail()).isEqualTo(EMAIL);

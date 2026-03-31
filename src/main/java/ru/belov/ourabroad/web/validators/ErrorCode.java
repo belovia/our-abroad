@@ -2,6 +2,8 @@ package ru.belov.ourabroad.web.validators;
 
 public enum ErrorCode {
 
+    SUCCESS("Успешно"),
+
     // Общие ошибки
     FIELD_REQUIRED("Поле обязательно для заполнения"),
 
@@ -47,9 +49,27 @@ public enum ErrorCode {
     CATEGORY_REQUIRED("Категория специалиста обязательна"),
     PRICE_RANGE_INVALID("Минимальная цена не может быть больше максимальной"),
 
+    // Репутация
+    REPUTATION_NOT_FOUND("Репутация не найдена"),
+    REPUTATION_ALREADY_EXISTS("Репутация для пользователя уже существует"),
+    REPUTATION_POINTS_INVALID("Количество очков должно быть больше нуля"),
+
     // Верификация
     VERIFICATION_TYPE_INVALID("Неверный тип верификации"),
-    VERIFICATION_ALREADY_EXISTS("Верификация уже существует");
+    VERIFICATION_ALREADY_EXISTS("Верификация уже существует"),
+    VERIFICATION_NOT_FOUND("Верификация не найдена"),
+    VERIFICATION_NOT_PENDING("Верификация не ожидает подтверждения"),
+
+    // Q&A
+    QUESTION_NOT_FOUND("Вопрос не найден"),
+    ANSWER_NOT_FOUND("Ответ не найден"),
+    PERMISSION_DENIED("Недостаточно прав"),
+    VOTE_UPDATE_FAILED("Не удалось сохранить голос"),
+    ENTITY_VOTE_UPDATE_FAILED("Не удалось обновить счётчик голосов"),
+
+    // Комментарии
+    COMMENT_NOT_FOUND("Комментарий не найден"),
+    COMMENT_NESTING_TOO_DEEP("Превышена глубина вложенности комментариев");
 
     private final String message;
 

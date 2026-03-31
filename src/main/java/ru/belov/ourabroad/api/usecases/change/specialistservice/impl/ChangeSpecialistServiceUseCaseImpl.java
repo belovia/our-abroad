@@ -10,6 +10,7 @@ import ru.belov.ourabroad.core.domain.SpecialistService;
 import ru.belov.ourabroad.web.validators.FieldValidator;
 
 import static ru.belov.ourabroad.web.validators.ErrorCode.PRICE_MUST_BE_BIGGER_THAN_ZERO;
+import static ru.belov.ourabroad.web.validators.ErrorCode.SUCCESS;
 
 @Service
 @RequiredArgsConstructor
@@ -88,11 +89,11 @@ public class ChangeSpecialistServiceUseCaseImpl implements ChangeSpecialistServi
 
     protected Response errorResponse(String serviceId, Context context) {
         log.error("[serviceId: {}] Returning error response", serviceId);
-        return new Response(serviceId, false, context.getErrorCode().getMessage());
+        return new Response(serviceId, false, context.getErrorMessage());
     }
 
     protected Response successResponse(String serviceId) {
         log.info("[serviceId: {}] Returning success response", serviceId);
-        return new Response(serviceId, true, null);
+        return new Response(serviceId, true, SUCCESS.getMessage());
     }
 }

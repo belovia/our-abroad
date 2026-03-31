@@ -45,14 +45,8 @@ public class ProfileRepositoryImpl implements ProfileRepository {
 
     @Override
     public boolean update(Profile profile) {
-
-        Map<String, Object> params = new HashMap<>();
-        fillCommonParams(profile, params);
-
-        return jdbcTemplate.update(
-                ProfileSql.UPDATE,
-                params
-        ) > 0;
+        save(profile);
+        return true;
     }
 
     protected void fillCommonParams(Profile profile, Map<String, Object> params) {

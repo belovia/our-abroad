@@ -32,16 +32,12 @@ public class ProfileSql {
             :city,
             :languages
         )
-        """;
-
-    public static final String UPDATE = """
-        update profiles
-        set display_name = :displayName,
-            avatar_url = :avatarUrl,
-            bio = :bio,
-            country = :country,
-            city = :city,
-            languages = :languages
-        where user_id = :userId
+        on conflict (user_id) do update set
+            display_name = excluded.display_name,
+            avatar_url = excluded.avatar_url,
+            bio = excluded.bio,
+            country = excluded.country,
+            city = excluded.city,
+            languages = excluded.languages
         """;
 }

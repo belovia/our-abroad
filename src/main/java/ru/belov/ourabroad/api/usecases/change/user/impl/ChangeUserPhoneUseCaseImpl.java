@@ -8,6 +8,7 @@ import ru.belov.ourabroad.api.usecases.change.user.ChangeUserPhoneUseCase;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
+import ru.belov.ourabroad.web.validators.ErrorCode;
 import ru.belov.ourabroad.web.validators.UserValidator;
 
 @Service
@@ -63,11 +64,11 @@ public class ChangeUserPhoneUseCaseImpl extends AbstractUserUseCase implements C
 
     private Response errorResponse(Context context, String userId) {
         log.error("[userId: {}] Returning error response", userId);
-        return new Response(userId, false, context.getErrorCode().getMessage());
+        return new Response(userId, false, context.getErrorMessage());
     }
 
     private Response successResponse(String userId) {
         log.info("[userId: {}] Returning success response", userId);
-        return new Response(userId, true, null);
+        return new Response(userId, true, ErrorCode.SUCCESS.getMessage());
     }
 }

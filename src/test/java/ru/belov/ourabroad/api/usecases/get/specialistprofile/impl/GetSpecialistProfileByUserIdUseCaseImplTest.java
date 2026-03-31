@@ -69,7 +69,7 @@ class GetSpecialistProfileByUserIdUseCaseImplTest {
 
         // Asserts
         assertThat(response.success()).isTrue();
-        assertThat(response.errorMessage()).isNull();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.SUCCESS.getMessage());
         assertThat(response.specialist()).isNotNull();
         assertThat(response.specialist().getUserId()).isEqualTo(USER_ID);
         assertThat(response.specialist().getServices()).isEqualTo(services);

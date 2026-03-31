@@ -1,6 +1,5 @@
 package ru.belov.ourabroad.core.domain;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,5 +28,35 @@ public class Reputation {
         rep.score = score;
         rep.level = level;
         return rep;
+    }
+
+    /**
+     * Увеличивает счёт очков и пересчитывает уровень (1 уровень на каждые 100 очков, макс. 10).
+     */
+    public void addPoints(int positiveDelta) {
+        if (positiveDelta <= 0) {
+            throw new IllegalArgumentException("positiveDelta must be > 0");
+        }
+        this.score += positiveDelta;
+        this.level = levelForScore(this.score);
+    }
+
+    public static int levelForScore(int score) {
+        if (score < 0) {
+            return 1;
+        }
+        int computed = 1 + score / 100;
+        return Math.min(10, Math.max(1, computed));
+    }
+
+    /**
+     * Изменяет счёт на произвольную дельту (например отмена upvote). Счёт не уходит ниже нуля.
+     */
+    public void applyScoreDelta(int delta) {
+        this.score += delta;
+        if (this.score < 0) {
+            this.score = 0;
+        }
+        this.level = levelForScore(this.score);
     }
 }

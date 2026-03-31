@@ -62,16 +62,13 @@ public final class SpecialistServiceSql {
             :currency,
             :active
         )
-        """;
-
-    public static final String UPDATE = """
-        update specialist_service
-        set title = :title,
-            description = :description,
-            price = :price,
-            currency = :currency,
-            active = :active
-        where id = :id
+        on conflict (id) do update set
+            specialist_id = excluded.specialist_id,
+            title = excluded.title,
+            description = excluded.description,
+            price = excluded.price,
+            currency = excluded.currency,
+            active = excluded.active
         """;
 
     public static final String DELETE = """

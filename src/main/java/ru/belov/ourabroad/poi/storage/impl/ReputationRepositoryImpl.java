@@ -38,18 +38,13 @@ public class ReputationRepositoryImpl implements ReputationRepository {
         put(params, "score", reputation.getScore());
         put(params, "level", reputation.getLevel());
 
-        jdbcTemplate.update(ReputationSql.INSERT, params);
+        jdbcTemplate.update(ReputationSql.UPSERT, params);
     }
 
     @Override
     public boolean update(Reputation reputation) {
-        Map<String, Object> params = new HashMap<>();
-
-        put(params, "userId", reputation.getUserId());
-        put(params, "score", reputation.getScore());
-        put(params, "level", reputation.getLevel());
-
-        return jdbcTemplate.update(ReputationSql.UPDATE, params) > 0;
+        save(reputation);
+        return true;
     }
 
     private void put(Map<String, Object> params, String key, Object value) {

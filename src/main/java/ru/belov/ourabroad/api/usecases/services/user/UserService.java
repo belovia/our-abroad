@@ -7,7 +7,7 @@ public interface UserService {
 
     User findById(String userId, Context context);
 
-    User findByEmail(String userId, String userEmail, Context context);
+    User findByEmail(String userEmail, Context context);
 
     User findByPhone(String userId, String userPhone, Context context);
 

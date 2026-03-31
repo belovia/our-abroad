@@ -72,11 +72,11 @@ public class CreateSpecialistServiceUseCaseImpl
 
     protected Response errorResponse(String specialistProfileId, Context context) {
         log.error("[specialistProfileId: {}] Returning error response", specialistProfileId);
-        return new Response(specialistProfileId, false, context.getErrorCode().getMessage());
+        return new Response(specialistProfileId, false, context.getErrorMessage());
     }
 
     protected Response successResponse(String specialistProfileId) {
         log.info("[specialistProfileId: {}] Returning success response", specialistProfileId);
-        return new Response(specialistProfileId, true, null);
+        return new Response(specialistProfileId, true, ErrorCode.SUCCESS.getMessage());
     }
 }

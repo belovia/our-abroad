@@ -58,7 +58,7 @@ class CreateSpecialistServiceUseCaseImplTest {
         // Asserts
         assertThat(response.success()).isTrue();
         assertThat(response.specialistProfileId()).isEqualTo(PROFILE_ID);
-        assertThat(response.message()).isNull();
+        assertThat(response.message()).isEqualTo(ErrorCode.SUCCESS.getMessage());
 
         verify(repository).save(serviceCaptor.capture());
         SpecialistService saved = serviceCaptor.getValue();
