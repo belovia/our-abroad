@@ -58,14 +58,8 @@ public class SpecialistProfileRepositoryImpl implements SpecialistProfileReposit
 
     @Override
     public boolean update(SpecialistProfile profile) {
-
-        Map<String, Object> params = new HashMap<>();
-        paramHelper.putParam(params, "id", profile.getId(), profile.getUserId());
-        putCommonParams(profile, params);
-
-        return jdbcTemplate.update(
-                SpecialistProfileSql.UPDATE,
-                params) > 0;
+        save(profile);
+        return true;
     }
 
     @Override

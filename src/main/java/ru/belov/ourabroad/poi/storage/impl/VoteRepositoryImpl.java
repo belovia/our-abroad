@@ -37,10 +37,7 @@ public class VoteRepositoryImpl implements VoteRepository {
 
     @Override
     public boolean updateType(Vote vote) {
-        return jdbc.update(
-                QaVoteSql.UPDATE_TYPE,
-                Map.of("id", vote.getId(), "voteType", vote.getType().name())
-        ) > 0;
+        return save(vote);
     }
 
     @Override

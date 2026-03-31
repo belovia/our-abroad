@@ -38,6 +38,12 @@ public class VerificationSql {
             :id, :userId, :type, :relatedEntityId,
             :status, :createdAt, :verifiedAt
         )
+        ON CONFLICT (id) DO UPDATE SET
+            user_id = EXCLUDED.user_id,
+            type = EXCLUDED.type,
+            related_entity_id = EXCLUDED.related_entity_id,
+            status = EXCLUDED.status,
+            verified_at = EXCLUDED.verified_at
     """;
 
     public static final String UPDATE_STATUS = """

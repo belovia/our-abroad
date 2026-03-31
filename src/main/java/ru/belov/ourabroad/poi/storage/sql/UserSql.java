@@ -32,7 +32,7 @@ public class UserSql {
             where email = :email
             """;
 
-    public static final String INSERT = """
+    public static final String UPSERT = """
             insert into users (
                 id,
                 email,
@@ -56,6 +56,16 @@ public class UserSql {
                 :createdAt,
                 :lastLoginAt
             )
+            on conflict (id) do update set
+                email = excluded.email,
+                phone = excluded.phone,
+                password_hash = excluded.password_hash,
+                status = excluded.status,
+                telegram_username = excluded.telegram_username,
+                whatsapp_number = excluded.whatsapp_number,
+                activity = excluded.activity,
+                last_login_at = excluded.last_login_at
+            returning (xmax = 0) as inserted
             """;
 
     public static final String UPDATE_LAST_LOGIN = """

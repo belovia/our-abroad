@@ -37,6 +37,13 @@ public final class AnswerSql {
         ) VALUES (
             :id, :questionId, :authorId, :specialistProfileId, :content, :votes, :accepted, :createdAt
         )
+        ON CONFLICT (id) DO UPDATE SET
+            question_id = EXCLUDED.question_id,
+            author_id = EXCLUDED.author_id,
+            specialist_profile_id = EXCLUDED.specialist_profile_id,
+            content = EXCLUDED.content,
+            votes = EXCLUDED.votes,
+            accepted = EXCLUDED.accepted
         """;
 
     public static final String CLEAR_ACCEPTED_BY_QUESTION_ID = """

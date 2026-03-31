@@ -11,6 +11,7 @@ import ru.belov.ourabroad.poi.storage.UserRepository;
 import java.util.Optional;
 
 import static ru.belov.ourabroad.web.validators.ErrorCode.USER_NOT_FOUND;
+import static ru.belov.ourabroad.web.validators.ErrorCode.REQUEST_VALIDATION_ERROR;
 
 @Component
 @RequiredArgsConstructor
@@ -69,6 +70,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void save(User user, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
+        if (user == null) {
+            context.setError(REQUEST_VALIDATION_ERROR);
+            return;
+        }
         log.info("[userId: {}] Saving new user", user.getId());
         userRepository.save(user);
         log.info("[userId: {}] User saved successfully", user.getId());
@@ -76,6 +84,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void update(User user, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
+        if (user == null) {
+            context.setError(REQUEST_VALIDATION_ERROR);
+            return;
+        }
         log.info("[userId: {}] Updating user", user.getId());
         userRepository.save(user);
         log.info("[userId: {}] User updated successfully", user.getId());

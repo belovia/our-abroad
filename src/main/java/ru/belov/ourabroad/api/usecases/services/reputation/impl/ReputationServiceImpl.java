@@ -11,6 +11,7 @@ import ru.belov.ourabroad.poi.storage.ReputationRepository;
 import java.util.Optional;
 
 import static ru.belov.ourabroad.web.validators.ErrorCode.REPUTATION_NOT_FOUND;
+import static ru.belov.ourabroad.web.validators.ErrorCode.REQUEST_VALIDATION_ERROR;
 
 @Component
 @RequiredArgsConstructor
@@ -38,12 +39,26 @@ public class ReputationServiceImpl implements ReputationService {
 
     @Override
     public void save(Reputation reputation, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
+        if (reputation == null) {
+            context.setError(REQUEST_VALIDATION_ERROR);
+            return;
+        }
         log.info("[userId: {}] Saving reputation", reputation.getUserId());
         repository.save(reputation);
     }
 
     @Override
     public void update(Reputation reputation, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
+        if (reputation == null) {
+            context.setError(REQUEST_VALIDATION_ERROR);
+            return;
+        }
         log.info("[userId: {}] Updating reputation", reputation.getUserId());
         repository.update(reputation);
     }

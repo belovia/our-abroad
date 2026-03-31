@@ -9,7 +9,7 @@ public class ReputationSql {
         WHERE user_id = :userId
     """;
 
-    public static final String INSERT = """
+    public static final String UPSERT = """
         INSERT INTO reputations (
             user_id,
             score,
@@ -19,13 +19,8 @@ public class ReputationSql {
             :score,
             :level
         )
-    """;
-
-    public static final String UPDATE = """
-        UPDATE reputations
-        SET
-            score = :score,
-            level = :level
-        WHERE user_id = :userId
+        ON CONFLICT (user_id) DO UPDATE SET
+            score = EXCLUDED.score,
+            level = EXCLUDED.level
     """;
 }

@@ -7,6 +7,7 @@ public final class CommentLikeSql {
     public static final String INSERT = """
             INSERT INTO comment_likes (id, user_id, comment_id)
             VALUES (:id, :userId, :commentId)
+            ON CONFLICT (user_id, comment_id) DO NOTHING
             """;
 
     public static final String FIND_BY_USER_AND_COMMENT = """

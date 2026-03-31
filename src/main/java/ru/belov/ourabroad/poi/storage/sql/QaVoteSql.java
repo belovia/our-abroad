@@ -13,6 +13,10 @@ public final class QaVoteSql {
     public static final String INSERT = """
         INSERT INTO qa_votes (id, user_id, entity_id, vote_type)
         VALUES (:id, :userId, :entityId, :voteType)
+        ON CONFLICT (id) DO UPDATE SET
+            user_id = EXCLUDED.user_id,
+            entity_id = EXCLUDED.entity_id,
+            vote_type = EXCLUDED.vote_type
         """;
 
     public static final String UPDATE_TYPE = """

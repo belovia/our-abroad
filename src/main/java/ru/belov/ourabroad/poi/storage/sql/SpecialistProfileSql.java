@@ -24,15 +24,12 @@ public class SpecialistProfileSql {
             :id, :userId, :description,
             :active, :rating, :reviewsCount
         )
-        """;
-
-    public static final String UPDATE = """
-        update specialist_profile
-        set description = :description,
-            active = :active,
-            rating = :rating,
-            reviews_count = :reviewsCount
-        where id = :id
+        on conflict (id) do update set
+            user_id = excluded.user_id,
+            description = excluded.description,
+            active = excluded.active,
+            rating = excluded.rating,
+            reviews_count = excluded.reviews_count
         """;
 
     public static final String DEACTIVATE = """

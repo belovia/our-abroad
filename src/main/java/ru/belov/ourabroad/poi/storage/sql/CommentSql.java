@@ -10,6 +10,14 @@ public final class CommentSql {
             ) VALUES (
                 :id, :authorId, :entityId, :entityType, :parentId, :content, :likes, :repliesCount, :createdAt
             )
+            ON CONFLICT (id) DO UPDATE SET
+                author_id = EXCLUDED.author_id,
+                entity_id = EXCLUDED.entity_id,
+                entity_type = EXCLUDED.entity_type,
+                parent_id = EXCLUDED.parent_id,
+                content = EXCLUDED.content,
+                likes = EXCLUDED.likes,
+                replies_count = EXCLUDED.replies_count
             """;
 
     public static final String FIND_BY_ID = """

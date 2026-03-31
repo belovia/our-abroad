@@ -48,10 +48,8 @@ public class SpecialistServiceRepositoryImpl implements SpecialistServiceReposit
 
     @Override
     public boolean update(SpecialistService service) {
-        return jdbc.update(
-                SpecialistServiceSql.UPDATE,
-                toParams(service)
-        ) > 0;
+        save(service);
+        return true;
     }
 
     @Override

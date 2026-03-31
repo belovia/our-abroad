@@ -27,6 +27,13 @@ public final class QuestionSql {
         ) VALUES (
             :id, :authorId, :title, :content, :tags, :votes, :answersCount, :createdAt
         )
+        ON CONFLICT (id) DO UPDATE SET
+            author_id = EXCLUDED.author_id,
+            title = EXCLUDED.title,
+            content = EXCLUDED.content,
+            tags = EXCLUDED.tags,
+            votes = EXCLUDED.votes,
+            answers_count = EXCLUDED.answers_count
         """;
 
     public static final String UPDATE_VOTES = """

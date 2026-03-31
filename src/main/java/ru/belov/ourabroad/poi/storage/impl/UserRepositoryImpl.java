@@ -16,7 +16,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import static ru.belov.ourabroad.core.domain.NameSpaces.*;
-import static ru.belov.ourabroad.poi.storage.sql.UserSql.*;
+import static ru.belov.ourabroad.poi.storage.sql.UserSql.FIND_BY_EMAIL;
+import static ru.belov.ourabroad.poi.storage.sql.UserSql.FIND_BY_ID;
+import static ru.belov.ourabroad.poi.storage.sql.UserSql.UPDATE_LAST_LOGIN;
+import static ru.belov.ourabroad.poi.storage.sql.UserSql.UPDATE_STATUS;
+import static ru.belov.ourabroad.poi.storage.sql.UserSql.UPSERT;
 
 @Repository
 @RequiredArgsConstructor
@@ -78,10 +82,12 @@ public class UserRepositoryImpl implements UserRepository {
 
         log.info("[userId: {}] Save user", user.getId());
 
-        jdbcTemplate.update(
-                INSERT,
-                params
-        );
+        Boolean inserted = jdbcTemplate.queryForObject(UPSERT, params, Boolean.class);
+        if (Boolean.TRUE.equals(inserted)) {
+            log.info("[userId: {}] User upsert: INSERT", user.getId());
+        } else {
+            log.info("[userId: {}] User upsert: UPDATE", user.getId());
+        }
     }
 
     @Override
