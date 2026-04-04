@@ -69,7 +69,14 @@ public enum ErrorCode {
 
     // Комментарии
     COMMENT_NOT_FOUND("Комментарий не найден"),
-    COMMENT_NESTING_TOO_DEEP("Превышена глубина вложенности комментариев");
+    COMMENT_NESTING_TOO_DEEP("Превышена глубина вложенности комментариев"),
+
+    // Запись к специалисту (booking)
+    BOOKING_NOT_FOUND("Запись не найдена"),
+    SPECIALIST_NOT_FOUND("Специалист не найден"),
+    SERVICE_NOT_AVAILABLE("Услуга недоступна"),
+    ACCESS_DENIED("Доступ запрещён"),
+    INVALID_BOOKING_STATE("Недопустимое состояние записи");
 
     private final String message;
 
