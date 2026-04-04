@@ -7,6 +7,7 @@ import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.create.booking.CreateBookingUseCase;
 import ru.belov.ourabroad.api.usecases.services.booking.BookingService;
 import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Booking;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
@@ -21,18 +22,19 @@ public class CreateBookingUseCaseImpl implements CreateBookingUseCase {
     private final SpecialistProfileService specialistProfileService;
     private final BookingService bookingService;
     private final FieldValidator fieldValidator;
+    private final CurrentUserProvider currentUserProvider;
 
     @Override
     public Response execute(Request request) {
         Context context = new Context();
+        String userId = currentUserProvider.requiredUserId();
         log.info(
                 "[userId: {}] Create booking for specialist {} service {}",
-                request.userId(),
+                userId,
                 request.specialistId(),
                 request.serviceId()
         );
 
-        fieldValidator.validateRequiredField(request.userId(), context);
         fieldValidator.validateRequiredField(request.specialistId(), context);
         fieldValidator.validateRequiredField(request.serviceId(), context);
         if (context.isSuccess() && request.startTime() == null) {
@@ -54,7 +56,7 @@ public class CreateBookingUseCaseImpl implements CreateBookingUseCase {
 
         Context bookingContext = new Context();
         Booking booking = bookingService.createBooking(
-                request.userId(),
+                userId,
                 request.specialistId(),
                 request.serviceId(),
                 request.startTime(),

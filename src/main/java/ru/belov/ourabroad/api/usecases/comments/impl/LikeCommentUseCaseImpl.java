@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.belov.ourabroad.api.usecases.comments.LikeCommentUseCase;
 import ru.belov.ourabroad.api.usecases.services.comments.CommentLikeService;
 import ru.belov.ourabroad.api.usecases.services.comments.CommentLikeToggleResult;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.web.validators.FieldValidator;
-import ru.belov.ourabroad.web.validators.UserValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -17,23 +17,23 @@ import ru.belov.ourabroad.web.validators.UserValidator;
 public class LikeCommentUseCaseImpl implements LikeCommentUseCase {
 
     private final CommentLikeService commentLikeService;
-    private final UserValidator userValidator;
     private final FieldValidator fieldValidator;
+    private final CurrentUserProvider currentUserProvider;
 
     @Override
     @Transactional
     public Response execute(Request request) {
         Context context = new Context();
-        log.info("[commentId: {}][userId: {}] Like comment", request.commentId(), request.userId());
+        String userId = currentUserProvider.requiredUserId();
+        log.info("[commentId: {}][userId: {}] Like comment", request.commentId(), userId);
 
-        userValidator.validateId(request.userId(), context);
         fieldValidator.validateRequiredField(request.commentId(), context);
         if (!context.isSuccess()) {
             return errorResponse(context);
         }
 
         CommentLikeToggleResult result = commentLikeService.likeComment(
-                request.userId(),
+                userId,
                 request.commentId(),
                 context
         );

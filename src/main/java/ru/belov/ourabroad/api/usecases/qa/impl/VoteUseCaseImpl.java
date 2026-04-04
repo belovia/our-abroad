@@ -8,11 +8,11 @@ import ru.belov.ourabroad.api.usecases.qa.VoteUseCase;
 import ru.belov.ourabroad.api.usecases.services.qa.VoteApplyResult;
 import ru.belov.ourabroad.api.usecases.services.qa.VoteService;
 import ru.belov.ourabroad.api.usecases.services.reputation.ReputationService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.enums.QaVoteTarget;
 import ru.belov.ourabroad.web.validators.ErrorCode;
 import ru.belov.ourabroad.web.validators.FieldValidator;
-import ru.belov.ourabroad.web.validators.UserValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -21,16 +21,16 @@ public class VoteUseCaseImpl implements VoteUseCase {
 
     private final VoteService voteService;
     private final ReputationService reputationService;
-    private final UserValidator userValidator;
     private final FieldValidator fieldValidator;
+    private final CurrentUserProvider currentUserProvider;
 
     @Override
     @Transactional
     public Response execute(Request request) {
         Context context = new Context();
-        log.info("[userId: {}] Vote {} {}", request.voterUserId(), request.target(), request.entityId());
+        String voterUserId = currentUserProvider.requiredUserId();
+        log.info("[userId: {}] Vote {} {}", voterUserId, request.target(), request.entityId());
 
-        userValidator.validateId(request.voterUserId(), context);
         fieldValidator.validateRequiredField(request.entityId(), context);
         if (context.isSuccess() && (request.target() == null || request.voteType() == null)) {
             context.setError(ErrorCode.REQUEST_VALIDATION_ERROR);
@@ -41,13 +41,13 @@ public class VoteUseCaseImpl implements VoteUseCase {
 
         VoteApplyResult result = switch (request.target()) {
             case QUESTION -> voteService.voteQuestion(
-                    request.voterUserId(),
+                    voterUserId,
                     request.entityId(),
                     request.voteType(),
                     context
             );
             case ANSWER -> voteService.voteAnswer(
-                    request.voterUserId(),
+                    voterUserId,
                     request.entityId(),
                     request.voteType(),
                     context

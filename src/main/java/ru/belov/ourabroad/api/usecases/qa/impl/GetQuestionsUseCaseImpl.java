@@ -8,9 +8,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.belov.ourabroad.api.usecases.qa.GetQuestionsUseCase;
+import ru.belov.ourabroad.api.usecases.services.qa.QuestionService;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.Question;
-import ru.belov.ourabroad.poi.storage.QuestionRepository;
 import ru.belov.ourabroad.web.dto.qa.read.QuestionResponse;
 
 import java.util.List;
@@ -22,7 +22,7 @@ import static ru.belov.ourabroad.web.validators.ErrorCode.REQUEST_VALIDATION_ERR
 @Slf4j
 public class GetQuestionsUseCaseImpl implements GetQuestionsUseCase {
 
-    private final QuestionRepository questionRepository;
+    private final QuestionService questionService;
 
     @Override
     @Transactional(readOnly = true)
@@ -38,8 +38,8 @@ public class GetQuestionsUseCaseImpl implements GetQuestionsUseCase {
         log.info("[page: {}][size: {}][sort: {}][tag: {}] Get questions", request.page(), request.size(), request.sort(), request.tag());
 
         List<Question> questions = request.tag() == null || request.tag().isBlank()
-                ? questionRepository.findAll(pageable, sort)
-                : questionRepository.findByTag(request.tag(), pageable, sort);
+                ? questionService.findQuestionsPage(pageable, sort)
+                : questionService.findQuestionsByTag(request.tag(), pageable, sort);
 
         context.setSuccessResult();
         return new Response(

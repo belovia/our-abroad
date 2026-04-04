@@ -1,5 +1,6 @@
 package ru.belov.ourabroad.api.usecases.services.booking.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.belov.ourabroad.api.usecases.services.booking.BookingService;
 import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
+import ru.belov.ourabroad.api.usecases.services.specialistservice.SpecialistServiceService;
 import ru.belov.ourabroad.core.domain.Booking;
 import ru.belov.ourabroad.core.domain.BookingFactory;
 import ru.belov.ourabroad.core.domain.Context;
@@ -15,7 +17,6 @@ import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.core.domain.SpecialistService;
 import ru.belov.ourabroad.core.enums.BookingStatus;
 import ru.belov.ourabroad.poi.storage.BookingRepository;
-import ru.belov.ourabroad.poi.storage.SpecialistServiceRepository;
 import ru.belov.ourabroad.web.validators.ErrorCode;
 
 import java.time.LocalDateTime;
@@ -42,13 +43,21 @@ class BookingServiceImplTest {
     private BookingRepository bookingRepository;
 
     @MockitoBean
-    private SpecialistServiceRepository specialistServiceRepository;
+    private SpecialistServiceService specialistServiceService;
 
     @MockitoBean
     private SpecialistProfileService specialistProfileService;
 
     @Autowired
     private BookingService bookingService;
+
+    @BeforeEach
+    void stubActiveServiceByDefault() {
+        SpecialistService service = SpecialistServiceFactoryInactive.service(SPECIALIST_ID, true);
+        when(specialistServiceService.requireActiveServiceForSpecialist(
+                eq(SERVICE_ID), eq(SPECIALIST_ID), any(Context.class))
+        ).thenReturn(service);
+    }
 
     @Test
     void contextCreated() {
@@ -57,8 +66,13 @@ class BookingServiceImplTest {
 
     @Test
     void WHEN_createBooking_serviceInactive_THEN_serviceNotAvailable() {
-        SpecialistService service = SpecialistServiceFactoryInactive.service(SPECIALIST_ID, false);
-        when(specialistServiceRepository.findById(SERVICE_ID)).thenReturn(Optional.of(service));
+        when(specialistServiceService.requireActiveServiceForSpecialist(
+                eq(SERVICE_ID), eq(SPECIALIST_ID), any(Context.class))
+        ).thenAnswer(invocation -> {
+            Context ctx = invocation.getArgument(2);
+            ctx.setError(ErrorCode.SERVICE_NOT_AVAILABLE);
+            return null;
+        });
 
         Context context = new Context();
         Booking booking = bookingService.createBooking(USER_ID, SPECIALIST_ID, SERVICE_ID, START, context);
@@ -70,8 +84,13 @@ class BookingServiceImplTest {
 
     @Test
     void WHEN_createBooking_wrongSpecialist_THEN_serviceNotAvailable() {
-        SpecialistService service = SpecialistServiceFactoryInactive.service("other-spec", true);
-        when(specialistServiceRepository.findById(SERVICE_ID)).thenReturn(Optional.of(service));
+        when(specialistServiceService.requireActiveServiceForSpecialist(
+                eq(SERVICE_ID), eq(SPECIALIST_ID), any(Context.class))
+        ).thenAnswer(invocation -> {
+            Context ctx = invocation.getArgument(2);
+            ctx.setError(ErrorCode.SERVICE_NOT_AVAILABLE);
+            return null;
+        });
 
         Context context = new Context();
         Booking booking = bookingService.createBooking(USER_ID, SPECIALIST_ID, SERVICE_ID, START, context);
@@ -82,9 +101,6 @@ class BookingServiceImplTest {
 
     @Test
     void WHEN_createBooking_valid_THEN_pendingAndSaved() {
-        SpecialistService service = SpecialistServiceFactoryInactive.service(SPECIALIST_ID, true);
-        when(specialistServiceRepository.findById(SERVICE_ID)).thenReturn(Optional.of(service));
-
         Context context = new Context();
         Booking booking = bookingService.createBooking(USER_ID, SPECIALIST_ID, SERVICE_ID, START, context);
 

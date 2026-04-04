@@ -1,5 +1,6 @@
 package ru.belov.ourabroad.api.usecases.qa.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -14,6 +15,7 @@ import ru.belov.ourabroad.api.usecases.services.qa.AnswerService;
 import ru.belov.ourabroad.api.usecases.services.qa.QuestionService;
 import ru.belov.ourabroad.api.usecases.services.reputation.ReputationService;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Answer;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.Question;
@@ -54,6 +56,9 @@ class AnswerQuestionUseCaseImplTest {
     @MockitoBean
     private ReputationService reputationService;
 
+    @MockitoBean
+    private CurrentUserProvider currentUserProvider;
+
     @Autowired
     private AnswerQuestionUseCase useCase;
 
@@ -63,6 +68,11 @@ class AnswerQuestionUseCaseImplTest {
     private static final String QUESTION_ID = "q-1";
     private static final String AUTHOR_ID = "user-answerer";
     private static final String CONTENT = "Попробуйте так...";
+
+    @BeforeEach
+    void stubAuthor() {
+        when(currentUserProvider.requiredUserId()).thenReturn(AUTHOR_ID);
+    }
 
     @Test
     void contextCreated() {
@@ -79,7 +89,7 @@ class AnswerQuestionUseCaseImplTest {
             return null;
         });
 
-        var request = new AnswerQuestionUseCase.Request(QUESTION_ID, AUTHOR_ID, CONTENT, null);
+        var request = new AnswerQuestionUseCase.Request(QUESTION_ID, CONTENT, null);
         AnswerQuestionUseCase.Response response = useCase.execute(request);
 
         assertThat(response.success()).isFalse();
@@ -101,7 +111,7 @@ class AnswerQuestionUseCaseImplTest {
         doNothing().when(questionService).incrementAnswersCount(eq(QUESTION_ID), any(Context.class));
         doNothing().when(reputationService).addPoints(anyString(), anyInt(), any(Context.class));
 
-        var request = new AnswerQuestionUseCase.Request(QUESTION_ID, AUTHOR_ID, CONTENT, null);
+        var request = new AnswerQuestionUseCase.Request(QUESTION_ID, CONTENT, null);
         AnswerQuestionUseCase.Response response = useCase.execute(request);
 
         assertThat(response.success()).isTrue();

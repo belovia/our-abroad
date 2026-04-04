@@ -2,6 +2,7 @@ package ru.belov.ourabroad.web.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,12 +48,15 @@ public class SpecialistServiceController {
     }
 
     @DeleteMapping("/{serviceId}")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<DeleteSpecialistServiceUseCase.Response> delete(
             @PathVariable("serviceId") String serviceId
     ) {
         log.info("[serviceId: {}] Request to delete specialist service", serviceId);
-        deleteSpecialistServiceUseCase.delete(serviceId);
-        return ResponseEntity.noContent().build();
+        DeleteSpecialistServiceUseCase.Response response = deleteSpecialistServiceUseCase.delete(serviceId);
+        if (!response.success()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping

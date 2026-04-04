@@ -10,8 +10,8 @@ import ru.belov.ourabroad.api.usecases.services.user.UserService;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.Reputation;
 import ru.belov.ourabroad.core.domain.ReputationFactory;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.User;
-import ru.belov.ourabroad.poi.storage.ReputationRepository;
 import ru.belov.ourabroad.web.validators.ErrorCode;
 import ru.belov.ourabroad.web.validators.UserValidator;
 
@@ -22,20 +22,14 @@ public class CreateReputationUseCaseImpl implements CreateReputationUseCase {
 
     private final UserService userService;
     private final ReputationService reputationService;
-    private final ReputationRepository reputationRepository;
-    private final UserValidator userValidator;
+    private final CurrentUserProvider currentUserProvider;
 
     @Override
     @Transactional
     public Response execute(Request request) {
         Context context = new Context();
-        String userId = request.userId();
+        String userId = currentUserProvider.requiredUserId();
         log.info("[userId: {}] Create reputation", userId);
-
-        userValidator.validateId(userId, context);
-        if (!context.isSuccess()) {
-            return errorResponse(userId, context);
-        }
 
         User user = userService.findById(userId, context);
         if (user == null) {

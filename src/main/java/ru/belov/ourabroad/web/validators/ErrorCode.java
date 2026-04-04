@@ -76,7 +76,15 @@ public enum ErrorCode {
     SPECIALIST_NOT_FOUND("Специалист не найден"),
     SERVICE_NOT_AVAILABLE("Услуга недоступна"),
     ACCESS_DENIED("Доступ запрещён"),
-    INVALID_BOOKING_STATE("Недопустимое состояние записи");
+    INVALID_BOOKING_STATE("Недопустимое состояние записи"),
+
+    // Аутентификация / JWT
+    UNAUTHORIZED("Требуется авторизация"),
+    INVALID_CREDENTIALS("Неверный email или пароль"),
+    TOKEN_EXPIRED("Срок действия токена истёк"),
+    TOKEN_INVALID("Недействительный токен"),
+    REFRESH_TOKEN_INVALID("Недействительный refresh-токен"),
+    REFRESH_TOKEN_REUSED("Refresh-токен уже использован или отозван");
 
     private final String message;
 

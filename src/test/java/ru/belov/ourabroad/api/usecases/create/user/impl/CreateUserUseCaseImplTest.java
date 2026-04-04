@@ -1,10 +1,12 @@
 package ru.belov.ourabroad.api.usecases.create.user.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -34,6 +36,9 @@ class CreateUserUseCaseImplTest {
     @MockitoBean
     private UserService userService;
 
+    @MockitoBean
+    private PasswordEncoder passwordEncoder;
+
     @Autowired
     private CreateUserUseCaseImpl usecase;
 
@@ -43,6 +48,11 @@ class CreateUserUseCaseImplTest {
     private static final String EMAIL = "user@example.com";
     private static final String PHONE = "+79123456789";
     private static final String PASSWORD = "SecurePass1";
+
+    @BeforeEach
+    void stubEncoder() {
+        when(passwordEncoder.encode(anyString())).thenAnswer(inv -> "ENC(" + inv.getArgument(0) + ")");
+    }
 
     @Test
     void contextCreated() {

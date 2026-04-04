@@ -7,12 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.belov.ourabroad.api.usecases.comments.CreateCommentUseCase;
 import ru.belov.ourabroad.api.usecases.services.comments.CommentService;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.core.enums.CommentEntityType;
 import ru.belov.ourabroad.web.validators.ErrorCode;
 import ru.belov.ourabroad.web.validators.FieldValidator;
-import ru.belov.ourabroad.web.validators.UserValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -21,16 +21,17 @@ public class CreateCommentUseCaseImpl implements CreateCommentUseCase {
 
     private final UserService userService;
     private final CommentService commentService;
-    private final UserValidator userValidator;
     private final FieldValidator fieldValidator;
+    private final CurrentUserProvider currentUserProvider;
 
     @Override
     @Transactional
     public Response execute(Request request) {
         Context context = new Context();
+        String authorId = currentUserProvider.requiredUserId();
         log.info(
                 "[userId: {}][entityId: {}][entityType: {}] Create comment",
-                request.authorId(),
+                authorId,
                 request.entityId(),
                 request.entityType()
         );
@@ -49,13 +50,13 @@ public class CreateCommentUseCaseImpl implements CreateCommentUseCase {
             return errorResponse(context);
         }
 
-        User author = userService.findById(request.authorId(), context);
+        User author = userService.findById(authorId, context);
         if (author == null) {
             return errorResponse(context);
         }
 
         String commentId = commentService.createComment(
-                request.authorId(),
+                authorId,
                 request.entityId(),
                 entityType,
                 request.content(),
@@ -71,7 +72,6 @@ public class CreateCommentUseCaseImpl implements CreateCommentUseCase {
     }
 
     protected void validateRequest(Request request, Context context) {
-        userValidator.validateId(request.authorId(), context);
         fieldValidator.validateRequiredField(request.entityId(), context);
         fieldValidator.validateRequiredField(request.content(), context);
         fieldValidator.validateRequiredField(request.entityType(), context);

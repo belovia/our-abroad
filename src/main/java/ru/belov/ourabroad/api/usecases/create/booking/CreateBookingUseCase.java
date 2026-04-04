@@ -9,7 +9,6 @@ public interface CreateBookingUseCase {
     Response execute(Request request);
 
     record Request(
-            String userId,
             String specialistId,
             String serviceId,
             LocalDateTime startTime

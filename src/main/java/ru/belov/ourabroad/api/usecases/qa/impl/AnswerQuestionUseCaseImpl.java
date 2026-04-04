@@ -10,12 +10,12 @@ import ru.belov.ourabroad.api.usecases.services.qa.AnswerService;
 import ru.belov.ourabroad.api.usecases.services.qa.QuestionService;
 import ru.belov.ourabroad.api.usecases.services.reputation.ReputationService;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Answer;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.Question;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.web.validators.FieldValidator;
-import ru.belov.ourabroad.web.validators.UserValidator;
 
 import java.util.UUID;
 
@@ -28,19 +28,18 @@ public class AnswerQuestionUseCaseImpl implements AnswerQuestionUseCase {
     private final QuestionService questionService;
     private final AnswerService answerService;
     private final ReputationService reputationService;
-    private final UserValidator userValidator;
     private final FieldValidator fieldValidator;
+    private final CurrentUserProvider currentUserProvider;
 
     @Override
     @Transactional
     public Response execute(Request request) {
         Context context = new Context();
         String questionId = request.questionId();
-        String authorId = request.authorId();
+        String authorId = currentUserProvider.requiredUserId();
         log.info("[questionId: {}][userId: {}] Answer question", questionId, authorId);
 
         fieldValidator.validateRequiredField(questionId, context);
-        userValidator.validateId(authorId, context);
         fieldValidator.validateRequiredField(request.content(), context);
         if (!context.isSuccess()) {
             return errorResponse(questionId, context);

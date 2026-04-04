@@ -1,5 +1,6 @@
 package ru.belov.ourabroad.api.usecases.comments.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.belov.ourabroad.api.usecases.comments.LikeCommentUseCase;
 import ru.belov.ourabroad.api.usecases.services.comments.CommentLikeService;
 import ru.belov.ourabroad.api.usecases.services.comments.CommentLikeToggleResult;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.web.validators.ErrorCode;
 import ru.belov.ourabroad.web.validators.FieldValidator;
@@ -36,8 +38,16 @@ class LikeCommentUseCaseImplTest {
     @MockitoBean
     private CommentLikeService commentLikeService;
 
+    @MockitoBean
+    private CurrentUserProvider currentUserProvider;
+
     @Autowired
     private LikeCommentUseCase useCase;
+
+    @BeforeEach
+    void stubUser() {
+        when(currentUserProvider.requiredUserId()).thenReturn(USER);
+    }
 
     @Test
     void contextCreated() {
@@ -45,12 +55,12 @@ class LikeCommentUseCaseImplTest {
     }
 
     @Test
-    void WHEN_userIdMissing_THEN_errorAndNoServiceCall() {
-        LikeCommentUseCase.Response response = useCase.execute(new LikeCommentUseCase.Request("", COMMENT_ID));
+    void WHEN_commentIdMissing_THEN_errorAndNoServiceCall() {
+        LikeCommentUseCase.Response response = useCase.execute(new LikeCommentUseCase.Request(""));
 
         assertThat(response.success()).isFalse();
         assertThat(response.liked()).isFalse();
-        assertThat(response.errorMessage()).isEqualTo(ErrorCode.USER_ID_REQUIRED.getMessage());
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.FIELD_REQUIRED.getMessage());
         verify(commentLikeService, never()).likeComment(any(), any(), any());
     }
 
@@ -59,7 +69,7 @@ class LikeCommentUseCaseImplTest {
         when(commentLikeService.likeComment(eq(USER), eq(COMMENT_ID), any(Context.class)))
                 .thenReturn(new CommentLikeToggleResult(true));
 
-        LikeCommentUseCase.Response response = useCase.execute(new LikeCommentUseCase.Request(USER, COMMENT_ID));
+        LikeCommentUseCase.Response response = useCase.execute(new LikeCommentUseCase.Request(COMMENT_ID));
 
         assertThat(response.success()).isTrue();
         assertThat(response.liked()).isTrue();
@@ -76,7 +86,7 @@ class LikeCommentUseCaseImplTest {
                     return null;
                 });
 
-        LikeCommentUseCase.Response response = useCase.execute(new LikeCommentUseCase.Request(USER, COMMENT_ID));
+        LikeCommentUseCase.Response response = useCase.execute(new LikeCommentUseCase.Request(COMMENT_ID));
 
         assertThat(response.success()).isFalse();
         assertThat(response.errorMessage()).isEqualTo(ErrorCode.COMMENT_NOT_FOUND.getMessage());

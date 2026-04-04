@@ -76,6 +76,7 @@ public class UserRepositoryImpl implements UserRepository {
         paramHelper.putParam(params, TELEGRAM_USERNAME, user.getTelegramUsername(), user.getId());
         paramHelper.putParam(params, WHATSAPP_USERNAME, user.getWhatsappNumber(), user.getId());
         paramHelper.putParam(params, ACTIVITY, user.getActivity(), user.getId());
+        paramHelper.putParam(params, ROLES, user.getRoles(), user.getId());
         paramHelper.putParam(params, STATUS, user.getStatus().name(), user.getId());
         paramHelper.putParam(params, CREATED_AT, user.getCreatedAt(), user.getId());
         paramHelper.putParam(params, LAST_LOGIN_AT, user.getLastLoginAt(), user.getId());

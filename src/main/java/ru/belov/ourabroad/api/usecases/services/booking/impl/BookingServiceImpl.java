@@ -6,14 +6,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.services.booking.BookingService;
 import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
+import ru.belov.ourabroad.api.usecases.services.specialistservice.SpecialistServiceService;
 import ru.belov.ourabroad.core.domain.Booking;
 import ru.belov.ourabroad.core.domain.BookingFactory;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
-import ru.belov.ourabroad.core.domain.SpecialistService;
 import ru.belov.ourabroad.core.enums.BookingStatus;
 import ru.belov.ourabroad.poi.storage.BookingRepository;
-import ru.belov.ourabroad.poi.storage.SpecialistServiceRepository;
 import ru.belov.ourabroad.web.validators.ErrorCode;
 
 import java.time.LocalDateTime;
@@ -26,7 +25,7 @@ import java.util.Optional;
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
-    private final SpecialistServiceRepository specialistServiceRepository;
+    private final SpecialistServiceService specialistServiceService;
     private final SpecialistProfileService specialistProfileService;
 
     @Override
@@ -48,20 +47,13 @@ public class BookingServiceImpl implements BookingService {
             return null;
         }
 
-        Optional<SpecialistService> serviceOpt = specialistServiceRepository.findById(serviceId);
-        if (serviceOpt.isEmpty()) {
-            context.setError(ErrorCode.SERVICE_NOT_AVAILABLE);
-            return null;
-        }
-        SpecialistService service = serviceOpt.get();
-        if (!specialistId.equals(service.getSpecialistId()) || !service.isActive()) {
+        if (specialistServiceService.requireActiveServiceForSpecialist(serviceId, specialistId, context) == null) {
             log.warn(
                     "[userId: {}] Service not available for specialist: serviceId={}, specialistId={}",
                     userId,
                     serviceId,
                     specialistId
             );
-            context.setError(ErrorCode.SERVICE_NOT_AVAILABLE);
             return null;
         }
 

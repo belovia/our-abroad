@@ -7,9 +7,7 @@ public interface GetUserByPhoneUseCase {
 
     Response execute(Request request);
 
-    record Request(
-            String userId,
-            String phone) {
+    record Request(String phone) {
     }
 
     record Response(

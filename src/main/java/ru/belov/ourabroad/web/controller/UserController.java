@@ -63,57 +63,42 @@ public class UserController {
     }
 
     @GetMapping("/by-phone")
-    public ResponseEntity<GetUserByPhoneUseCase.Response> getByPhone(
-            @RequestParam String userId,
-            @RequestParam String phone
-    ) {
-        log.info("[userId: {}] GET /api/users/by-phone", userId);
-        var response = getUserByPhoneUseCase.execute(new GetUserByPhoneUseCase.Request(userId, phone));
+    public ResponseEntity<GetUserByPhoneUseCase.Response> getByPhone(@RequestParam String phone) {
+        log.info("GET /api/users/by-phone");
+        var response = getUserByPhoneUseCase.execute(new GetUserByPhoneUseCase.Request(phone));
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{userId}")
-    public ResponseEntity<Void> patchUser(
-            @PathVariable("userId") String userId,
-            @RequestBody UpdateUserRequest request
-    ) {
-        log.info("[userId: {}] PATCH /api/users/{}", userId);
-        userUpdateUsecase.updateUser(userId, request);
+    @PatchMapping("/me")
+    public ResponseEntity<Void> patchUser(@RequestBody UpdateUserRequest request) {
+        log.info("PATCH /api/users/me");
+        userUpdateUsecase.updateUser(request);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PutMapping("/{userId}/email")
-    public ResponseEntity<ChangeUserEmailUseCase.Response> changeEmail(
-            @PathVariable("userId") String userId,
-            @RequestBody ChangeEmailBody body
-    ) {
-        log.info("[userId: {}] PUT .../email", userId);
+    @PutMapping("/me/email")
+    public ResponseEntity<ChangeUserEmailUseCase.Response> changeEmail(@RequestBody ChangeEmailBody body) {
+        log.info("PUT /api/users/me/email");
         var response = changeUserEmailUseCase.execute(
-                new ChangeUserEmailUseCase.Request(userId, body.newEmail())
+                new ChangeUserEmailUseCase.Request(body.newEmail())
         );
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{userId}/password")
-    public ResponseEntity<ChangeUserPasswordUseCase.Response> changePassword(
-            @PathVariable("userId") String userId,
-            @RequestBody ChangePasswordBody body
-    ) {
-        log.info("[userId: {}] PUT .../password", userId);
+    @PutMapping("/me/password")
+    public ResponseEntity<ChangeUserPasswordUseCase.Response> changePassword(@RequestBody ChangePasswordBody body) {
+        log.info("PUT /api/users/me/password");
         var response = changeUserPasswordUseCase.execute(
-                new ChangeUserPasswordUseCase.Request(userId, body.oldPassword(), body.newPassword())
+                new ChangeUserPasswordUseCase.Request(body.oldPassword(), body.newPassword())
         );
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{userId}/phone")
-    public ResponseEntity<ChangeUserPhoneUseCase.Response> changePhone(
-            @PathVariable("userId") String userId,
-            @RequestBody ChangePhoneBody body
-    ) {
-        log.info("[userId: {}] PUT .../phone", userId);
+    @PutMapping("/me/phone")
+    public ResponseEntity<ChangeUserPhoneUseCase.Response> changePhone(@RequestBody ChangePhoneBody body) {
+        log.info("PUT /api/users/me/phone");
         var response = changeUserPhoneUseCase.execute(
-                new ChangeUserPhoneUseCase.Request(userId, body.newPhone())
+                new ChangeUserPhoneUseCase.Request(body.newPhone())
         );
         return ResponseEntity.ok(response);
     }

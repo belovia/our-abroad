@@ -4,7 +4,7 @@ public interface ConfirmBookingUseCase {
 
     Response execute(Request request);
 
-    record Request(String specialistUserId, String bookingId) {
+    record Request(String bookingId) {
     }
 
     record Response(boolean success, String message) {

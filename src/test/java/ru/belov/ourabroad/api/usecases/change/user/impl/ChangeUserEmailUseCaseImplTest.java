@@ -1,5 +1,6 @@
 package ru.belov.ourabroad.api.usecases.change.user.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -7,9 +8,11 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.belov.ourabroad.api.usecases.change.user.ChangeUserEmailUseCase;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.core.domain.UserFactory;
@@ -21,6 +24,7 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -37,6 +41,9 @@ class ChangeUserEmailUseCaseImplTest {
     @MockitoBean
     private UserService userService;
 
+    @MockitoBean
+    private CurrentUserProvider currentUserProvider;
+
     @Autowired
     private ChangeUserEmailUseCaseImpl usecase;
 
@@ -45,6 +52,11 @@ class ChangeUserEmailUseCaseImplTest {
 
     private static final String USER_ID = "user-123";
     private static final String NEW_EMAIL = "new@example.com";
+
+    @BeforeEach
+    void stubCurrentUser() {
+        org.mockito.Mockito.when(currentUserProvider.requiredUserId()).thenReturn(USER_ID);
+    }
 
     @Test
     void contextCreated() {
@@ -75,17 +87,12 @@ class ChangeUserEmailUseCaseImplTest {
     }
 
     @Test
-    void WHEN_execute_nullUserId_THEN_returnValidationError() {
-        // Arrange
-        ChangeUserEmailUseCase.Request request = new ChangeUserEmailUseCase.Request(null, NEW_EMAIL);
+    void WHEN_noAuthenticatedUser_THEN_throws() {
+        org.mockito.Mockito.when(currentUserProvider.requiredUserId())
+                .thenThrow(new InsufficientAuthenticationException("test"));
 
-        // Action
-        ChangeUserEmailUseCase.Response response = usecase.execute(request);
-
-        // Asserts
-        assertThat(response.success()).isFalse();
-        assertThat(response.userId()).isNull();
-        assertThat(response.errorMessage()).isEqualTo(ErrorCode.USER_ID_REQUIRED.getMessage());
+        assertThrows(InsufficientAuthenticationException.class,
+                () -> usecase.execute(new ChangeUserEmailUseCase.Request(NEW_EMAIL)));
 
         verify(userService, never()).findById(anyString(), any(Context.class));
         verify(userService, never()).update(any(User.class), any(Context.class));
@@ -94,7 +101,7 @@ class ChangeUserEmailUseCaseImplTest {
     @Test
     void WHEN_execute_nullEmail_THEN_returnValidationError() {
         // Arrange
-        ChangeUserEmailUseCase.Request request = new ChangeUserEmailUseCase.Request(USER_ID, null);
+        ChangeUserEmailUseCase.Request request = new ChangeUserEmailUseCase.Request(null);
 
         // Action
         ChangeUserEmailUseCase.Response response = usecase.execute(request);
@@ -111,7 +118,7 @@ class ChangeUserEmailUseCaseImplTest {
     @Test
     void WHEN_execute_invalidEmailFormat_THEN_returnValidationError() {
         // Arrange
-        ChangeUserEmailUseCase.Request request = new ChangeUserEmailUseCase.Request(USER_ID, "not-an-email");
+        ChangeUserEmailUseCase.Request request = new ChangeUserEmailUseCase.Request("not-an-email");
 
         // Action
         ChangeUserEmailUseCase.Response response = usecase.execute(request);
@@ -160,13 +167,14 @@ class ChangeUserEmailUseCaseImplTest {
     }
 
     private ChangeUserEmailUseCase.Request createValidRequest() {
-        return new ChangeUserEmailUseCase.Request(USER_ID, NEW_EMAIL);
+        return new ChangeUserEmailUseCase.Request(NEW_EMAIL);
     }
 
     private User createUser() {
         return User.create(
                 USER_ID, "old@example.com", "+79001234567", "password",
                 UserStatus.ACTIVE, null, null, null,
+                ru.belov.ourabroad.core.security.AppRoles.DEFAULT,
                 LocalDateTime.now(), null
         );
     }

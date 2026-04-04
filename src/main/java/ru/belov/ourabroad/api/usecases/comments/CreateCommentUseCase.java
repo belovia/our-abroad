@@ -5,7 +5,6 @@ public interface CreateCommentUseCase {
     Response execute(Request request);
 
     record Request(
-            String authorId,
             String entityId,
             String entityType,
             String content,

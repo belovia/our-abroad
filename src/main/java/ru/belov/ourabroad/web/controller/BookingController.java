@@ -3,14 +3,7 @@ package ru.belov.ourabroad.web.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.belov.ourabroad.api.usecases.change.booking.CancelBookingUseCase;
 import ru.belov.ourabroad.api.usecases.change.booking.ConfirmBookingUseCase;
 import ru.belov.ourabroad.api.usecases.create.booking.CreateBookingUseCase;
@@ -35,9 +28,8 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<BookingResponse> create(@RequestBody CreateBookingRequest body) {
-        log.info("[userId: {}] POST /api/bookings", body.userId());
+        log.info("POST /api/bookings");
         var request = new CreateBookingUseCase.Request(
-                body.userId(),
                 body.specialistId(),
                 body.serviceId(),
                 body.startTime()
@@ -47,9 +39,9 @@ public class BookingController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<BookingsListResponse> myBookings(@RequestParam("userId") String userId) {
-        log.info("[userId: {}] GET /api/bookings/my", userId);
-        var response = getUserBookingsUseCase.execute(new GetUserBookingsUseCase.Request(userId));
+    public ResponseEntity<BookingsListResponse> myBookings() {
+        log.info("GET /api/bookings/my");
+        var response = getUserBookingsUseCase.execute(new GetUserBookingsUseCase.Request());
         return ResponseEntity.ok(new BookingsListResponse(
                 response.success(),
                 response.message(),
@@ -58,10 +50,10 @@ public class BookingController {
     }
 
     @GetMapping("/incoming")
-    public ResponseEntity<BookingsListResponse> incoming(@RequestParam("userId") String specialistUserId) {
-        log.info("[specialistUserId: {}] GET /api/bookings/incoming", specialistUserId);
+    public ResponseEntity<BookingsListResponse> incoming() {
+        log.info("GET /api/bookings/incoming");
         var response = getSpecialistBookingsUseCase.execute(
-                new GetSpecialistBookingsUseCase.Request(specialistUserId)
+                new GetSpecialistBookingsUseCase.Request()
         );
         return ResponseEntity.ok(new BookingsListResponse(
                 response.success(),
@@ -72,22 +64,20 @@ public class BookingController {
 
     @PatchMapping("/{id}/cancel")
     public ResponseEntity<CancelBookingUseCase.Response> cancel(
-            @PathVariable("id") String bookingId,
-            @RequestParam("userId") String userId
+            @PathVariable("id") String bookingId
     ) {
         log.info("[bookingId: {}] PATCH cancel", bookingId);
-        var response = cancelBookingUseCase.execute(new CancelBookingUseCase.Request(userId, bookingId));
+        var response = cancelBookingUseCase.execute(new CancelBookingUseCase.Request(bookingId));
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/confirm")
     public ResponseEntity<ConfirmBookingUseCase.Response> confirm(
-            @PathVariable("id") String bookingId,
-            @RequestParam("userId") String specialistUserId
+            @PathVariable("id") String bookingId
     ) {
         log.info("[bookingId: {}] PATCH confirm", bookingId);
         var response = confirmBookingUseCase.execute(
-                new ConfirmBookingUseCase.Request(specialistUserId, bookingId)
+                new ConfirmBookingUseCase.Request(bookingId)
         );
         return ResponseEntity.ok(response);
     }

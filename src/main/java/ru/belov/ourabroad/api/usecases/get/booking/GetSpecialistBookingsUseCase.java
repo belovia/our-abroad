@@ -9,7 +9,7 @@ public interface GetSpecialistBookingsUseCase {
 
     Response execute(Request request);
 
-    record Request(String specialistUserId) {
+    record Request() {
     }
 
     record BookingItem(

@@ -4,7 +4,7 @@ public interface CancelBookingUseCase {
 
     Response execute(Request request);
 
-    record Request(String userId, String bookingId) {
+    record Request(String bookingId) {
     }
 
     record Response(boolean success, String message) {

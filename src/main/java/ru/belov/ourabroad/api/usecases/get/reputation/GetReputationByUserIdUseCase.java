@@ -6,7 +6,7 @@ public interface GetReputationByUserIdUseCase {
 
     Response execute(Request request);
 
-    record Request(String userId) {
+    record Request() {
     }
 
     record Response(
