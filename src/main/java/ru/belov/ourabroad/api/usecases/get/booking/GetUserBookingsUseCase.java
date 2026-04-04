@@ -9,7 +9,11 @@ public interface GetUserBookingsUseCase {
 
     Response execute(Request request);
 
-    record Request(String userId) {
+    /**
+     * Пустой запрос намеренно: идентификатор пользователя берётся из JWT ({@code CurrentUserProvider}),
+     * а не из параметров HTTP.
+     */
+    record Request() {
     }
 
     record BookingItem(

@@ -37,6 +37,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Optional<User> findByEmailRaw(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
     public User findByEmail(String email, Context context) {
         log.info("Try to find user by email: {}",email);
 

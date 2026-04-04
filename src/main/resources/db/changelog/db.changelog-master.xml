@@ -18,5 +18,7 @@
     <include file="db/changelog/009-qa-votes.xml"/>
     <include file="db/changelog/010-comments.xml"/>
     <include file="db/changelog/012-bookings.xml"/>
+    <include file="db/changelog/013-users-roles.xml"/>
+    <include file="db/changelog/014-refresh-tokens.xml"/>
 
 </databaseChangeLog>

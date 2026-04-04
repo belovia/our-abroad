@@ -6,10 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.get.booking.GetUserBookingsUseCase;
 import ru.belov.ourabroad.api.usecases.services.booking.BookingService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Booking;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.web.validators.ErrorCode;
-import ru.belov.ourabroad.web.validators.FieldValidator;
 
 import java.util.List;
 
@@ -19,19 +19,15 @@ import java.util.List;
 public class GetUserBookingsUseCaseImpl implements GetUserBookingsUseCase {
 
     private final BookingService bookingService;
-    private final FieldValidator fieldValidator;
+    private final CurrentUserProvider currentUserProvider;
 
     @Override
     public Response execute(Request request) {
         Context context = new Context();
-        log.info("[userId: {}] Get user bookings", request.userId());
+        String userId = currentUserProvider.requiredUserId();
+        log.info("[userId: {}] Get user bookings", userId);
 
-        fieldValidator.validateRequiredField(request.userId(), context);
-        if (!context.isSuccess()) {
-            return errorResponse(context.getErrorMessage());
-        }
-
-        List<Booking> bookings = bookingService.getUserBookings(request.userId(), context);
+        List<Booking> bookings = bookingService.getUserBookings(userId, context);
         if (!context.isSuccess()) {
             return errorResponse(context.getErrorMessage());
         }

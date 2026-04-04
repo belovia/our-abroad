@@ -1,15 +1,18 @@
 package ru.belov.ourabroad.api.usecases.change.user.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.belov.ourabroad.api.usecases.change.user.ChangeUserPhoneUseCase;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.core.enums.UserStatus;
@@ -20,6 +23,7 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -36,6 +40,9 @@ class ChangeUserPhoneUseCaseImplTest {
     @MockitoBean
     private UserService userService;
 
+    @MockitoBean
+    private CurrentUserProvider currentUserProvider;
+
     @Autowired
     private ChangeUserPhoneUseCaseImpl usecase;
 
@@ -44,6 +51,11 @@ class ChangeUserPhoneUseCaseImplTest {
 
     private static final String USER_ID = "user-123";
     private static final String NEW_PHONE = "+79001234567";
+
+    @BeforeEach
+    void stubCurrentUser() {
+        when(currentUserProvider.requiredUserId()).thenReturn(USER_ID);
+    }
 
     @Test
     void contextCreated() {
@@ -74,17 +86,12 @@ class ChangeUserPhoneUseCaseImplTest {
     }
 
     @Test
-    void WHEN_execute_nullUserId_THEN_returnValidationError() {
-        // Arrange
-        ChangeUserPhoneUseCase.Request request = new ChangeUserPhoneUseCase.Request(null, NEW_PHONE);
+    void WHEN_noAuthenticatedUser_THEN_throws() {
+        when(currentUserProvider.requiredUserId())
+                .thenThrow(new InsufficientAuthenticationException("test"));
 
-        // Action
-        ChangeUserPhoneUseCase.Response response = usecase.execute(request);
-
-        // Asserts
-        assertThat(response.success()).isFalse();
-        assertThat(response.userId()).isNull();
-        assertThat(response.message()).isEqualTo(ErrorCode.USER_ID_REQUIRED.getMessage());
+        assertThrows(InsufficientAuthenticationException.class,
+                () -> usecase.execute(new ChangeUserPhoneUseCase.Request(NEW_PHONE)));
 
         verify(userService, never()).findById(anyString(), any(Context.class));
         verify(userService, never()).update(any(User.class), any(Context.class));
@@ -93,7 +100,7 @@ class ChangeUserPhoneUseCaseImplTest {
     @Test
     void WHEN_execute_invalidPhoneFormat_THEN_returnValidationError() {
         // Arrange
-        ChangeUserPhoneUseCase.Request request = new ChangeUserPhoneUseCase.Request(USER_ID, "12345");
+        ChangeUserPhoneUseCase.Request request = new ChangeUserPhoneUseCase.Request("12345");
 
         // Action
         ChangeUserPhoneUseCase.Response response = usecase.execute(request);
@@ -132,7 +139,7 @@ class ChangeUserPhoneUseCaseImplTest {
     @Test
     void WHEN_execute_nullPhone_THEN_phoneIsOptionalSoNoFormatError() {
         // Arrange — null phone skips format validation (no text = no pattern check)
-        ChangeUserPhoneUseCase.Request request = new ChangeUserPhoneUseCase.Request(USER_ID, null);
+        ChangeUserPhoneUseCase.Request request = new ChangeUserPhoneUseCase.Request(null);
         User existingUser = createUser();
 
         when(userService.findById(eq(USER_ID), any(Context.class))).thenReturn(existingUser);
@@ -160,13 +167,14 @@ class ChangeUserPhoneUseCaseImplTest {
     }
 
     private ChangeUserPhoneUseCase.Request createValidRequest() {
-        return new ChangeUserPhoneUseCase.Request(USER_ID, NEW_PHONE);
+        return new ChangeUserPhoneUseCase.Request(NEW_PHONE);
     }
 
     private User createUser() {
         return User.create(
                 USER_ID, "user@example.com", "+79119999999", "password",
                 UserStatus.ACTIVE, null, null, null,
+                ru.belov.ourabroad.core.security.AppRoles.DEFAULT,
                 LocalDateTime.now(), null
         );
     }

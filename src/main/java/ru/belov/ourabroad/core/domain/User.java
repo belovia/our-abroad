@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import ru.belov.ourabroad.core.enums.UserStatus;
+import ru.belov.ourabroad.core.security.AppRoles;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -21,6 +22,7 @@ public class User {
     private String telegramUsername;
     private String whatsappNumber;
     private String activity;
+    private String roles;
     private final LocalDateTime createdAt;
     private LocalDateTime lastLoginAt;
 
@@ -38,6 +40,7 @@ public class User {
             String telegramUsername,
             String whatsappNumber,
             String activity,
+            String roles,
             LocalDateTime createdAt,
             LocalDateTime lastLoginAt
     ) {
@@ -52,6 +55,7 @@ public class User {
         user.telegramUsername = telegramUsername;
         user.whatsappNumber = whatsappNumber;
         user.activity = activity;
+        user.roles = roles != null && !roles.isBlank() ? roles : AppRoles.DEFAULT;
         user.lastLoginAt = lastLoginAt;
         return user;
     }

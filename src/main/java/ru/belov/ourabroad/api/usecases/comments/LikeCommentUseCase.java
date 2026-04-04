@@ -4,7 +4,7 @@ public interface LikeCommentUseCase {
 
     Response execute(Request request);
 
-    record Request(String userId, String commentId) {
+    record Request(String commentId) {
     }
 
     /**

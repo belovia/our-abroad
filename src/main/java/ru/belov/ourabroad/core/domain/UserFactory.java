@@ -1,6 +1,7 @@
 package ru.belov.ourabroad.core.domain;
 
 import ru.belov.ourabroad.core.enums.UserStatus;
+import ru.belov.ourabroad.core.security.AppRoles;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -19,6 +20,7 @@ public final class UserFactory {
             String telegramUsername,
             String whatAppNumber,
             String activity,
+            String roles,
             LocalDateTime createdAt,
             LocalDateTime lastLoginAt
     ) {
@@ -31,6 +33,7 @@ public final class UserFactory {
                 telegramUsername,
                 whatAppNumber,
                 activity,
+                roles,
                 createdAt,
                 lastLoginAt
         );
@@ -58,6 +61,7 @@ public final class UserFactory {
                 telegramUsername,
                 whatAppNumber,
                 activity,
+                AppRoles.DEFAULT,
                 LocalDateTime.now(),
                 null
         );

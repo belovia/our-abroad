@@ -7,11 +7,11 @@ import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.get.booking.GetSpecialistBookingsUseCase;
 import ru.belov.ourabroad.api.usecases.services.booking.BookingService;
 import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Booking;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.web.validators.ErrorCode;
-import ru.belov.ourabroad.web.validators.FieldValidator;
 
 import java.util.List;
 
@@ -22,19 +22,15 @@ public class GetSpecialistBookingsUseCaseImpl implements GetSpecialistBookingsUs
 
     private final SpecialistProfileService specialistProfileService;
     private final BookingService bookingService;
-    private final FieldValidator fieldValidator;
+    private final CurrentUserProvider currentUserProvider;
 
     @Override
     public Response execute(Request request) {
         Context context = new Context();
-        log.info("[specialistUserId: {}] Get incoming bookings", request.specialistUserId());
+        String specialistUserId = currentUserProvider.requiredUserId();
+        log.info("[specialistUserId: {}] Get incoming bookings", specialistUserId);
 
-        fieldValidator.validateRequiredField(request.specialistUserId(), context);
-        if (!context.isSuccess()) {
-            return errorResponse(context.getErrorMessage());
-        }
-
-        SpecialistProfile profile = specialistProfileService.findByUserId(request.specialistUserId(), context);
+        SpecialistProfile profile = specialistProfileService.findByUserId(specialistUserId, context);
         if (!context.isSuccess() || profile == null) {
             return errorResponse(ErrorCode.SPECIALIST_NOT_FOUND.getMessage());
         }

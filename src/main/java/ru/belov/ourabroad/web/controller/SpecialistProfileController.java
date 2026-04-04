@@ -30,7 +30,7 @@ public class SpecialistProfileController {
     public ResponseEntity<CreateSpecialistProfileUseCase.Response> create(
             @RequestBody CreateSpecialistProfileUseCase.Request request
     ) {
-        log.info("[userId: {}] Request to create specialist profile", request.userId());
+        log.info("Request to create specialist profile for current user");
         var response = createSpecialistProfileUseCase.execute(request);
         return ResponseEntity.ok(response);
     }

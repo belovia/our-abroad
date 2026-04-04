@@ -1,5 +1,6 @@
 package ru.belov.ourabroad.api.usecases.create.verification.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.belov.ourabroad.api.usecases.create.verification.CreateVerificationUseCase;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
 import ru.belov.ourabroad.api.usecases.services.verification.VerificationService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.UserFactory;
 import ru.belov.ourabroad.core.enums.VerificationType;
@@ -18,7 +20,10 @@ import ru.belov.ourabroad.web.validators.UserValidator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CreateVerificationUseCaseImpl.class, UserValidator.class})
@@ -30,10 +35,18 @@ class CreateVerificationUseCaseImplTest {
     @MockitoBean
     private VerificationService verificationService;
 
+    @MockitoBean
+    private CurrentUserProvider currentUserProvider;
+
     @Autowired
     private CreateVerificationUseCase useCase;
 
     private static final String USER_ID = "user-1";
+
+    @BeforeEach
+    void stubUser() {
+        when(currentUserProvider.requiredUserId()).thenReturn(USER_ID);
+    }
 
     @Test
     void WHEN_noDuplicate_THEN_saves() {
@@ -44,7 +57,7 @@ class CreateVerificationUseCaseImplTest {
         doNothing().when(verificationService).save(any(), any(Context.class));
 
         var response = useCase.execute(
-                new CreateVerificationUseCase.Request(USER_ID, VerificationType.EMAIL, null)
+                new CreateVerificationUseCase.Request(VerificationType.EMAIL, null)
         );
 
         assertThat(response.success()).isTrue();
@@ -61,7 +74,7 @@ class CreateVerificationUseCaseImplTest {
                 .thenReturn(true);
 
         var response = useCase.execute(
-                new CreateVerificationUseCase.Request(USER_ID, VerificationType.EMAIL, null)
+                new CreateVerificationUseCase.Request(VerificationType.EMAIL, null)
         );
 
         assertThat(response.success()).isFalse();

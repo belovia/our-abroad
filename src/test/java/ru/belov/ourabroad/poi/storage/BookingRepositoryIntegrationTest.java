@@ -16,6 +16,7 @@ import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.core.domain.UserFactory;
 import ru.belov.ourabroad.core.enums.BookingStatus;
 import ru.belov.ourabroad.core.enums.UserStatus;
+import ru.belov.ourabroad.core.security.AppRoles;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -65,6 +66,7 @@ class BookingRepositoryIntegrationTest {
                 null,
                 null,
                 null,
+                AppRoles.DEFAULT,
                 now,
                 null
         );
@@ -77,6 +79,7 @@ class BookingRepositoryIntegrationTest {
                 null,
                 null,
                 null,
+                AppRoles.DEFAULT,
                 now,
                 null
         );

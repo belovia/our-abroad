@@ -1,5 +1,6 @@
 package ru.belov.ourabroad.api.usecases.create.booking.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.belov.ourabroad.api.usecases.create.booking.CreateBookingUseCase;
 import ru.belov.ourabroad.api.usecases.services.booking.BookingService;
 import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Booking;
 import ru.belov.ourabroad.core.domain.BookingFactory;
 import ru.belov.ourabroad.core.domain.Context;
@@ -45,8 +47,16 @@ class CreateBookingUseCaseImplTest {
     @MockitoBean
     private BookingService bookingService;
 
+    @MockitoBean
+    private CurrentUserProvider currentUserProvider;
+
     @Autowired
     private CreateBookingUseCaseImpl useCase;
+
+    @BeforeEach
+    void stubUser() {
+        when(currentUserProvider.requiredUserId()).thenReturn(USER_ID);
+    }
 
     @Test
     void contextCreated() {
@@ -70,7 +80,7 @@ class CreateBookingUseCaseImplTest {
                 .thenReturn(created);
 
         CreateBookingUseCase.Request request = new CreateBookingUseCase.Request(
-                USER_ID, SPECIALIST_ID, SERVICE_ID, START
+                SPECIALIST_ID, SERVICE_ID, START
         );
         CreateBookingUseCase.Response response = useCase.execute(request);
 
@@ -96,7 +106,7 @@ class CreateBookingUseCaseImplTest {
         });
 
         CreateBookingUseCase.Response response = useCase.execute(
-                new CreateBookingUseCase.Request(USER_ID, SPECIALIST_ID, SERVICE_ID, START)
+                new CreateBookingUseCase.Request(SPECIALIST_ID, SERVICE_ID, START)
         );
 
         assertThat(response.success()).isFalse();
@@ -117,7 +127,7 @@ class CreateBookingUseCaseImplTest {
         when(specialistProfileService.findById(eq(SPECIALIST_ID), any(Context.class))).thenReturn(profile);
 
         CreateBookingUseCase.Response response = useCase.execute(
-                new CreateBookingUseCase.Request(USER_ID, SPECIALIST_ID, SERVICE_ID, START)
+                new CreateBookingUseCase.Request(SPECIALIST_ID, SERVICE_ID, START)
         );
 
         assertThat(response.success()).isFalse();
@@ -145,7 +155,7 @@ class CreateBookingUseCaseImplTest {
                 });
 
         CreateBookingUseCase.Response response = useCase.execute(
-                new CreateBookingUseCase.Request(USER_ID, SPECIALIST_ID, SERVICE_ID, START)
+                new CreateBookingUseCase.Request(SPECIALIST_ID, SERVICE_ID, START)
         );
 
         assertThat(response.success()).isFalse();

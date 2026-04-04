@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.create.specialistservice.CreateSpecialistServiceUseCase;
 import ru.belov.ourabroad.core.domain.Context;
+import ru.belov.ourabroad.api.usecases.services.specialistservice.SpecialistServiceService;
 import ru.belov.ourabroad.core.domain.SpecialistService;
 import ru.belov.ourabroad.core.domain.SpecialistServiceFactory;
-import ru.belov.ourabroad.poi.storage.SpecialistServiceRepository;
 import ru.belov.ourabroad.web.validators.ErrorCode;
 
 @Service
@@ -17,7 +17,7 @@ import ru.belov.ourabroad.web.validators.ErrorCode;
 public class CreateSpecialistServiceUseCaseImpl
         implements CreateSpecialistServiceUseCase {
 
-    private final SpecialistServiceRepository repository;
+    private final SpecialistServiceService specialistServiceService;
 
     @Override
     public Response execute(Request request) {
@@ -32,7 +32,10 @@ public class CreateSpecialistServiceUseCaseImpl
         }
 
         SpecialistService service = makeServiceFromRequest(specialistProfileId, request);
-        saveSpecialistService(specialistProfileId, service);
+        saveSpecialistService(specialistProfileId, service, context);
+        if (!context.isSuccess()) {
+            return errorResponse(specialistProfileId, context);
+        }
 
         log.info("[specialistProfileId: {}] Service created successfully", specialistProfileId);
         return successResponse(specialistProfileId);
@@ -65,9 +68,9 @@ public class CreateSpecialistServiceUseCaseImpl
         );
     }
 
-    private void saveSpecialistService(String specialistProfileId, SpecialistService service) {
+    private void saveSpecialistService(String specialistProfileId, SpecialistService service, Context context) {
         log.info("[specialistProfileId: {}] Saving specialist service", specialistProfileId);
-        repository.save(service);
+        specialistServiceService.saveNew(service, context);
     }
 
     protected Response errorResponse(String specialistProfileId, Context context) {

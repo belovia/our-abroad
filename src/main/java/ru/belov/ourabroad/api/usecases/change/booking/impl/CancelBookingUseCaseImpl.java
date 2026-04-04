@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.change.booking.CancelBookingUseCase;
 import ru.belov.ourabroad.api.usecases.services.booking.BookingService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.web.validators.ErrorCode;
 import ru.belov.ourabroad.web.validators.FieldValidator;
@@ -17,19 +18,20 @@ public class CancelBookingUseCaseImpl implements CancelBookingUseCase {
 
     private final BookingService bookingService;
     private final FieldValidator fieldValidator;
+    private final CurrentUserProvider currentUserProvider;
 
     @Override
     public Response execute(Request request) {
         Context context = new Context();
-        log.info("[bookingId: {}] Cancel booking by user {}", request.bookingId(), request.userId());
+        String userId = currentUserProvider.requiredUserId();
+        log.info("[bookingId: {}] Cancel booking by user {}", request.bookingId(), userId);
 
-        fieldValidator.validateRequiredField(request.userId(), context);
         fieldValidator.validateRequiredField(request.bookingId(), context);
         if (!context.isSuccess()) {
             return errorResponse(context.getErrorMessage());
         }
 
-        bookingService.cancelBooking(request.bookingId(), request.userId(), context);
+        bookingService.cancelBooking(request.bookingId(), userId, context);
         if (!context.isSuccess()) {
             return errorResponse(context.getErrorMessage());
         }

@@ -33,7 +33,7 @@ public class VerificationController {
     public ResponseEntity<CreateVerificationUseCase.Response> create(
             @RequestBody CreateVerificationUseCase.Request request
     ) {
-        log.info("[userId: {}] Request to create verification", request.userId());
+        log.info("Request to create verification");
         return ResponseEntity.ok(createVerificationUseCase.execute(request));
     }
 
@@ -46,13 +46,10 @@ public class VerificationController {
         return ResponseEntity.ok(getVerificationByIdUseCase.execute(request));
     }
 
-    @GetMapping("/by-user")
-    public ResponseEntity<GetVerificationsByUserIdUseCase.Response> listByUser(
-            @RequestParam("userId") String userId
-    ) {
-        log.info("[userId: {}] Request to list verifications", userId);
-        var request = new GetVerificationsByUserIdUseCase.Request(userId);
-        return ResponseEntity.ok(getVerificationsByUserIdUseCase.execute(request));
+    @GetMapping("/mine")
+    public ResponseEntity<GetVerificationsByUserIdUseCase.Response> listMine() {
+        log.info("Request to list verifications for current user");
+        return ResponseEntity.ok(getVerificationsByUserIdUseCase.execute(new GetVerificationsByUserIdUseCase.Request()));
     }
 
     @PatchMapping("/{id}/complete")

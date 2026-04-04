@@ -8,7 +8,7 @@ public interface GetVerificationsByUserIdUseCase {
 
     Response execute(Request request);
 
-    record Request(String userId) {
+    record Request() {
     }
 
     record Response(List<Verification> verifications, boolean success, String errorMessage) {

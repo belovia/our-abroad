@@ -2,6 +2,7 @@ package ru.belov.ourabroad.api.usecases.create.user.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase;
@@ -23,6 +24,7 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
 
     private final UserService userService;
     private final UserValidator userValidator;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -67,7 +69,7 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
     }
 
     private User buildUser(String userId, Request request) {
-        return UserFactory.newUser(
+        User user = UserFactory.newUser(
                 userId,
                 request.email(),
                 request.phone(),
@@ -76,6 +78,8 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
                 request.whatsAppNumber(),
                 request.activity()
         );
+        user.changePassword(passwordEncoder.encode(user.getPassword()));
+        return user;
     }
 
     protected Response errorResponse(Context context, String userId) {
