@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase;
+import ru.belov.ourabroad.api.usecases.services.profile.ProfileService;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
@@ -25,6 +26,7 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
     private final UserService userService;
     private final UserValidator userValidator;
     private final PasswordEncoder passwordEncoder;
+    private final ProfileService profileService;
 
     @Override
     @Transactional
@@ -48,6 +50,12 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
 
         User user = buildUser(userId, request);
         userService.save(user, context);
+        if (context.isSuccess()) {
+            profileService.saveEmpty(userId, context);
+        }
+        if (!context.isSuccess()) {
+            return errorResponse(context, userId);
+        }
 
         log.info("[userId: {}] User created successfully", userId);
         return successResponse(userId);

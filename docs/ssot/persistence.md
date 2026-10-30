@@ -14,7 +14,7 @@ last_updated: 2026-10-31
 | Таблица | Ключ и столбцы | Связи |
 |---|---|---|
 | `users` | `id`; `email` UNIQUE NOT NULL; `phone` UNIQUE; `password_hash` NOT NULL; `status`; `created_at`; `last_login_at`; `telegram_username`; `whatsapp_number`; `activity`; `roles` varchar(512), по умолчанию `ROLE_USER` | — |
-| `profile` | `user_id` PK; `display_name`; `avatar_url`; `bio`; `country`; `city`; `languages` | сценария записи нет, см. [gaps.md](gaps.md) |
+| `profile` | `user_id` PK; `display_name`; `avatar_url`; `bio`; `country`; `city`; `languages` | строка создаётся вместе с пользователем, см. [identity](identity.md) |
 | `specialist_profile` | `id` PK; `user_id` UNIQUE NOT NULL; `description`; `active`; `rating` default 0; `reviews_count` default 0 | — |
 | `specialist_service` | `id` PK; `specialist_id`; `title`; `description`; `price`; `currency`; `active` | FK на `specialist_profile(id)` ON DELETE CASCADE |
 | `reputation` | `user_id` PK; `score`; `level` | — |
@@ -38,3 +38,4 @@ last_updated: 2026-10-31
 | Дата | Изменение |
 |---|---|
 | 2026-10-31 | Таблицы по changeset 001–014. |
+| 2026-10-31 | У `profile` есть сценарий записи, см. identity. |

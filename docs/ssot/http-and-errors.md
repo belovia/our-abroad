@@ -32,6 +32,8 @@ last_updated: 2026-10-31
 | GET | `/api/users/email/{email}` | да |
 | GET | `/api/users/by-phone` | нет |
 | PATCH | `/api/users/me` | нет |
+| GET | `/api/users/me/profile` | нет |
+| PATCH | `/api/users/me/profile` | нет |
 | PUT | `/api/users/me/email` | нет |
 | PUT | `/api/users/me/password` | нет |
 | PUT | `/api/users/me/phone` | нет |
@@ -77,3 +79,4 @@ last_updated: 2026-10-31
 | Дата | Изменение |
 |---|---|
 | 2026-10-31 | Маршруты и коды HTTP по контроллерам и security. |
+| 2026-10-31 | Добавлены GET и PATCH `/api/users/me/profile`. |
