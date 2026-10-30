@@ -36,6 +36,17 @@ public class SecurityConfig {
                         .accessDeniedHandler(accessDeniedHandler)
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml",
+                                "/v3/api-docs/swagger-config",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/error"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/register",
                                 "/api/auth/login",
@@ -47,9 +58,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/questions/*/answers").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/specialist-profiles/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/specialist-services").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/users/userId/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/users/email/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/userId/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/email/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                         .anyRequest().authenticated()
                 )

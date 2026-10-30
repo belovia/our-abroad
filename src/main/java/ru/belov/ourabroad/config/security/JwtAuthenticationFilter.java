@@ -1,6 +1,5 @@
 package ru.belov.ourabroad.config.security;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,6 +11,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -24,6 +25,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String BEARER_PREFIX = "Bearer ";
 
+    private static final RequestMatcher[] DOCUMENTATION_AND_STATIC_PATHS = {
+            new AntPathRequestMatcher("/swagger-ui/**"),
+            new AntPathRequestMatcher("/swagger-ui.html"),
+            new AntPathRequestMatcher("/v3/api-docs"),
+            new AntPathRequestMatcher("/v3/api-docs/**"),
+            new AntPathRequestMatcher("/v3/api-docs.yaml"),
+            new AntPathRequestMatcher("/v3/api-docs/swagger-config"),
+            new AntPathRequestMatcher("/swagger-resources/**"),
+            new AntPathRequestMatcher("/webjars/**")
+    };
+
     private final JwtService jwtService;
 
     @Override
@@ -32,16 +44,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
+        if (matchesAny(DOCUMENTATION_AND_STATIC_PATHS, request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (!StringUtils.hasText(header) || !header.startsWith(BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
         }
+
         String token = header.substring(BEARER_PREFIX.length()).trim();
         if (!StringUtils.hasText(token)) {
             filterChain.doFilter(request, response);
             return;
         }
+
         try {
             var claims = jwtService.parseClaims(token);
             JwtUserPrincipal principal = jwtService.toPrincipal(claims);
@@ -52,13 +71,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             );
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        } catch (ExpiredJwtException e) {
-            SecurityContextHolder.clearContext();
-            request.setAttribute("jwtException", e);
         } catch (JwtException e) {
             SecurityContextHolder.clearContext();
-            request.setAttribute("jwtException", e);
         }
+
         filterChain.doFilter(request, response);
+    }
+
+    private static boolean matchesAny(RequestMatcher[] matchers, HttpServletRequest request) {
+        for (RequestMatcher matcher : matchers) {
+            if (matcher.matches(request)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -12,9 +12,9 @@ public class JwtProperties {
     /**
      * HMAC key (UTF-8); must be long enough for HS-256.
      */
-    private String secret = "dev-only-change-me-use-at-least-256-bits-secret-key-for-hs256!!";
+    private String secret = "dev";
 
-    private long accessTokenMinutes = 15;
+    private long accessTokenMinutes = 10000;
 
-    private long refreshTokenDays = 30;
+    private long refreshTokenDays = 300;
 }
