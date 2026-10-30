@@ -11,7 +11,6 @@ last_updated: 2026-10-31
 
 | id | Тема | Что видно в коде | Чего нет | Статус |
 |---|---|---|---|---|
-| GAP-001 | [identity](identity.md) | Таблица `profile`, класс `Profile`, `ProfileRepositoryImpl` | Вызова репозитория из use case или контроллера | open |
 | GAP-002 | [identity](identity.md) | `ErrorCode` содержит тексты длины пароля, заглавной буквы, цифры и допустимых символов | `UserValidator.validatePassword` проверяет только непустое значение | open |
 | GAP-003 | [identity](identity.md) | Столбец `users.phone` UNIQUE и текст `PHONE_ALREADY_EXISTS` | Ни один сценарий этот `ErrorCode` не ставит. Ответ API при конфликте уникальности не зафиксирован | open |
 | GAP-004 | [identity](identity.md) | `User.block`, `User.activate`, статусы `BLOCKED` и `DELETED` | HTTP-сценария смены статуса. Логин любого не-`ACTIVE` отвечает как при неверном пароле | open |
@@ -25,3 +24,4 @@ last_updated: 2026-10-31
 | Дата | Изменение |
 |---|---|
 | 2026-10-31 | Открыты GAP-001 … GAP-008 по срезу кода. |
+| 2026-10-31 | GAP-001 закрыт: профиль кабинета пишется при создании пользователя и читается через `/api/users/me/profile`. |

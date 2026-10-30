@@ -53,16 +53,25 @@ Refresh — 48 случайных байт в Base64 URL без padding. В та
 
 `PATCH /api/users/me` принимает `email`, `phone`, `telegramUsername`, `whatsappNumber`, `activity`. Поле попадает в запись, только если в теле оно не `null`. Ответ контроллера — `204`, в том числе когда проверки внутри сценария уже остановили сохранение.
 
-Запись `Profile` (`displayName`, `avatarUrl`, `bio`, `country`, `city`, `languages`) и таблица `profile` в HTTP-сценариях не участвуют. См. [gaps.md](gaps.md).
+## Profile
+
+Кабинетный `Profile` — отдельная запись с ключом `userId`. Поля: `displayName`, `avatarUrl`, `bio`, `country`, `city`, `languages` (в таблице строка через запятую).
+
+Пустая строка создаётся сразу после успешного сохранения пользователя в `POST /api/auth/register` и в `POST /api/users`. Поля при этом пустые, `languages` — пустой набор.
+
+`GET /api/users/me/profile` и `PATCH /api/users/me/profile` работают с профилем текущего пользователя и отвечают `200`. Нет строки — «Профиль не найден».
+
+`PATCH` меняет только поля, которые в теле не `null`. `displayName` перед записью обрезается по краям: короче 2 символов — «Имя для отображения должно содержать минимум 2 символа», длиннее 50 — «Имя для отображения должно содержать максимум 50 символов». `bio` длиннее 500 символов — «Описание не должно превышать 500 символов». Пустой набор `languages` очищает список.
 
 Методы домена `block` и `activate` HTTP-маршрута не имеют.
 
 ## Источник в коде
 
-`User`, `UserFactory`, `Profile`, `AuthenticationUseCaseImpl`, `RefreshTokenUseCaseImpl`, `RefreshTokenServiceImpl`, `AuthServiceImpl`, `JwtService`, `UserValidator`, `UserController`, `AuthController`, `UserUpdateUseCaseImpl`.
+`User`, `UserFactory`, `Profile`, `ProfileFactory`, `AuthenticationUseCaseImpl`, `RefreshTokenUseCaseImpl`, `RefreshTokenServiceImpl`, `AuthServiceImpl`, `JwtService`, `UserValidator`, `UserController`, `AuthController`, `UserUpdateUseCaseImpl`, `GetMyProfileUseCaseImpl`, `UpdateMyProfileUseCaseImpl`, `ProfileServiceImpl`.
 
 ## Update Log
 
 | Дата | Изменение |
 |---|---|
 | 2026-10-31 | Учётная запись, JWT и кабинет по коду. |
+| 2026-10-31 | Кабинетный Profile создаётся вместе с пользователем; чтение и частичное обновление — `GET`/`PATCH /api/users/me/profile`. |

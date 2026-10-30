@@ -8,6 +8,7 @@ import ru.belov.ourabroad.api.usecases.auth.AuthenticationUseCase;
 import ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase;
 import ru.belov.ourabroad.api.usecases.services.auth.AuthService;
 import ru.belov.ourabroad.api.usecases.services.auth.RefreshTokenService;
+import ru.belov.ourabroad.api.usecases.services.profile.ProfileService;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
 import ru.belov.ourabroad.config.security.JwtService;
 import ru.belov.ourabroad.core.domain.Context;
@@ -29,6 +30,7 @@ public class AuthenticationUseCaseImpl implements AuthenticationUseCase {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    private final ProfileService profileService;
 
     @Override
     @Transactional
@@ -65,6 +67,10 @@ public class AuthenticationUseCaseImpl implements AuthenticationUseCase {
                 request.activity()
         );
         userService.save(user, context);
+        if (!context.isSuccess()) {
+            return AuthResponse.error(context.getErrorMessage());
+        }
+        profileService.saveEmpty(user.getId(), context);
         if (!context.isSuccess()) {
             return AuthResponse.error(context.getErrorMessage());
         }

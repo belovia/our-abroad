@@ -11,6 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase;
+import ru.belov.ourabroad.api.usecases.services.profile.ProfileService;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
@@ -38,6 +39,9 @@ class CreateUserUseCaseImplTest {
 
     @MockitoBean
     private PasswordEncoder passwordEncoder;
+
+    @MockitoBean
+    private ProfileService profileService;
 
     @Autowired
     private CreateUserUseCaseImpl usecase;
@@ -145,6 +149,18 @@ class CreateUserUseCaseImplTest {
         assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_REQUIRED.getMessage());
 
         verify(userService, never()).save(any(User.class), any(Context.class));
+        verify(profileService, never()).saveEmpty(anyString(), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_validRequest_THEN_savesEmptyProfile() {
+        CreateUserUseCase.Request request = createValidRequest();
+        when(userService.existsByEmail(anyString(), eq(EMAIL), any(Context.class))).thenReturn(false);
+
+        CreateUserUseCase.Response response = usecase.execute(request);
+
+        assertThat(response.success()).isTrue();
+        verify(profileService).saveEmpty(eq(response.userId()), any(Context.class));
     }
 
     @Test

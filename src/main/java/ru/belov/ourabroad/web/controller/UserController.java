@@ -6,10 +6,12 @@ import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.belov.ourabroad.api.usecases.change.profile.UpdateMyProfileUseCase;
 import ru.belov.ourabroad.api.usecases.change.user.ChangeUserEmailUseCase;
 import ru.belov.ourabroad.api.usecases.change.user.ChangeUserPasswordUseCase;
 import ru.belov.ourabroad.api.usecases.change.user.ChangeUserPhoneUseCase;
 import ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase;
+import ru.belov.ourabroad.api.usecases.get.profile.GetMyProfileUseCase;
 import ru.belov.ourabroad.api.usecases.get.user.GetUserByEmailUseCase;
 import ru.belov.ourabroad.api.usecases.get.user.GetUserByIdUsecase;
 import ru.belov.ourabroad.api.usecases.get.user.GetUserByPhoneUseCase;
@@ -33,6 +35,8 @@ public class UserController {
     private final ChangeUserEmailUseCase changeUserEmailUseCase;
     private final ChangeUserPasswordUseCase changeUserPasswordUseCase;
     private final ChangeUserPhoneUseCase changeUserPhoneUseCase;
+    private final GetMyProfileUseCase getMyProfileUseCase;
+    private final UpdateMyProfileUseCase updateMyProfileUseCase;
 
     @PostMapping
     public ResponseEntity<Response> create(@RequestBody Request request) {
@@ -61,6 +65,20 @@ public class UserController {
         log.info("GET /api/users/by-phone");
         var response = getUserByPhoneUseCase.execute(new GetUserByPhoneUseCase.Request(phone));
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me/profile")
+    public ResponseEntity<GetMyProfileUseCase.Response> myProfile() {
+        log.info("GET /api/users/me/profile");
+        return ResponseEntity.ok(getMyProfileUseCase.execute());
+    }
+
+    @PatchMapping("/me/profile")
+    public ResponseEntity<UpdateMyProfileUseCase.Response> patchProfile(
+            @RequestBody UpdateMyProfileUseCase.Request request
+    ) {
+        log.info("PATCH /api/users/me/profile");
+        return ResponseEntity.ok(updateMyProfileUseCase.execute(request));
     }
 
     @PatchMapping("/me")
