@@ -1,0 +1,6 @@
+# Spring Boot 3.4+ default Liquibase path is db/changelog/db.changelog-master.yaml.
+# The project keeps the real changelog graph in db.changelog-master.xml — this file only includes it.
+databaseChangeLog:
+  - include:
+      file: db.changelog-master.xml
+      relativeToChangelogFile: true
