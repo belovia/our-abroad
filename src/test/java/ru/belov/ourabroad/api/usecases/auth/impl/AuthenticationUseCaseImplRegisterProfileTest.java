@@ -18,8 +18,12 @@ import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.web.validators.UserValidator;
 
+import ru.belov.ourabroad.web.validators.ErrorCode;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -86,5 +90,39 @@ class AuthenticationUseCaseImplRegisterProfileTest {
 
         verify(profileService, never()).saveEmpty(anyString(), any(Context.class));
         verify(userService, never()).save(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_registerPhoneAlreadyExists_THEN_returnPhoneAlreadyExistsError() {
+        when(userService.existsByPhone(anyString(), eq("+79123456789"), any(Context.class))).thenReturn(true);
+
+        var response = authenticationUseCase.register(new AuthenticationUseCase.RegisterRequest(
+                "user@example.com",
+                "+79123456789",
+                "Abcdef1!",
+                null,
+                null,
+                null
+        ));
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.message()).isEqualTo(ErrorCode.PHONE_ALREADY_EXISTS.getMessage());
+        verify(userService, never()).save(any(User.class), any(Context.class));
+        verify(profileService, never()).saveEmpty(anyString(), any(Context.class));
+    }
+
+    @Test
+    void WHEN_registerWithoutPhone_THEN_success() {
+        var response = authenticationUseCase.register(new AuthenticationUseCase.RegisterRequest(
+                "user@example.com",
+                null,
+                "Abcdef1!",
+                null,
+                null,
+                null
+        ));
+
+        assertThat(response.success()).isTrue();
+        verify(userService, never()).existsByPhone(anyString(), any(), any(Context.class));
     }
 }

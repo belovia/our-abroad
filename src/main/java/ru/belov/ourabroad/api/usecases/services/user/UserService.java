@@ -23,4 +23,6 @@ public interface UserService {
     void update(User user, Context context);
 
     boolean existsByEmail(String userId, String email, Context context);
+
+    boolean existsByPhone(String excludeUserId, String phone, Context context);
 }
