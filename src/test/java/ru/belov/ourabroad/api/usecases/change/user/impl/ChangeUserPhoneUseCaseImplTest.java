@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -150,6 +151,40 @@ class ChangeUserPhoneUseCaseImplTest {
 
         // Asserts
         assertThat(response.success()).isTrue();
+        assertThat(response.message()).isNotEqualTo(ErrorCode.PHONE_ALREADY_EXISTS.getMessage());
+        verify(userService, never()).existsByPhone(anyString(), any(), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_phoneAlreadyExists_THEN_returnPhoneAlreadyExistsError() {
+        ChangeUserPhoneUseCase.Request request = createValidRequest();
+        User existingUser = createUser();
+
+        when(userService.findById(eq(USER_ID), any(Context.class))).thenReturn(existingUser);
+        when(userService.existsByPhone(eq(USER_ID), eq(NEW_PHONE), any(Context.class))).thenReturn(true);
+
+        ChangeUserPhoneUseCase.Response response = usecase.execute(request);
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.message()).isEqualTo(ErrorCode.PHONE_ALREADY_EXISTS.getMessage());
+        verify(userService, never()).update(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_samePhoneAsOwn_THEN_updateSuccessfully() {
+        String ownPhone = "+79119999999";
+        ChangeUserPhoneUseCase.Request request = new ChangeUserPhoneUseCase.Request(ownPhone);
+        User existingUser = createUser();
+
+        when(userService.findById(eq(USER_ID), any(Context.class))).thenReturn(existingUser);
+        when(userService.existsByPhone(eq(USER_ID), eq(ownPhone), any(Context.class))).thenReturn(false);
+        doNothing().when(userService).update(any(User.class), any(Context.class));
+
+        ChangeUserPhoneUseCase.Response response = usecase.execute(request);
+
+        assertThat(response.success()).isTrue();
+        verify(userService).update(userCaptor.capture(), any(Context.class));
+        assertThat(userCaptor.getValue().getPhone()).isEqualTo(ownPhone);
     }
 
     @Test

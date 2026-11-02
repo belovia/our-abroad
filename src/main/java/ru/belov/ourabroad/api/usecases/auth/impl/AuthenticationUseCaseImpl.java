@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.auth.AuthenticationUseCase;
 import ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase;
 import ru.belov.ourabroad.api.usecases.services.auth.AuthService;
@@ -55,6 +56,12 @@ public class AuthenticationUseCaseImpl implements AuthenticationUseCase {
         if (userService.existsByEmail(userId, request.email(), context)) {
             context.setError(ErrorCode.EMAIL_ALREADY_EXISTS);
             return AuthResponse.error(ErrorCode.EMAIL_ALREADY_EXISTS.getMessage());
+        }
+
+        if (StringUtils.hasText(request.phone())
+                && userService.existsByPhone(userId, request.phone(), context)) {
+            context.setError(ErrorCode.PHONE_ALREADY_EXISTS);
+            return AuthResponse.error(ErrorCode.PHONE_ALREADY_EXISTS.getMessage());
         }
 
         User user = UserFactory.newUser(
