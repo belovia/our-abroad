@@ -44,6 +44,7 @@ public enum ErrorCode {
 
     // Профиль
     BIO_TOO_LONG("Описание не должно превышать 500 символов"),
+    PROFILE_NOT_FOUND("Профиль не найден"),
 
     // Специалист
     CATEGORY_REQUIRED("Категория специалиста обязательна"),
@@ -69,7 +70,22 @@ public enum ErrorCode {
 
     // Комментарии
     COMMENT_NOT_FOUND("Комментарий не найден"),
-    COMMENT_NESTING_TOO_DEEP("Превышена глубина вложенности комментариев");
+    COMMENT_NESTING_TOO_DEEP("Превышена глубина вложенности комментариев"),
+
+    // Запись к специалисту (booking)
+    BOOKING_NOT_FOUND("Запись не найдена"),
+    SPECIALIST_NOT_FOUND("Специалист не найден"),
+    SERVICE_NOT_AVAILABLE("Услуга недоступна"),
+    ACCESS_DENIED("Доступ запрещён"),
+    INVALID_BOOKING_STATE("Недопустимое состояние записи"),
+
+    // Аутентификация / JWT
+    UNAUTHORIZED("Требуется авторизация"),
+    INVALID_CREDENTIALS("Неверный email или пароль"),
+    TOKEN_EXPIRED("Срок действия токена истёк"),
+    TOKEN_INVALID("Недействительный токен"),
+    REFRESH_TOKEN_INVALID("Недействительный refresh-токен"),
+    REFRESH_TOKEN_REUSED("Refresh-токен уже использован или отозван");
 
     private final String message;
 

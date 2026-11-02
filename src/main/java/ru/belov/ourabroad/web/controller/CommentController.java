@@ -33,9 +33,8 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<CreateCommentUseCase.Response> createComment(@RequestBody CreateCommentBody body) {
-        log.info("[userId: {}] POST /api/comments", body.authorId());
+        log.info("POST /api/comments");
         var request = new CreateCommentUseCase.Request(
-                body.authorId(),
                 body.entityId(),
                 body.entityType(),
                 body.content(),
@@ -46,11 +45,10 @@ public class CommentController {
 
     @PostMapping("/{id}/like")
     public ResponseEntity<LikeCommentUseCase.Response> likeComment(
-            @PathVariable("id") String commentId,
-            @RequestParam("userId") String userId
+            @PathVariable("id") String commentId
     ) {
-        log.info("[commentId: {}][userId: {}] POST /api/comments/{id}/like", commentId, userId);
-        return ResponseEntity.ok(likeCommentUseCase.execute(new LikeCommentUseCase.Request(userId, commentId)));
+        log.info("[commentId: {}] POST /api/comments/{id}/like", commentId);
+        return ResponseEntity.ok(likeCommentUseCase.execute(new LikeCommentUseCase.Request(commentId)));
     }
 
     @GetMapping

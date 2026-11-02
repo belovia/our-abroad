@@ -2,12 +2,15 @@ package ru.belov.ourabroad.api.usecases.services.qa.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import ru.belov.ourabroad.api.usecases.services.qa.QuestionService;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.Question;
 import ru.belov.ourabroad.poi.storage.QuestionRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static ru.belov.ourabroad.web.validators.ErrorCode.ENTITY_VOTE_UPDATE_FAILED;
@@ -71,5 +74,15 @@ public class QuestionServiceImpl implements QuestionService {
             log.warn("[questionId: {}] addVoteDelta affected no rows", questionId);
             context.setError(ENTITY_VOTE_UPDATE_FAILED);
         }
+    }
+
+    @Override
+    public List<Question> findQuestionsPage(Pageable pageable, Sort sort) {
+        return questionRepository.findAll(pageable, sort);
+    }
+
+    @Override
+    public List<Question> findQuestionsByTag(String tag, Pageable pageable, Sort sort) {
+        return questionRepository.findByTag(tag, pageable, sort);
     }
 }

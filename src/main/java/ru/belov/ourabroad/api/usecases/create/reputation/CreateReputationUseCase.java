@@ -4,7 +4,7 @@ public interface CreateReputationUseCase {
 
     Response execute(Request request);
 
-    record Request(String userId) {
+    record Request() {
     }
 
     record Response(String userId, boolean success, String errorMessage) {

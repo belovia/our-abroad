@@ -12,6 +12,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.core.domain.UserFactory;
 import ru.belov.ourabroad.core.enums.UserStatus;
+import ru.belov.ourabroad.core.security.AppRoles;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -57,6 +58,7 @@ class UpsertIntegrationTest {
                 "tg1",
                 "wa1",
                 "act1",
+                AppRoles.DEFAULT,
                 createdAt1,
                 null
         );
@@ -71,6 +73,7 @@ class UpsertIntegrationTest {
                 "tg2",
                 "wa2",
                 "act2",
+                AppRoles.DEFAULT,
                 createdAt2,
                 LocalDateTime.of(2025, 3, 3, 12, 0)
         );

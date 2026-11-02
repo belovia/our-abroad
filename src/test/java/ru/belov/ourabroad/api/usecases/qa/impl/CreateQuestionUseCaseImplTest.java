@@ -1,5 +1,6 @@
 package ru.belov.ourabroad.api.usecases.qa.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -13,6 +14,7 @@ import ru.belov.ourabroad.api.usecases.qa.QaReputationRules;
 import ru.belov.ourabroad.api.usecases.services.qa.QuestionService;
 import ru.belov.ourabroad.api.usecases.services.reputation.ReputationService;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.Question;
 import ru.belov.ourabroad.core.domain.UserFactory;
@@ -49,6 +51,9 @@ class CreateQuestionUseCaseImplTest {
     @MockitoBean
     private ReputationService reputationService;
 
+    @MockitoBean
+    private CurrentUserProvider currentUserProvider;
+
     @Autowired
     private CreateQuestionUseCase useCase;
 
@@ -58,6 +63,11 @@ class CreateQuestionUseCaseImplTest {
     private static final String AUTHOR_ID = "user-author";
     private static final String TITLE = "Как настроить Spring?";
     private static final String CONTENT = "Подробное описание проблемы.";
+
+    @BeforeEach
+    void stubAuthor() {
+        when(currentUserProvider.requiredUserId()).thenReturn(AUTHOR_ID);
+    }
 
     @Test
     void contextCreated() {
@@ -72,7 +82,7 @@ class CreateQuestionUseCaseImplTest {
         doNothing().when(reputationService).addPoints(anyString(), anyInt(), any(Context.class));
 
         var request = new CreateQuestionUseCase.Request(
-                AUTHOR_ID, TITLE, CONTENT, Set.of("java", "spring")
+                TITLE, CONTENT, Set.of("java", "spring")
         );
         CreateQuestionUseCase.Response response = useCase.execute(request);
 
@@ -96,7 +106,7 @@ class CreateQuestionUseCaseImplTest {
 
     @Test
     void WHEN_titleMissing_THEN_validationError() {
-        var request = new CreateQuestionUseCase.Request(AUTHOR_ID, null, CONTENT, Set.of());
+        var request = new CreateQuestionUseCase.Request(null, CONTENT, Set.of());
 
         CreateQuestionUseCase.Response response = useCase.execute(request);
 

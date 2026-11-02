@@ -15,6 +15,7 @@ public class NameSpaces {
     public static final String STATUS = "status";
     public static final String CREATED_AT = "createdAt";
     public static final String LAST_LOGIN_AT = "lastLoginAt";
+    public static final String ROLES = "roles";
 
 
 }

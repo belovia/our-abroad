@@ -37,9 +37,8 @@ public class QaController {
     public ResponseEntity<CreateQuestionUseCase.Response> createQuestion(
             @RequestBody CreateQuestionBody body
     ) {
-        log.info("[userId: {}] POST /questions", body.authorId());
+        log.info("POST /questions");
         var request = new CreateQuestionUseCase.Request(
-                body.authorId(),
                 body.title(),
                 body.content(),
                 body.tags()
@@ -75,16 +74,15 @@ public class QaController {
             @PathVariable("questionId") String questionId,
             @RequestBody CreateAnswerBody body
     ) {
-        log.info("[questionId: {}][userId: {}] POST answer", questionId, body.authorId());
-        var request = new AnswerQuestionUseCase.Request(questionId, body.authorId(), body.content(), body.specialistProfileId());
+        log.info("[questionId: {}][userId: {}] POST answer", questionId, body.specialistProfileId());
+        var request = new AnswerQuestionUseCase.Request(questionId, body.content(), body.specialistProfileId());
         return ResponseEntity.ok(answerQuestionUseCase.execute(request));
     }
 
     @PostMapping("/votes")
     public ResponseEntity<VoteUseCase.Response> vote(@RequestBody VoteBody body) {
-        log.info("[userId: {}] POST /votes", body.voterUserId());
+        log.info("POST /votes");
         var request = new VoteUseCase.Request(
-                body.voterUserId(),
                 body.target(),
                 body.entityId(),
                 body.voteType()

@@ -7,13 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.belov.ourabroad.api.usecases.create.verification.CreateVerificationUseCase;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
 import ru.belov.ourabroad.api.usecases.services.verification.VerificationService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.core.domain.Verification;
 import ru.belov.ourabroad.core.domain.VerificationFactory;
 import ru.belov.ourabroad.core.enums.VerificationType;
 import ru.belov.ourabroad.web.validators.ErrorCode;
-import ru.belov.ourabroad.web.validators.UserValidator;
 
 import java.util.UUID;
 
@@ -24,20 +24,15 @@ public class CreateVerificationUseCaseImpl implements CreateVerificationUseCase 
 
     private final UserService userService;
     private final VerificationService verificationService;
-    private final UserValidator userValidator;
+    private final CurrentUserProvider currentUserProvider;
 
     @Override
     @Transactional
     public Response execute(Request request) {
         Context context = new Context();
-        String userId = request.userId();
+        String userId = currentUserProvider.requiredUserId();
         VerificationType type = request.type();
         log.info("[userId: {}] Create verification type {}", userId, type);
-
-        userValidator.validateId(userId, context);
-        if (!context.isSuccess()) {
-            return errorResponse(context);
-        }
 
         if (type == null) {
             context.setError(ErrorCode.VERIFICATION_TYPE_INVALID);

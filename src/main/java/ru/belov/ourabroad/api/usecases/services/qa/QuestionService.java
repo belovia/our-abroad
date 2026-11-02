@@ -1,7 +1,11 @@
 package ru.belov.ourabroad.api.usecases.services.qa;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.Question;
+
+import java.util.List;
 
 public interface QuestionService {
 
@@ -17,4 +21,8 @@ public interface QuestionService {
     void incrementAnswersCount(String questionId, Context context);
 
     void applyVoteDelta(String questionId, int delta, Context context);
+
+    List<Question> findQuestionsPage(Pageable pageable, Sort sort);
+
+    List<Question> findQuestionsByTag(String tag, Pageable pageable, Sort sort);
 }

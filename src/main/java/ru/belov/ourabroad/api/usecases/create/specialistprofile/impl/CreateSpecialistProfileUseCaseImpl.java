@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.create.specialistprofile.CreateSpecialistProfileUseCase;
 import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.core.domain.SpecialistProfileFactory;
@@ -19,11 +20,12 @@ import static ru.belov.ourabroad.web.validators.ErrorCode.USER_ID_REQUIRED;
 public class CreateSpecialistProfileUseCaseImpl implements CreateSpecialistProfileUseCase {
 
     private final SpecialistProfileService profileService;
+    private final CurrentUserProvider currentUserProvider;
 
     @Override
     public Response execute(Request request) {
         Context context = new Context();
-        String userId = request.userId();
+        String userId = currentUserProvider.requiredUserId();
         log.info("[userId: {}] Start to create specialistProfileId", userId);
 
         validate(userId, context);

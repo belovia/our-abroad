@@ -3,12 +3,12 @@ package ru.belov.ourabroad.web.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.belov.ourabroad.api.usecases.change.reputation.AddReputationPointsUseCase;
 import ru.belov.ourabroad.api.usecases.create.reputation.CreateReputationUseCase;
@@ -25,23 +25,19 @@ public class ReputationController {
     private final AddReputationPointsUseCase addReputationPointsUseCase;
 
     @PostMapping
-    public ResponseEntity<CreateReputationUseCase.Response> create(
-            @RequestBody CreateReputationUseCase.Request request
-    ) {
-        log.info("[userId: {}] Request to create reputation", request.userId());
-        return ResponseEntity.ok(createReputationUseCase.execute(request));
+    public ResponseEntity<CreateReputationUseCase.Response> create() {
+        log.info("Request to create reputation for current user");
+        return ResponseEntity.ok(createReputationUseCase.execute(new CreateReputationUseCase.Request()));
     }
 
     @GetMapping
-    public ResponseEntity<GetReputationByUserIdUseCase.Response> getByUserId(
-            @RequestParam("userId") String userId
-    ) {
-        log.info("[userId: {}] Request to get reputation", userId);
-        var request = new GetReputationByUserIdUseCase.Request(userId);
-        return ResponseEntity.ok(getReputationByUserIdUseCase.execute(request));
+    public ResponseEntity<GetReputationByUserIdUseCase.Response> getMine() {
+        log.info("Request to get reputation for current user");
+        return ResponseEntity.ok(getReputationByUserIdUseCase.execute(new GetReputationByUserIdUseCase.Request()));
     }
 
     @PatchMapping("/points")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AddReputationPointsUseCase.Response> addPoints(
             @RequestBody AddReputationPointsUseCase.Request request
     ) {

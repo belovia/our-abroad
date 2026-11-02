@@ -8,7 +8,6 @@ public interface VoteUseCase {
     Response execute(Request request);
 
     record Request(
-            String voterUserId,
             QaVoteTarget target,
             String entityId,
             VoteType voteType

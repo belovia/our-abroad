@@ -1,5 +1,6 @@
 package ru.belov.ourabroad.api.usecases.comments.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.belov.ourabroad.api.usecases.comments.CreateCommentUseCase;
 import ru.belov.ourabroad.api.usecases.services.comments.CommentService;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.UserFactory;
 import ru.belov.ourabroad.core.enums.CommentEntityType;
@@ -38,8 +40,16 @@ class CreateCommentUseCaseImplTest {
     @MockitoBean
     private CommentService commentService;
 
+    @MockitoBean
+    private CurrentUserProvider currentUserProvider;
+
     @Autowired
     private CreateCommentUseCase useCase;
+
+    @BeforeEach
+    void stubUser() {
+        when(currentUserProvider.requiredUserId()).thenReturn("u1");
+    }
 
     @Test
     void contextCreated() {
@@ -49,7 +59,6 @@ class CreateCommentUseCaseImplTest {
     @Test
     void WHEN_invalidEntityType_THEN_errorAndNoCommentService() {
         var request = new CreateCommentUseCase.Request(
-                "u1",
                 "e1",
                 "NOT_A_TYPE",
                 "hello",
@@ -79,7 +88,6 @@ class CreateCommentUseCaseImplTest {
         )).thenReturn("new-id");
 
         var request = new CreateCommentUseCase.Request(
-                "u1",
                 "e1",
                 "ANSWER",
                 "hello",

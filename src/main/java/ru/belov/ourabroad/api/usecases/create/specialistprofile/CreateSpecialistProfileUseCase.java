@@ -4,9 +4,7 @@ public interface CreateSpecialistProfileUseCase {
 
     Response execute(Request request);
 
-    record Request(
-            String userId,
-            String description) {
+    record Request(String description) {
     }
 
     record Response(

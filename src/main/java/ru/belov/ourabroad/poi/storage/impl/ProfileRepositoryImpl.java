@@ -56,7 +56,7 @@ public class ProfileRepositoryImpl implements ProfileRepository {
         paramHelper.putParam(params, "bio", profile.getBio(), profile.getUserId());
         paramHelper.putParam(params, "country", profile.getCountry(), profile.getUserId());
         paramHelper.putParam(params, "city", profile.getCity(), profile.getUserId());
-        paramHelper.putParam(params, "languages", String.join(",", profile.getLanguages()), profile.getUserId());
+        paramHelper.putParam(params, "languages", ProfileSql.joinLanguages(profile.getLanguages()), profile.getUserId());
 
     }
 }

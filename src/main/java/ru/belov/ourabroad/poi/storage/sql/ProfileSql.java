@@ -1,6 +1,15 @@
 package ru.belov.ourabroad.poi.storage.sql;
 
+import java.util.Set;
+
 public class ProfileSql {
+
+    public static String joinLanguages(Set<String> languages) {
+        if (languages == null || languages.isEmpty()) {
+            return "";
+        }
+        return String.join(",", languages);
+    }
 
     public static final String FIND_BY_USER_ID = """
         select user_id,
@@ -10,12 +19,12 @@ public class ProfileSql {
                country,
                city,
                languages
-        from profiles
+        from profile
         where user_id = :userId
         """;
 
     public static final String INSERT = """
-        insert into profiles (
+        insert into profile (
             user_id,
             display_name,
             avatar_url,

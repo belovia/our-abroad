@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.belov.ourabroad.api.usecases.AbstractUserUseCase;
 import ru.belov.ourabroad.api.usecases.change.user.ChangeUserPhoneUseCase;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.web.validators.ErrorCode;
@@ -17,19 +18,22 @@ import ru.belov.ourabroad.web.validators.UserValidator;
 public class ChangeUserPhoneUseCaseImpl extends AbstractUserUseCase implements ChangeUserPhoneUseCase {
 
     private final UserValidator userValidator;
+    private final CurrentUserProvider currentUserProvider;
 
     public ChangeUserPhoneUseCaseImpl(
             UserService userService,
-            UserValidator userValidator
+            UserValidator userValidator,
+            CurrentUserProvider currentUserProvider
     ) {
         super(userService);
         this.userValidator = userValidator;
+        this.currentUserProvider = currentUserProvider;
     }
 
     @Override
     public Response execute(Request request) {
         Context context = new Context();
-        String userId = request.userId();
+        String userId = currentUserProvider.requiredUserId();
         log.info("[userId: {}] Start changing phone", userId);
 
         validateRequest(request, context);
@@ -53,7 +57,6 @@ public class ChangeUserPhoneUseCaseImpl extends AbstractUserUseCase implements C
 
     private void validateRequest(Request request, Context context) {
         log.info("Validating request");
-        userValidator.validateId(request.userId(), context);
         userValidator.validatePhone(request.newPhone(), context);
         if (context.isSuccess()) {
             log.info("Validation success");

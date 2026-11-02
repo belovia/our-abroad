@@ -77,6 +77,28 @@ public class UserValidator {
         }
     }
 
+    public void validateDisplayName(String displayName, Context context) {
+        if (!context.isSuccess() || displayName == null) {
+            return;
+        }
+        if (displayName.length() < 2) {
+            context.setError(DISPLAY_NAME_TOO_SHORT);
+            return;
+        }
+        if (displayName.length() > 50) {
+            context.setError(DISPLAY_NAME_TOO_LONG);
+        }
+    }
+
+    public void validateBio(String bio, Context context) {
+        if (!context.isSuccess() || bio == null) {
+            return;
+        }
+        if (bio.length() > 500) {
+            context.setError(BIO_TOO_LONG);
+        }
+    }
+
     public void validateWhatsapp(String phone, Context context) {
         if (!context.isSuccess()) {
             return;

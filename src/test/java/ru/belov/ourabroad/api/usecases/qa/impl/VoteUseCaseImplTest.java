@@ -1,5 +1,6 @@
 package ru.belov.ourabroad.api.usecases.qa.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import ru.belov.ourabroad.api.usecases.qa.VoteUseCase;
 import ru.belov.ourabroad.api.usecases.services.qa.VoteApplyResult;
 import ru.belov.ourabroad.api.usecases.services.qa.VoteService;
 import ru.belov.ourabroad.api.usecases.services.reputation.ReputationService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.enums.QaVoteTarget;
 import ru.belov.ourabroad.core.enums.VoteType;
@@ -38,12 +40,20 @@ class VoteUseCaseImplTest {
     @MockitoBean
     private ReputationService reputationService;
 
+    @MockitoBean
+    private CurrentUserProvider currentUserProvider;
+
     @Autowired
     private VoteUseCase useCase;
 
     private static final String VOTER_ID = "voter-1";
     private static final String ENTITY_ID = "q-or-a-1";
     private static final String AUTHOR_ID = "content-author";
+
+    @BeforeEach
+    void stubVoter() {
+        when(currentUserProvider.requiredUserId()).thenReturn(VOTER_ID);
+    }
 
     @Test
     void contextCreated() {
@@ -56,7 +66,7 @@ class VoteUseCaseImplTest {
                 .thenReturn(new VoteApplyResult(AUTHOR_ID, 1));
         doNothing().when(reputationService).addPoints(anyString(), anyInt(), any(Context.class));
 
-        var request = new VoteUseCase.Request(VOTER_ID, QaVoteTarget.QUESTION, ENTITY_ID, VoteType.UP);
+        var request = new VoteUseCase.Request(QaVoteTarget.QUESTION, ENTITY_ID, VoteType.UP);
         VoteUseCase.Response response = useCase.execute(request);
 
         assertThat(response.success()).isTrue();
@@ -70,7 +80,7 @@ class VoteUseCaseImplTest {
                 .thenReturn(new VoteApplyResult(AUTHOR_ID, 0));
         doNothing().when(reputationService).addPoints(anyString(), anyInt(), any(Context.class));
 
-        var request = new VoteUseCase.Request(VOTER_ID, QaVoteTarget.ANSWER, ENTITY_ID, VoteType.DOWN);
+        var request = new VoteUseCase.Request(QaVoteTarget.ANSWER, ENTITY_ID, VoteType.DOWN);
         VoteUseCase.Response response = useCase.execute(request);
 
         assertThat(response.success()).isTrue();
@@ -86,7 +96,7 @@ class VoteUseCaseImplTest {
                     return null;
                 });
 
-        var request = new VoteUseCase.Request(VOTER_ID, QaVoteTarget.QUESTION, ENTITY_ID, VoteType.UP);
+        var request = new VoteUseCase.Request(QaVoteTarget.QUESTION, ENTITY_ID, VoteType.UP);
         VoteUseCase.Response response = useCase.execute(request);
 
         assertThat(response.success()).isFalse();
@@ -100,7 +110,7 @@ class VoteUseCaseImplTest {
                 .thenReturn(new VoteApplyResult(AUTHOR_ID, -1));
         doNothing().when(reputationService).addPoints(anyString(), anyInt(), any(Context.class));
 
-        var request = new VoteUseCase.Request(VOTER_ID, QaVoteTarget.QUESTION, ENTITY_ID, VoteType.DOWN);
+        var request = new VoteUseCase.Request(QaVoteTarget.QUESTION, ENTITY_ID, VoteType.DOWN);
         VoteUseCase.Response response = useCase.execute(request);
 
         assertThat(response.success()).isTrue();

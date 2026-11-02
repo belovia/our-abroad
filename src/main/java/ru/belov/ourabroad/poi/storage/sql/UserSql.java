@@ -11,6 +11,7 @@ public class UserSql {
                    telegram_username,
                    whatsapp_number,
                    activity,
+                   roles,
                    created_at,
                    last_login_at
             from users
@@ -26,6 +27,7 @@ public class UserSql {
                    telegram_username,
                    whatsapp_number,
                    activity,
+                   roles,
                    created_at,
                    last_login_at
             from users
@@ -42,6 +44,7 @@ public class UserSql {
                 telegram_username,
                 whatsapp_number,
                 activity,
+                roles,
                 created_at,
                 last_login_at
             ) values (
@@ -53,6 +56,7 @@ public class UserSql {
                 :telegramUsername,
                 :whatsappNumber,
                 :activity,
+                :roles,
                 :createdAt,
                 :lastLoginAt
             )
@@ -64,6 +68,7 @@ public class UserSql {
                 telegram_username = excluded.telegram_username,
                 whatsapp_number = excluded.whatsapp_number,
                 activity = excluded.activity,
+                roles = excluded.roles,
                 last_login_at = excluded.last_login_at
             returning (xmax = 0) as inserted
             """;

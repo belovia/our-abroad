@@ -1,15 +1,19 @@
 package ru.belov.ourabroad.api.usecases.change.user.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.belov.ourabroad.api.usecases.change.user.ChangeUserPasswordUseCase;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.core.enums.UserStatus;
@@ -20,6 +24,7 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -36,6 +41,12 @@ class ChangeUserPasswordUseCaseImplTest {
     @MockitoBean
     private UserService userService;
 
+    @MockitoBean
+    private PasswordEncoder passwordEncoder;
+
+    @MockitoBean
+    private CurrentUserProvider currentUserProvider;
+
     @Autowired
     private ChangeUserPasswordUseCaseImpl usecase;
 
@@ -45,6 +56,13 @@ class ChangeUserPasswordUseCaseImplTest {
     private static final String USER_ID = "user-123";
     private static final String OLD_PASSWORD = "OldPassword1";
     private static final String NEW_PASSWORD = "NewPassword1";
+
+    @BeforeEach
+    void stubCurrentUserAndEncoder() {
+        when(currentUserProvider.requiredUserId()).thenReturn(USER_ID);
+        when(passwordEncoder.encode(NEW_PASSWORD)).thenReturn("ENCODED_NEW");
+        when(passwordEncoder.matches(eq(OLD_PASSWORD), eq(OLD_PASSWORD))).thenReturn(true);
+    }
 
     @Test
     void contextCreated() {
@@ -71,23 +89,16 @@ class ChangeUserPasswordUseCaseImplTest {
 
         verify(userService).findById(eq(USER_ID), any(Context.class));
         verify(userService).update(userCaptor.capture(), any(Context.class));
-        assertThat(userCaptor.getValue().getPassword()).isEqualTo(NEW_PASSWORD);
+        assertThat(userCaptor.getValue().getPassword()).isEqualTo("ENCODED_NEW");
     }
 
     @Test
-    void WHEN_execute_nullUserId_THEN_returnValidationError() {
-        // Arrange
-        ChangeUserPasswordUseCase.Request request = new ChangeUserPasswordUseCase.Request(
-                null, OLD_PASSWORD, NEW_PASSWORD
-        );
+    void WHEN_noAuthenticatedUser_THEN_throws() {
+        when(currentUserProvider.requiredUserId())
+                .thenThrow(new InsufficientAuthenticationException("test"));
 
-        // Action
-        ChangeUserPasswordUseCase.Response response = usecase.execute(request);
-
-        // Asserts
-        assertThat(response.success()).isFalse();
-        assertThat(response.userId()).isNull();
-        assertThat(response.errorMessage()).isEqualTo(ErrorCode.USER_ID_REQUIRED.getMessage());
+        assertThrows(InsufficientAuthenticationException.class,
+                () -> usecase.execute(new ChangeUserPasswordUseCase.Request(OLD_PASSWORD, NEW_PASSWORD)));
 
         verify(userService, never()).findById(anyString(), any(Context.class));
         verify(userService, never()).update(any(User.class), any(Context.class));
@@ -97,7 +108,7 @@ class ChangeUserPasswordUseCaseImplTest {
     void WHEN_execute_nullNewPassword_THEN_returnValidationError() {
         // Arrange
         ChangeUserPasswordUseCase.Request request = new ChangeUserPasswordUseCase.Request(
-                USER_ID, OLD_PASSWORD, null
+                OLD_PASSWORD, null
         );
 
         // Action
@@ -138,10 +149,11 @@ class ChangeUserPasswordUseCaseImplTest {
     void WHEN_execute_oldPasswordMismatch_THEN_returnPasswordMismatchError() {
         // Arrange
         ChangeUserPasswordUseCase.Request request = new ChangeUserPasswordUseCase.Request(
-                USER_ID, "WrongOldPassword", NEW_PASSWORD
+                "WrongOldPassword", NEW_PASSWORD
         );
         User existingUser = createUser(OLD_PASSWORD);
 
+        when(passwordEncoder.matches(eq("WrongOldPassword"), eq(OLD_PASSWORD))).thenReturn(false);
         when(userService.findById(eq(USER_ID), any(Context.class))).thenReturn(existingUser);
 
         // Action
@@ -185,17 +197,18 @@ class ChangeUserPasswordUseCaseImplTest {
         // Asserts
         verify(userService).update(userCaptor.capture(), any(Context.class));
         assertThat(userCaptor.getValue().getPassword()).isNotEqualTo(OLD_PASSWORD);
-        assertThat(userCaptor.getValue().getPassword()).isEqualTo(NEW_PASSWORD);
+        assertThat(userCaptor.getValue().getPassword()).isEqualTo("ENCODED_NEW");
     }
 
     private ChangeUserPasswordUseCase.Request createValidRequest() {
-        return new ChangeUserPasswordUseCase.Request(USER_ID, OLD_PASSWORD, NEW_PASSWORD);
+        return new ChangeUserPasswordUseCase.Request(OLD_PASSWORD, NEW_PASSWORD);
     }
 
     private User createUser(String password) {
         return User.create(
                 USER_ID, "user@example.com", "+79001234567", password,
                 UserStatus.ACTIVE, null, null, null,
+                ru.belov.ourabroad.core.security.AppRoles.DEFAULT,
                 LocalDateTime.now(), null
         );
     }

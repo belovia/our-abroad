@@ -10,4 +10,13 @@ public interface SpecialistServiceService {
     SpecialistService findById(String serviceId, Context context);
     Set<SpecialistService> findAllById(String specialistProfileId, Context context);
     void update(SpecialistService specialistService);
+
+    void saveNew(SpecialistService specialistService, Context context);
+
+    void deleteById(String serviceId, Context context);
+
+    /**
+     * Услуга существует, принадлежит профилю специалиста и активна (сценарий booking).
+     */
+    SpecialistService requireActiveServiceForSpecialist(String serviceId, String specialistProfileId, Context context);
 }

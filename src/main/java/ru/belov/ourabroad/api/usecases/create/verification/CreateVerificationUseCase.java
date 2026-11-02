@@ -6,7 +6,7 @@ public interface CreateVerificationUseCase {
 
     Response execute(Request request);
 
-    record Request(String userId, VerificationType type, String relatedEntityId) {
+    record Request(VerificationType type, String relatedEntityId) {
     }
 
     record Response(String verificationId, boolean success, String errorMessage) {

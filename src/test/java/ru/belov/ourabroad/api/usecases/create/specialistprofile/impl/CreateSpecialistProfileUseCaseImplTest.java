@@ -1,5 +1,6 @@
 package ru.belov.ourabroad.api.usecases.create.specialistprofile.impl;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -10,6 +11,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.belov.ourabroad.api.usecases.create.specialistprofile.CreateSpecialistProfileUseCase;
 import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProfileService;
+import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.web.validators.ErrorCode;
@@ -17,7 +19,12 @@ import ru.belov.ourabroad.web.validators.ErrorCode;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
@@ -30,6 +37,9 @@ class CreateSpecialistProfileUseCaseImplTest {
     @MockitoBean
     private SpecialistProfileService profileService;
 
+    @MockitoBean
+    private CurrentUserProvider currentUserProvider;
+
     @Autowired
     private CreateSpecialistProfileUseCaseImpl usecase;
 
@@ -38,6 +48,11 @@ class CreateSpecialistProfileUseCaseImplTest {
 
     private static final String USER_ID = "user-123";
     private static final String DESCRIPTION = "Expert in Java development";
+
+    @BeforeEach
+    void stubUser() {
+        when(currentUserProvider.requiredUserId()).thenReturn(USER_ID);
+    }
 
     @Test
     void contextCreated() {
@@ -65,39 +80,28 @@ class CreateSpecialistProfileUseCaseImplTest {
     }
 
     @Test
-    void WHEN_execute_nullUserId_THEN_returnValidationError() {
-        // Arrange
-        CreateSpecialistProfileUseCase.Request request = new CreateSpecialistProfileUseCase.Request(
-                null,
-                DESCRIPTION
+    void WHEN_execute_emptyUserIdFromContext_THEN_returnValidationError() {
+        when(currentUserProvider.requiredUserId()).thenReturn("");
+
+        CreateSpecialistProfileUseCase.Response response = usecase.execute(
+                new CreateSpecialistProfileUseCase.Request(DESCRIPTION)
         );
 
-        // Action
-        CreateSpecialistProfileUseCase.Response response = usecase.execute(request);
-
-        // Asserts
         assertThat(response.success()).isFalse();
-        assertThat(response.userId()).isNull();
         assertThat(response.errorMessage()).isEqualTo(ErrorCode.USER_ID_REQUIRED.getMessage());
-
         verify(profileService, never()).save(any(SpecialistProfile.class), any(Context.class));
     }
 
     @Test
-    void WHEN_execute_blankUserId_THEN_returnValidationError() {
-        // Arrange
-        CreateSpecialistProfileUseCase.Request request = new CreateSpecialistProfileUseCase.Request(
-                "   ",
-                DESCRIPTION
+    void WHEN_execute_blankUserIdFromContext_THEN_returnValidationError() {
+        when(currentUserProvider.requiredUserId()).thenReturn("   ");
+
+        CreateSpecialistProfileUseCase.Response response = usecase.execute(
+                new CreateSpecialistProfileUseCase.Request(DESCRIPTION)
         );
 
-        // Action
-        CreateSpecialistProfileUseCase.Response response = usecase.execute(request);
-
-        // Asserts
         assertThat(response.success()).isFalse();
         assertThat(response.errorMessage()).isEqualTo(ErrorCode.USER_ID_REQUIRED.getMessage());
-
         verify(profileService, never()).save(any(SpecialistProfile.class), any(Context.class));
     }
 
@@ -117,10 +121,7 @@ class CreateSpecialistProfileUseCaseImplTest {
     @Test
     void WHEN_execute_validRequest_nullDescription_THEN_createProfileSuccessfully() {
         // Arrange
-        CreateSpecialistProfileUseCase.Request request = new CreateSpecialistProfileUseCase.Request(
-                USER_ID,
-                null
-        );
+        CreateSpecialistProfileUseCase.Request request = new CreateSpecialistProfileUseCase.Request(null);
         doNothing().when(profileService).save(any(SpecialistProfile.class), any(Context.class));
 
         // Action
@@ -146,6 +147,6 @@ class CreateSpecialistProfileUseCaseImplTest {
     }
 
     private CreateSpecialistProfileUseCase.Request createValidRequest() {
-        return new CreateSpecialistProfileUseCase.Request(USER_ID, DESCRIPTION);
+        return new CreateSpecialistProfileUseCase.Request(DESCRIPTION);
     }
 }
