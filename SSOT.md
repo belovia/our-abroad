@@ -10,19 +10,19 @@
 
 | Тема | Файл | Владеет |
 |---|---|---|
-| Слои | [docs/ssot/layers.md](docs/ssot/layers.md) | пакеты и направление вызовов |
-| HTTP и ошибки | [docs/ssot/http-and-errors.md](docs/ssot/http-and-errors.md) | маршруты, кто открыт, коды HTTP, тексты `ErrorCode` |
-| Identity | [docs/ssot/identity.md](docs/ssot/identity.md) | `User`, сессия JWT, регистрация и логин |
-| Специалисты | [docs/ssot/specialists.md](docs/ssot/specialists.md) | профиль специалиста и услуги |
-| Записи | [docs/ssot/bookings.md](docs/ssot/bookings.md) | `Booking` и статусы |
-| Репутация | [docs/ssot/reputation.md](docs/ssot/reputation.md) | счёт, уровень, откуда берутся очки |
-| Верификация | [docs/ssot/verification.md](docs/ssot/verification.md) | заявка на проверку |
-| Q&A | [docs/ssot/qa.md](docs/ssot/qa.md) | вопросы, ответы, голоса |
-| Комментарии | [docs/ssot/comments.md](docs/ssot/comments.md) | комментарии и лайки |
-| Хранение | [docs/ssot/persistence.md](docs/ssot/persistence.md) | таблицы Liquibase |
-| Пробелы | [docs/ssot/gaps.md](docs/ssot/gaps.md) | что есть в коде и не доведено до сценария |
+| Слои | [docs/ssot/layers.md](openspec/docs/ssot/layers.md) | пакеты и направление вызовов |
+| HTTP и ошибки | [docs/ssot/http-and-errors.md](openspec/docs/ssot/http-and-errors.md) | маршруты, кто открыт, коды HTTP, тексты `ErrorCode` |
+| Identity | [docs/ssot/identity.md](openspec/docs/ssot/identity.md) | `User`, сессия JWT, регистрация и логин |
+| Специалисты | [docs/ssot/specialists.md](openspec/docs/ssot/specialists.md) | профиль специалиста и услуги |
+| Записи | [docs/ssot/bookings.md](openspec/docs/ssot/bookings.md) | `Booking` и статусы |
+| Репутация | [docs/ssot/reputation.md](openspec/docs/ssot/reputation.md) | счёт, уровень, откуда берутся очки |
+| Верификация | [docs/ssot/verification.md](openspec/docs/ssot/verification.md) | заявка на проверку |
+| Q&A | [docs/ssot/qa.md](openspec/docs/ssot/qa.md) | вопросы, ответы, голоса |
+| Комментарии | [docs/ssot/comments.md](openspec/docs/ssot/comments.md) | комментарии и лайки |
+| Хранение | [docs/ssot/persistence.md](openspec/docs/ssot/persistence.md) | таблицы Liquibase |
+| Пробелы | [docs/ssot/gaps.md](openspec/docs/ssot/gaps.md) | что есть в коде и не доведено до сценария |
 
-Правила ведения: [docs/SSOT_GOVERNANCE.md](docs/SSOT_GOVERNANCE.md). Новая тема — из [docs/ssot/_templates/TOPIC_TEMPLATE.md](docs/ssot/_templates/TOPIC_TEMPLATE.md).
+Правила ведения: [docs/SSOT_GOVERNANCE.md](openspec/docs/SSOT_GOVERNANCE.md). Новая тема — из [docs/ssot/_templates/TOPIC_TEMPLATE.md](openspec/docs/ssot/_templates/TOPIC_TEMPLATE.md).
 
 ## Update Log
 
