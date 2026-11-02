@@ -153,6 +153,129 @@ class CreateUserUseCaseImplTest {
     }
 
     @Test
+    void WHEN_execute_blankPassword_THEN_returnPasswordRequired() {
+        CreateUserUseCase.Response response = usecase.execute(
+                new CreateUserUseCase.Request(EMAIL, PHONE, "   ", null, null, null)
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_REQUIRED.getMessage());
+        verify(userService, never()).save(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_passwordTooShort_THEN_returnLengthInvalid() {
+        CreateUserUseCase.Response response = usecase.execute(
+                new CreateUserUseCase.Request(EMAIL, PHONE, "Ab1!xyz", null, null, null)
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_LENGTH_INVALID.getMessage());
+        verify(userService, never()).save(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_passwordTooLong_THEN_returnLengthInvalid() {
+        CreateUserUseCase.Response response = usecase.execute(
+                new CreateUserUseCase.Request(EMAIL, PHONE, "Abcdefghijklmno1!", null, null, null)
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_LENGTH_INVALID.getMessage());
+        verify(userService, never()).save(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_passwordWithSpace_THEN_returnInvalidCharacters() {
+        CreateUserUseCase.Response response = usecase.execute(
+                new CreateUserUseCase.Request(EMAIL, PHONE, "Abcdef 1", null, null, null)
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_INVALID_CHARACTERS.getMessage());
+        verify(userService, never()).save(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_passwordWithNonLatin_THEN_returnInvalidCharacters() {
+        CreateUserUseCase.Response response = usecase.execute(
+                new CreateUserUseCase.Request(EMAIL, PHONE, "Пароль123", null, null, null)
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_INVALID_CHARACTERS.getMessage());
+        verify(userService, never()).save(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_passwordWithoutUppercase_THEN_returnUppercaseRequired() {
+        CreateUserUseCase.Response response = usecase.execute(
+                new CreateUserUseCase.Request(EMAIL, PHONE, "abcdefg1", null, null, null)
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_UPPERCASE_REQUIRED.getMessage());
+        verify(userService, never()).save(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_passwordWithoutDigit_THEN_returnDigitRequired() {
+        CreateUserUseCase.Response response = usecase.execute(
+                new CreateUserUseCase.Request(EMAIL, PHONE, "Abcdefgh", null, null, null)
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_DIGIT_REQUIRED.getMessage());
+        verify(userService, never()).save(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_passwordAb_THEN_returnFirstFailedRuleLength() {
+        CreateUserUseCase.Response response = usecase.execute(
+                new CreateUserUseCase.Request(EMAIL, PHONE, "ab", null, null, null)
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_LENGTH_INVALID.getMessage());
+        verify(userService, never()).save(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_passwordLiteral_THEN_returnFirstFailedRuleUppercase() {
+        CreateUserUseCase.Response response = usecase.execute(
+                new CreateUserUseCase.Request(EMAIL, PHONE, "password", null, null, null)
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_UPPERCASE_REQUIRED.getMessage());
+        verify(userService, never()).save(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_passwordAbcdef1Exclamation_THEN_createUserSuccessfully() {
+        when(userService.existsByEmail(anyString(), eq(EMAIL), any(Context.class))).thenReturn(false);
+
+        CreateUserUseCase.Response response = usecase.execute(
+                new CreateUserUseCase.Request(EMAIL, PHONE, "Abcdef1!", null, null, null)
+        );
+
+        assertThat(response.success()).isTrue();
+        verify(userService).save(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_passwordAllUppercaseWithDigit_THEN_createUserSuccessfully() {
+        when(userService.existsByEmail(anyString(), eq(EMAIL), any(Context.class))).thenReturn(false);
+
+        CreateUserUseCase.Response response = usecase.execute(
+                new CreateUserUseCase.Request(EMAIL, PHONE, "ABCDEFG1", null, null, null)
+        );
+
+        assertThat(response.success()).isTrue();
+        verify(userService).save(any(User.class), any(Context.class));
+    }
+
+    @Test
     void WHEN_execute_validRequest_THEN_savesEmptyProfile() {
         CreateUserUseCase.Request request = createValidRequest();
         when(userService.existsByEmail(anyString(), eq(EMAIL), any(Context.class))).thenReturn(false);
