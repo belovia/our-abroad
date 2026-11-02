@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -120,6 +121,88 @@ class ChangeUserPasswordUseCaseImplTest {
         assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_REQUIRED.getMessage());
 
         verify(userService, never()).findById(anyString(), any(Context.class));
+        verify(userService, never()).update(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_blankNewPassword_THEN_returnPasswordRequired() {
+        ChangeUserPasswordUseCase.Response response = usecase.execute(
+                new ChangeUserPasswordUseCase.Request(OLD_PASSWORD, "   ")
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_REQUIRED.getMessage());
+        verify(userService, never()).update(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_newPasswordTooShort_THEN_returnLengthInvalid() {
+        ChangeUserPasswordUseCase.Response response = usecase.execute(
+                new ChangeUserPasswordUseCase.Request(OLD_PASSWORD, "short")
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_LENGTH_INVALID.getMessage());
+        verify(userService, never()).findById(anyString(), any(Context.class));
+        verify(userService, never()).update(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_newPasswordTooLong_THEN_returnLengthInvalid() {
+        ChangeUserPasswordUseCase.Response response = usecase.execute(
+                new ChangeUserPasswordUseCase.Request(OLD_PASSWORD, "Abcdefghijklmno1!")
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_LENGTH_INVALID.getMessage());
+        verify(userService, never()).update(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_newPasswordWithSpace_THEN_returnInvalidCharacters() {
+        ChangeUserPasswordUseCase.Response response = usecase.execute(
+                new ChangeUserPasswordUseCase.Request(OLD_PASSWORD, "Abcdef 1")
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_INVALID_CHARACTERS.getMessage());
+        verify(userService, never()).update(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_newPasswordWithoutUppercase_THEN_returnUppercaseRequired() {
+        ChangeUserPasswordUseCase.Response response = usecase.execute(
+                new ChangeUserPasswordUseCase.Request(OLD_PASSWORD, "abcdefg1")
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_UPPERCASE_REQUIRED.getMessage());
+        verify(userService, never()).update(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_newPasswordWithoutDigit_THEN_returnDigitRequired() {
+        ChangeUserPasswordUseCase.Response response = usecase.execute(
+                new ChangeUserPasswordUseCase.Request(OLD_PASSWORD, "Abcdefgh")
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORD_DIGIT_REQUIRED.getMessage());
+        verify(userService, never()).update(any(User.class), any(Context.class));
+    }
+
+    @Test
+    void WHEN_execute_validNewPassword_wrongCurrent_THEN_returnPasswordMismatchError() {
+        User existingUser = createUser(OLD_PASSWORD);
+        when(passwordEncoder.matches(eq("WrongOldPassword"), eq(OLD_PASSWORD))).thenReturn(false);
+        when(userService.findById(eq(USER_ID), any(Context.class))).thenReturn(existingUser);
+
+        ChangeUserPasswordUseCase.Response response = usecase.execute(
+                new ChangeUserPasswordUseCase.Request("WrongOldPassword", "Abcdef1!")
+        );
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PASSWORDS_ARE_NOT_EQUAL.getMessage());
         verify(userService, never()).update(any(User.class), any(Context.class));
     }
 

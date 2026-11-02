@@ -2,7 +2,7 @@
 id: gaps
 title: Пробелы нормы
 status: as-is
-last_updated: 2026-10-31
+last_updated: 2026-11-02
 ---
 
 # Пробелы
@@ -11,7 +11,6 @@ last_updated: 2026-10-31
 
 | id | Тема | Что видно в коде | Чего нет | Статус |
 |---|---|---|---|---|
-| GAP-002 | [identity](identity.md) | `ErrorCode` содержит тексты длины пароля, заглавной буквы, цифры и допустимых символов | `UserValidator.validatePassword` проверяет только непустое значение | open |
 | GAP-003 | [identity](identity.md) | Столбец `users.phone` UNIQUE и текст `PHONE_ALREADY_EXISTS` | Ни один сценарий этот `ErrorCode` не ставит. Ответ API при конфликте уникальности не зафиксирован | open |
 | GAP-004 | [identity](identity.md) | `User.block`, `User.activate`, статусы `BLOCKED` и `DELETED` | HTTP-сценария смены статуса. Логин любого не-`ACTIVE` отвечает как при неверном пароле | open |
 | GAP-005 | [specialists](specialists.md) | Поля `rating` и `reviewsCount` читаются и сохраняются | Сценария, который меняет рейтинг или число отзывов | open |
@@ -25,3 +24,4 @@ last_updated: 2026-10-31
 |---|---|
 | 2026-10-31 | Открыты GAP-001 … GAP-008 по срезу кода. |
 | 2026-10-31 | GAP-001 закрыт: профиль кабинета пишется при создании пользователя и читается через `/api/users/me/profile`. |
+| 2026-11-02 | GAP-002 закрыт: `validatePassword` применяет правила длины, набора символов, заглавной буквы и цифры; норма перенесена в [identity.md](identity.md). |
