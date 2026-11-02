@@ -18,6 +18,14 @@ public class UserValidator {
     private static final Pattern PHONE_PATTERN =
             Pattern.compile("^\\+\\d{10,15}$");
 
+    private static final Pattern PASSWORD_ALLOWED_CHARS =
+            Pattern.compile("^[A-Za-z\\d@$!%*?&]+$");
+
+    private static final Pattern PASSWORD_HAS_UPPERCASE =
+            Pattern.compile(".*[A-Z].*");
+
+    private static final Pattern PASSWORD_HAS_DIGIT =
+            Pattern.compile(".*\\d.*");
 
     public void validateCreateUserRequest(Request request, Context context) {
         validateEmail(request.email(), context);
@@ -63,6 +71,22 @@ public class UserValidator {
         }
         if (!StringUtils.hasText(password)) {
             context.setError(PASSWORD_REQUIRED);
+            return;
+        }
+        if (password.length() < 8 || password.length() > 16) {
+            context.setError(PASSWORD_LENGTH_INVALID);
+            return;
+        }
+        if (!PASSWORD_ALLOWED_CHARS.matcher(password).matches()) {
+            context.setError(PASSWORD_INVALID_CHARACTERS);
+            return;
+        }
+        if (!PASSWORD_HAS_UPPERCASE.matcher(password).matches()) {
+            context.setError(PASSWORD_UPPERCASE_REQUIRED);
+            return;
+        }
+        if (!PASSWORD_HAS_DIGIT.matcher(password).matches()) {
+            context.setError(PASSWORD_DIGIT_REQUIRED);
         }
     }
 

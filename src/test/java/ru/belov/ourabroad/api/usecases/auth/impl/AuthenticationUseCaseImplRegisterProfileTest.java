@@ -63,7 +63,7 @@ class AuthenticationUseCaseImplRegisterProfileTest {
         var response = authenticationUseCase.register(new AuthenticationUseCase.RegisterRequest(
                 "user@example.com",
                 null,
-                "password",
+                "Abcdef1!",
                 null,
                 null,
                 null
