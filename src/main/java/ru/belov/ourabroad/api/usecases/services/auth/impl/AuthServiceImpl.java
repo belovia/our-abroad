@@ -35,6 +35,10 @@ public class AuthServiceImpl implements AuthService {
             return null;
         }
         User user = userOpt.get();
+        if (user.getStatus() == UserStatus.BLOCKED) {
+            context.setError(ErrorCode.USER_BLOCKED);
+            return null;
+        }
         if (user.getStatus() != UserStatus.ACTIVE) {
             context.setError(ErrorCode.INVALID_CREDENTIALS);
             return null;

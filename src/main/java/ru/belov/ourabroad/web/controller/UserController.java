@@ -5,8 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.belov.ourabroad.api.usecases.change.profile.UpdateMyProfileUseCase;
+import ru.belov.ourabroad.api.usecases.change.user.ActivateUserUseCase;
+import ru.belov.ourabroad.api.usecases.change.user.BlockUserUseCase;
 import ru.belov.ourabroad.api.usecases.change.user.ChangeUserEmailUseCase;
 import ru.belov.ourabroad.api.usecases.change.user.ChangeUserPasswordUseCase;
 import ru.belov.ourabroad.api.usecases.change.user.ChangeUserPhoneUseCase;
@@ -37,6 +40,8 @@ public class UserController {
     private final ChangeUserPhoneUseCase changeUserPhoneUseCase;
     private final GetMyProfileUseCase getMyProfileUseCase;
     private final UpdateMyProfileUseCase updateMyProfileUseCase;
+    private final BlockUserUseCase blockUserUseCase;
+    private final ActivateUserUseCase activateUserUseCase;
 
     @PostMapping
     public ResponseEntity<Response> create(@RequestBody Request request) {
@@ -113,6 +118,20 @@ public class UserController {
                 new ChangeUserPhoneUseCase.Request(body.newPhone())
         );
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{userId}/block")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<BlockUserUseCase.Response> block(@PathVariable("userId") String userId) {
+        log.info("[userId: {}] PATCH /api/users/{}/block", userId, userId);
+        return ResponseEntity.ok(blockUserUseCase.execute(new BlockUserUseCase.Request(userId)));
+    }
+
+    @PatchMapping("/{userId}/activate")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ActivateUserUseCase.Response> activate(@PathVariable("userId") String userId) {
+        log.info("[userId: {}] PATCH /api/users/{}/activate", userId, userId);
+        return ResponseEntity.ok(activateUserUseCase.execute(new ActivateUserUseCase.Request(userId)));
     }
 
     public record ChangeEmailBody(String newEmail) {
