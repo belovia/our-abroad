@@ -2,7 +2,7 @@
 id: identity
 title: Учётная запись и сессия
 status: as-is
-last_updated: 2026-11-02
+last_updated: 2026-11-04
 ---
 
 # Identity
@@ -32,7 +32,7 @@ Telegram, если проверяется: `^@\w{5,32}$`. WhatsApp, если п�
 
 `POST /api/users` вызывает `CreateUserUseCase` и токены не выдаёт. Маршрут открыт.
 
-`POST /api/auth/login`: email и пароль. Пустые поля, неизвестный email, статус не `ACTIVE` и несовпавший пароль дают один текст: «Неверный email или пароль». Успех обновляет `lastLoginAt` и выдаёт токены. В запрос можно передать `deviceInfo` — оно пишется в refresh-запись.
+`POST /api/auth/login`: email и пароль. Порядок проверок: пустые поля → email не найден → статус → пароль. Статус `BLOCKED` даёт «Учётная запись заблокирована» (`USER_BLOCKED`); пустые поля, неизвестный email, статус `DELETED` и несовпавший пароль дают один текст: «Неверный email или пароль». При любом отказе токены не выдаются и `lastLoginAt` не меняется. Успех обновляет `lastLoginAt` и выдаёт токены. В запрос можно передать `deviceInfo` — оно пишется в refresh-запись.
 
 Ответ с токенами: `success`, `message`, `userId`, `accessToken`, `refreshToken`, `expiresInSeconds`, `tokenType` = `Bearer`.
 
@@ -66,11 +66,17 @@ Refresh — 48 случайных байт в Base64 URL без padding. В та
 
 `PATCH` меняет только поля, которые в теле не `null`. `displayName` перед записью обрезается по краям: короче 2 символов — «Имя для отображения должно содержать минимум 2 символа», длиннее 50 — «Имя для отображения должно содержать максимум 50 символов». `bio` длиннее 500 символов — «Описание не должно превышать 500 символов». Пустой набор `languages` очищает список.
 
-Методы домена `block` и `activate` HTTP-маршрута не имеют.
+## Статус учётной записи
+
+`PATCH /api/users/{userId}/block` и `PATCH /api/users/{userId}/activate` закрыты и требуют роль `ADMIN` (`@PreAuthorize`); без неё — `403`, `code: access_denied`. Ответ `200`, тело `userId`, `success`, `message`. Пустой `userId` — «userId обязателен», неизвестный — «Пользователь не найден».
+
+`block` ставит `BLOCKED` и удаляет все refresh-записи пользователя (`revokeAllForUser`); выданный access доживает свой срок, фильтр JWT статус не проверяет. `activate` ставит `ACTIVE` и refresh-записи не трогает. Повторный вызов на том же статусе — `success: true` без побочных действий. `activate` не проверяет, что текущий статус именно `BLOCKED`.
+
+Сценария, который выставляет `DELETED`, нет — см. [gaps.md](gaps.md).
 
 ## Источник в коде
 
-`User`, `UserFactory`, `Profile`, `ProfileFactory`, `AuthenticationUseCaseImpl`, `RefreshTokenUseCaseImpl`, `RefreshTokenServiceImpl`, `AuthServiceImpl`, `JwtService`, `UserValidator`, `UserController`, `AuthController`, `UserUpdateUseCaseImpl`, `GetMyProfileUseCaseImpl`, `UpdateMyProfileUseCaseImpl`, `ProfileServiceImpl`.
+`User`, `UserFactory`, `Profile`, `ProfileFactory`, `AuthenticationUseCaseImpl`, `RefreshTokenUseCaseImpl`, `RefreshTokenServiceImpl`, `AuthServiceImpl`, `JwtService`, `UserValidator`, `UserController`, `AuthController`, `UserUpdateUseCaseImpl`, `BlockUserUseCaseImpl`, `ActivateUserUseCaseImpl`, `GetMyProfileUseCaseImpl`, `UpdateMyProfileUseCaseImpl`, `ProfileServiceImpl`.
 
 ## Update Log
 
@@ -80,3 +86,4 @@ Refresh — 48 случайных байт в Base64 URL без padding. В та
 | 2026-10-31 | Кабинетный Profile создаётся вместе с пользователем; чтение и частичное обновление — `GET`/`PATCH /api/users/me/profile`. |
 | 2026-11-02 | `validatePassword` применяет длину 8–16, набор символов, заглавную букву и цифру; логин сохранённый пароль по силе не перепроверяет. GAP-002 закрыт. |
 | 2026-11-02 | Занятый телефон даёт `PHONE_ALREADY_EXISTS` на register/create/`PUT /me/phone`; на `PATCH /me` занятый `phone` не сохраняется при ответе `204`. GAP-003 закрыт. |
+| 2026-11-04 | Админские `PATCH /api/users/{userId}/block` и `/activate`; block отзывает refresh; логин `BLOCKED` даёт `USER_BLOCKED`, `DELETED` — общий текст. GAP-004 закрыт. |

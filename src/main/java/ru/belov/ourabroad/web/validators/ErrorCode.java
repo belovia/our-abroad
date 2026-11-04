@@ -82,6 +82,7 @@ public enum ErrorCode {
     // Аутентификация / JWT
     UNAUTHORIZED("Требуется авторизация"),
     INVALID_CREDENTIALS("Неверный email или пароль"),
+    USER_BLOCKED("Учётная запись заблокирована"),
     TOKEN_EXPIRED("Срок действия токена истёк"),
     TOKEN_INVALID("Недействительный токен"),
     REFRESH_TOKEN_INVALID("Недействительный refresh-токен"),
