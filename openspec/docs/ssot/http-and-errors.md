@@ -2,7 +2,7 @@
 id: http-and-errors
 title: HTTP и ошибки
 status: as-is
-last_updated: 2026-10-31
+last_updated: 2026-11-04
 ---
 
 # HTTP и ошибки
@@ -11,7 +11,7 @@ last_updated: 2026-10-31
 
 Невалидный или просроченный access-токен фильтр снимает с контекста и пропускает запрос дальше. Для закрытого маршрута входная точка отвечает `401` и JSON `success: false`, `message: "Требуется авторизация"`, `code: "unauthorized"`.
 
-`403` отдаёт обработчик отказа в доступе: `code: "access_denied"`, текст `ErrorCode.ACCESS_DENIED` («Доступ запрещён»). Единственная проверка роли на методе — `PATCH /api/reputations/points`, роль `ADMIN`.
+`403` отдаёт обработчик отказа в доступе: `code: "access_denied"`, текст `ErrorCode.ACCESS_DENIED` («Доступ запрещён»). Проверки роли на методе (`@PreAuthorize`, роль `ADMIN`): `PATCH /api/reputations/points`, `PATCH /api/users/{userId}/block`, `PATCH /api/users/{userId}/activate`.
 
 Остальные сценарии возвращают `200` и признак `success` в теле. Исключение: `DELETE /api/specialist-services/{serviceId}` при `success: false` отвечает `400`. `PATCH /api/users/me` отвечает `204` и тело use case наружу не отдаёт.
 
@@ -37,6 +37,8 @@ last_updated: 2026-10-31
 | PUT | `/api/users/me/email` | нет |
 | PUT | `/api/users/me/password` | нет |
 | PUT | `/api/users/me/phone` | нет |
+| PATCH | `/api/users/{userId}/block` | нет, роль `ADMIN` |
+| PATCH | `/api/users/{userId}/activate` | нет, роль `ADMIN` |
 | POST | `/api/specialist-profiles` | нет |
 | GET | `/api/specialist-profiles/by-id` | да |
 | GET | `/api/specialist-profiles/by-user` | да |
@@ -80,3 +82,4 @@ last_updated: 2026-10-31
 |---|---|
 | 2026-10-31 | Маршруты и коды HTTP по контроллерам и security. |
 | 2026-10-31 | Добавлены GET и PATCH `/api/users/me/profile`. |
+| 2026-11-04 | Добавлены `PATCH /api/users/{userId}/block` и `/activate` (роль `ADMIN`); перечень ролевых проверок расширен. |
