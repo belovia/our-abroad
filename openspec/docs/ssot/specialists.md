@@ -2,7 +2,7 @@
 id: specialists
 title: Специалисты и услуги
 status: as-is
-last_updated: 2026-10-31
+last_updated: 2026-11-06
 ---
 
 # Специалисты
@@ -17,7 +17,19 @@ last_updated: 2026-10-31
 
 `PATCH /api/specialist-profiles` требует `profileId` и `description` и записывает описание. Поле `services` в типе запроса есть, сценарий его не применяет. Сверки «профиль принадлежит текущему пользователю» в этом сценарии нет.
 
-`rating` и `reviewsCount` читаются и пишутся вместе с профилем. Сценария, который их пересчитывает, нет. См. [gaps.md](gaps.md).
+`rating` и `reviewsCount` читаются и пишутся вместе с профилем. Их пересчитывает сценарий отзыва, см. «Отзывы».
+
+## Отзывы
+
+Отзыв (`specialist_reviews`): `id`, `bookingId` (уникален), `authorId`, `specialistId` (id профиля), `score` (1–5), `text` (необязателен), `createdAt`.
+
+`POST /api/specialist-reviews` закрыт. Тело: `bookingId`, `score`, `text`. Ответ `200`: `reviewId`, `success`, `message`. Отзыв принимает только клиент своей записи, если статус `CONFIRMED` и `startTime` уже наступил. Иначе «Отзыв можно оставить только после подтверждённого визита» (`REVIEW_NOT_ALLOWED`). Чужой пользователь — «Доступ запрещён». Нет записи — «Запись не найдена». Повторный отзыв по той же записи — «Отзыв по этой записи уже оставлен» (`REVIEW_ALREADY_EXISTS`). `score` вне 1–5 — «Оценка должна быть от 1 до 5» (`REVIEW_SCORE_INVALID`). Пустой `bookingId` — «Ошибка валидации запроса».
+
+После сохранения у профиля пересчитываются `reviewsCount` — число отзывов профиля и `rating` — среднее арифметическое их `score`. Отклонённый отзыв профиль не меняет.
+
+`GET /api/specialist-reviews?profileId=` открыт. Ответ `200`: `success`, `message`, `reviews` (новые первыми: `id`, `bookingId`, `authorId`, `score`, `text`, `createdAt`). Нет отзывов — пустой список и `success: true`. Пустой `profileId` — «Поле обязательно для заполнения».
+
+Редактирования и удаления отзыва нет.
 
 `DeleteSpecialistProfileUseCase` есть, контроллер его не вызывает. См. [gaps.md](gaps.md).
 
@@ -37,10 +49,11 @@ last_updated: 2026-10-31
 
 ## Источник в коде
 
-`SpecialistProfile`, `SpecialistProfileFactory`, `SpecialistService`, `CreateSpecialistProfileUseCaseImpl`, `ChangeSpecialistProfileUseCaseImpl`, `CreateSpecialistServiceUseCaseImpl`, `SpecialistServiceServiceImpl`, контроллеры `SpecialistProfileController`, `SpecialistServiceController`.
+`SpecialistProfile`, `SpecialistProfileFactory`, `SpecialistReview`, `SpecialistReviewFactory`, `SpecialistService`, `CreateSpecialistProfileUseCaseImpl`, `ChangeSpecialistProfileUseCaseImpl`, `CreateSpecialistServiceUseCaseImpl`, `CreateSpecialistReviewUseCaseImpl`, `GetSpecialistReviewsUseCaseImpl`, `SpecialistServiceServiceImpl`, контроллеры `SpecialistProfileController`, `SpecialistServiceController`, `SpecialistReviewController`.
 
 ## Update Log
 
 | Дата | Изменение |
 |---|---|
 | 2026-10-31 | Профиль специалиста и услуги по коду. |
+| 2026-11-06 | Отзыв после подтверждённого визита пересчитывает `rating` и `reviewsCount`. GAP-005 закрыт. |

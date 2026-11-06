@@ -2,12 +2,12 @@
 id: persistence
 title: Таблицы
 status: as-is
-last_updated: 2026-10-31
+last_updated: 2026-11-06
 ---
 
 # Хранение
 
-База — PostgreSQL. Liquibase входит через `db/changelog/db.changelog-master.yaml`, тот подключает `db.changelog-master.xml`. Порядок changeset: `001` … `014`.
+База — PostgreSQL. Liquibase входит через `db/changelog/db.changelog-master.yaml`, тот подключает `db.changelog-master.xml`. Порядок changeset: `001` … `015`.
 
 Параметры подключения в эту тему не копируются.
 
@@ -25,6 +25,7 @@ last_updated: 2026-10-31
 | `comments` | `id` PK; `author_id`; `entity_id`; `entity_type`; `parent_id`; `content`; `likes` default 0; `replies_count` default 0; `created_at` | FK `parent_id` → `comments(id)` ON DELETE CASCADE |
 | `comment_likes` | `id` PK; `user_id`; `comment_id` | FK на `comments(id)` ON DELETE CASCADE; UNIQUE (`user_id`, `comment_id`) |
 | `bookings` | `id` PK; `user_id`; `specialist_id`; `service_id`; `start_time`; `status`; `created_at` | FK на `users`, `specialist_profile`, `specialist_service`, все ON DELETE CASCADE |
+| `specialist_reviews` | `id` PK; `booking_id` UNIQUE NOT NULL; `author_id`; `specialist_id`; `score` CHECK 1–5; `text`; `created_at` | FK на `bookings`, `users`, `specialist_profile`, все ON DELETE CASCADE; индекс по `specialist_id` |
 | `refresh_tokens` | `id` PK; `user_id`; `token_hash`; `expires_at`; `created_at`; `device_info` | FK на `users(id)` ON DELETE CASCADE; UNIQUE (`token_hash`) |
 
 Смысл полей — в темах identity, specialists, bookings, reputation, verification, qa, comments.
@@ -39,3 +40,4 @@ last_updated: 2026-10-31
 |---|---|
 | 2026-10-31 | Таблицы по changeset 001–014. |
 | 2026-10-31 | У `profile` есть сценарий записи, см. identity. |
+| 2026-11-06 | Таблица `specialist_reviews`, changeset `015`. |
