@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+           http://www.liquibase.org/xml/ns/dbchangelog
+           http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="015-specialist-reviews" author="our-abroad">
+        <sql>
+            CREATE TABLE IF NOT EXISTS specialist_reviews (
+                id              VARCHAR(36) PRIMARY KEY,
+                booking_id      VARCHAR(36) NOT NULL UNIQUE,
+                author_id       VARCHAR(36) NOT NULL,
+                specialist_id   VARCHAR(36) NOT NULL,
+                score           SMALLINT NOT NULL CHECK (score BETWEEN 1 AND 5),
+                text            TEXT,
+                created_at      TIMESTAMP NOT NULL,
+
+                CONSTRAINT fk_specialist_reviews_booking
+                    FOREIGN KEY (booking_id)
+                    REFERENCES bookings(id)
+                    ON DELETE CASCADE,
+
+                CONSTRAINT fk_specialist_reviews_author
+                    FOREIGN KEY (author_id)
+                    REFERENCES users(id)
+                    ON DELETE CASCADE,
+
+                CONSTRAINT fk_specialist_reviews_specialist
+                    FOREIGN KEY (specialist_id)
+                    REFERENCES specialist_profile(id)
+                    ON DELETE CASCADE
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_specialist_reviews_specialist_id
+                ON specialist_reviews (specialist_id);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

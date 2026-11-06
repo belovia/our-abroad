@@ -2,7 +2,7 @@
 id: http-and-errors
 title: HTTP и ошибки
 status: as-is
-last_updated: 2026-11-04
+last_updated: 2026-11-06
 ---
 
 # HTTP и ошибки
@@ -47,6 +47,8 @@ last_updated: 2026-11-04
 | PATCH | `/api/specialist-services` | нет |
 | DELETE | `/api/specialist-services/{serviceId}` | нет |
 | GET | `/api/specialist-services` | да |
+| POST | `/api/specialist-reviews` | нет |
+| GET | `/api/specialist-reviews` | да |
 | POST | `/api/bookings` | нет |
 | GET | `/api/bookings/my` | нет |
 | GET | `/api/bookings/incoming` | нет |
@@ -83,3 +85,4 @@ last_updated: 2026-11-04
 | 2026-10-31 | Маршруты и коды HTTP по контроллерам и security. |
 | 2026-10-31 | Добавлены GET и PATCH `/api/users/me/profile`. |
 | 2026-11-04 | Добавлены `PATCH /api/users/{userId}/block` и `/activate` (роль `ADMIN`); перечень ролевых проверок расширен. |
+| 2026-11-06 | Добавлены `POST /api/specialist-reviews` (закрыт) и `GET /api/specialist-reviews` (открыт). |

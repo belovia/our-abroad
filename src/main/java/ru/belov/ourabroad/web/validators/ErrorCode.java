@@ -74,6 +74,9 @@ public enum ErrorCode {
 
     // Запись к специалисту (booking)
     BOOKING_NOT_FOUND("Запись не найдена"),
+    REVIEW_SCORE_INVALID("Оценка должна быть от 1 до 5"),
+    REVIEW_NOT_ALLOWED("Отзыв можно оставить только после подтверждённого визита"),
+    REVIEW_ALREADY_EXISTS("Отзыв по этой записи уже оставлен"),
     SPECIALIST_NOT_FOUND("Специалист не найден"),
     SERVICE_NOT_AVAILABLE("Услуга недоступна"),
     ACCESS_DENIED("Доступ запрещён"),
