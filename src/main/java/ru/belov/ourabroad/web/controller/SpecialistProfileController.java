@@ -2,9 +2,12 @@ package ru.belov.ourabroad.web.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.belov.ourabroad.api.usecases.change.specialistprofile.ChangeSpecialistProfileUseCase;
 import ru.belov.ourabroad.api.usecases.create.specialistprofile.CreateSpecialistProfileUseCase;
+import ru.belov.ourabroad.api.usecases.delete.specialistprofile.DeleteSpecialistProfileUseCase;
 import ru.belov.ourabroad.api.usecases.get.specialistprofile.GetSpecialistProfileByIdUseCase;
 import ru.belov.ourabroad.api.usecases.get.specialistprofile.GetSpecialistProfileByUserIdUseCase;
 
@@ -25,6 +29,7 @@ public class SpecialistProfileController {
     private final GetSpecialistProfileByIdUseCase getSpecialistProfileByIdUseCase;
     private final GetSpecialistProfileByUserIdUseCase getSpecialistProfileByUserIdUseCase;
     private final ChangeSpecialistProfileUseCase changeSpecialistProfileUseCase;
+    private final DeleteSpecialistProfileUseCase deleteSpecialistProfileUseCase;
 
     @PostMapping
     public ResponseEntity<CreateSpecialistProfileUseCase.Response> create(
@@ -61,6 +66,18 @@ public class SpecialistProfileController {
     ) {
         log.info("[profileId: {}] Request to change specialist profile", request.profileId());
         var response = changeSpecialistProfileUseCase.execute(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{profileId}")
+    public ResponseEntity<DeleteSpecialistProfileUseCase.Response> delete(
+            @PathVariable("profileId") String profileId
+    ) {
+        log.info("[profileId: {}] Request to delete specialist profile", profileId);
+        DeleteSpecialistProfileUseCase.Response response = deleteSpecialistProfileUseCase.delete(profileId);
+        if (!response.success()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
         return ResponseEntity.ok(response);
     }
 }

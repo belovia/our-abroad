@@ -7,7 +7,6 @@ import ru.belov.ourabroad.api.usecases.services.specialistprofile.SpecialistProf
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.SpecialistProfile;
 import ru.belov.ourabroad.poi.storage.SpecialistProfileRepository;
-import ru.belov.ourabroad.poi.storage.exceptions.SpecialistServiceNotFoundException;
 
 import java.util.Optional;
 
@@ -84,14 +83,18 @@ public class SpecialistProfileServiceImpl implements SpecialistProfileService {
     }
 
     @Override
-    public void delete(String profileId) {
+    public void delete(String profileId, Context context) {
+        if (!context.isSuccess()) {
+            return;
+        }
         log.info("[specialistProfileId: {}] Deleting specialistProfile", profileId);
 
         boolean deleted = repository.deleteById(profileId);
 
         if (!deleted) {
             log.warn("[specialistProfileId: {}] SpecialistProfile not found for deletion", profileId);
-            throw new SpecialistServiceNotFoundException(profileId);
+            context.setError(SPECIALIST_PROFILE_NOT_FOUND);
+            return;
         }
 
         log.info("[specialistProfileId: {}] SpecialistProfile deleted successfully", profileId);
