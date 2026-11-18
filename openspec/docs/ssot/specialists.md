@@ -2,7 +2,7 @@
 id: specialists
 title: Специалисты и услуги
 status: as-is
-last_updated: 2026-11-06
+last_updated: 2026-11-18
 ---
 
 # Специалисты
@@ -19,6 +19,8 @@ last_updated: 2026-11-06
 
 `rating` и `reviewsCount` читаются и пишутся вместе с профилем. Их пересчитывает сценарий отзыва, см. «Отзывы».
 
+`DELETE /api/specialist-profiles/{profileId}` закрыт. Удаляет строку профиля только если `userId` профиля совпадает с текущим пользователем. Успех — `200`, `success: true`. Чужой профиль — `400`, «Доступ запрещён». Нет профиля — `400`, «Специалист не найден». Пустой id — «Ошибка валидации запроса». Связанные услуги, записи и отзывы удаляются каскадом FK (`ON DELETE CASCADE`). Soft-deactivate нет.
+
 ## Отзывы
 
 Отзыв (`specialist_reviews`): `id`, `bookingId` (уникален), `authorId`, `specialistId` (id профиля), `score` (1–5), `text` (необязателен), `createdAt`.
@@ -30,8 +32,6 @@ last_updated: 2026-11-06
 `GET /api/specialist-reviews?profileId=` открыт. Ответ `200`: `success`, `message`, `reviews` (новые первыми: `id`, `bookingId`, `authorId`, `score`, `text`, `createdAt`). Нет отзывов — пустой список и `success: true`. Пустой `profileId` — «Поле обязательно для заполнения».
 
 Редактирования и удаления отзыва нет.
-
-`DeleteSpecialistProfileUseCase` есть, контроллер его не вызывает. См. [gaps.md](gaps.md).
 
 ## Услуга
 
@@ -49,7 +49,7 @@ last_updated: 2026-11-06
 
 ## Источник в коде
 
-`SpecialistProfile`, `SpecialistProfileFactory`, `SpecialistReview`, `SpecialistReviewFactory`, `SpecialistService`, `CreateSpecialistProfileUseCaseImpl`, `ChangeSpecialistProfileUseCaseImpl`, `CreateSpecialistServiceUseCaseImpl`, `CreateSpecialistReviewUseCaseImpl`, `GetSpecialistReviewsUseCaseImpl`, `SpecialistServiceServiceImpl`, контроллеры `SpecialistProfileController`, `SpecialistServiceController`, `SpecialistReviewController`.
+`SpecialistProfile`, `SpecialistProfileFactory`, `SpecialistReview`, `SpecialistReviewFactory`, `SpecialistService`, `CreateSpecialistProfileUseCaseImpl`, `ChangeSpecialistProfileUseCaseImpl`, `DeleteSpecialistProfileUseCaseImpl`, `CreateSpecialistServiceUseCaseImpl`, `CreateSpecialistReviewUseCaseImpl`, `GetSpecialistReviewsUseCaseImpl`, `SpecialistServiceServiceImpl`, контроллеры `SpecialistProfileController`, `SpecialistServiceController`, `SpecialistReviewController`.
 
 ## Update Log
 
@@ -57,3 +57,4 @@ last_updated: 2026-11-06
 |---|---|
 | 2026-10-31 | Профиль специалиста и услуги по коду. |
 | 2026-11-06 | Отзыв после подтверждённого визита пересчитывает `rating` и `reviewsCount`. GAP-005 закрыт. |
+| 2026-11-18 | `DELETE /api/specialist-profiles/{profileId}`: hard delete владельцем, каскад FK; GAP-006 закрыт. |

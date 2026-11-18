@@ -2,7 +2,7 @@
 id: http-and-errors
 title: HTTP и ошибки
 status: as-is
-last_updated: 2026-11-06
+last_updated: 2026-11-18
 ---
 
 # HTTP и ошибки
@@ -13,7 +13,7 @@ last_updated: 2026-11-06
 
 `403` отдаёт обработчик отказа в доступе: `code: "access_denied"`, текст `ErrorCode.ACCESS_DENIED` («Доступ запрещён»). Проверки роли на методе (`@PreAuthorize`, роль `ADMIN`): `PATCH /api/reputations/points`, `PATCH /api/users/{userId}/block`, `PATCH /api/users/{userId}/activate`.
 
-Остальные сценарии возвращают `200` и признак `success` в теле. Исключение: `DELETE /api/specialist-services/{serviceId}` при `success: false` отвечает `400`. `PATCH /api/users/me` отвечает `204` и тело use case наружу не отдаёт.
+Остальные сценарии возвращают `200` и признак `success` в теле. Исключение: `DELETE /api/specialist-services/{serviceId}` и `DELETE /api/specialist-profiles/{profileId}` при `success: false` отвечают `400`. `PATCH /api/users/me` отвечает `204` и тело use case наружу не отдаёт.
 
 Открыты без токена: Swagger и `/v3/api-docs/**`, `/error`, `/actuator/health`, маршруты из таблицы со столбцом «открыт».
 
@@ -43,6 +43,7 @@ last_updated: 2026-11-06
 | GET | `/api/specialist-profiles/by-id` | да |
 | GET | `/api/specialist-profiles/by-user` | да |
 | PATCH | `/api/specialist-profiles` | нет |
+| DELETE | `/api/specialist-profiles/{profileId}` | нет |
 | POST | `/api/specialist-services` | нет |
 | PATCH | `/api/specialist-services` | нет |
 | DELETE | `/api/specialist-services/{serviceId}` | нет |
@@ -86,3 +87,4 @@ last_updated: 2026-11-06
 | 2026-10-31 | Добавлены GET и PATCH `/api/users/me/profile`. |
 | 2026-11-04 | Добавлены `PATCH /api/users/{userId}/block` и `/activate` (роль `ADMIN`); перечень ролевых проверок расширен. |
 | 2026-11-06 | Добавлены `POST /api/specialist-reviews` (закрыт) и `GET /api/specialist-reviews` (открыт). |
+| 2026-11-18 | Добавлен `DELETE /api/specialist-profiles/{profileId}` (закрыт); `400` при `success: false` как у удаления услуги. |
