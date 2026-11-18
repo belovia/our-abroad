@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static ru.belov.ourabroad.core.domain.NameSpaces.*;
+import static ru.belov.ourabroad.poi.storage.sql.UserSql.EXISTS_BY_PHONE;
 import static ru.belov.ourabroad.poi.storage.sql.UserSql.FIND_BY_EMAIL;
 import static ru.belov.ourabroad.poi.storage.sql.UserSql.FIND_BY_ID;
 import static ru.belov.ourabroad.poi.storage.sql.UserSql.UPDATE_LAST_LOGIN;
@@ -130,5 +131,18 @@ public class UserRepositoryImpl implements UserRepository {
                 params,
                 rowMapper
         ).stream().findFirst().isPresent();
+    }
+
+    @Override
+    public boolean existsByPhone(String excludeUserId, String phone) {
+        log.info("[userId: {}] Start checking exist phone", excludeUserId);
+        Map<String, Object> params = new HashMap<>();
+        paramHelper.putParam(params, PHONE, phone, excludeUserId);
+        paramHelper.putParam(params, ID, excludeUserId, excludeUserId);
+        return Boolean.TRUE.equals(jdbcTemplate.query(
+                EXISTS_BY_PHONE,
+                params,
+                rs -> rs.next() ? Boolean.TRUE : Boolean.FALSE
+        ));
     }
 }

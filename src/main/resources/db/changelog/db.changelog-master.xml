@@ -20,5 +20,6 @@
     <include file="db/changelog/012-bookings.xml"/>
     <include file="db/changelog/013-users-roles.xml"/>
     <include file="db/changelog/014-refresh-tokens.xml"/>
+    <include file="db/changelog/015-specialist-reviews.xml"/>
 
 </databaseChangeLog>

@@ -58,6 +58,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/questions/*/answers").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/specialist-profiles/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/specialist-services").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/specialist-reviews").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/userId/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/email/**").permitAll()

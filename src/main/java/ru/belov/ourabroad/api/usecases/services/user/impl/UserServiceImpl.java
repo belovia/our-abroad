@@ -108,4 +108,12 @@ public class UserServiceImpl implements UserService {
         log.info("[userId: {}] Email exists: {}", userId, exists);
         return exists;
     }
+
+    @Override
+    public boolean existsByPhone(String excludeUserId, String phone, Context context) {
+        log.info("[userId: {}] Checking if phone already exists: {}", excludeUserId, phone);
+        boolean exists = userRepository.existsByPhone(excludeUserId, phone);
+        log.info("[userId: {}] Phone exists: {}", excludeUserId, exists);
+        return exists;
+    }
 }

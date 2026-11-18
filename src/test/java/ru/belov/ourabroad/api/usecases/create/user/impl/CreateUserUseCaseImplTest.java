@@ -303,6 +303,19 @@ class CreateUserUseCaseImplTest {
     }
 
     @Test
+    void WHEN_execute_phoneAlreadyExists_THEN_returnPhoneAlreadyExistsError() {
+        CreateUserUseCase.Request request = createValidRequest();
+        when(userService.existsByEmail(anyString(), eq(EMAIL), any(Context.class))).thenReturn(false);
+        when(userService.existsByPhone(anyString(), eq(PHONE), any(Context.class))).thenReturn(true);
+
+        CreateUserUseCase.Response response = usecase.execute(request);
+
+        assertThat(response.success()).isFalse();
+        assertThat(response.errorMessage()).isEqualTo(ErrorCode.PHONE_ALREADY_EXISTS.getMessage());
+        verify(userService, never()).save(any(User.class), any(Context.class));
+    }
+
+    @Test
     void WHEN_execute_validRequest_THEN_generatedUserIdIsNotNull() {
         // Arrange
         CreateUserUseCase.Request request = createValidRequest();

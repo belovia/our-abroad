@@ -3,6 +3,7 @@ package ru.belov.ourabroad.api.usecases.update.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.AbstractUserUseCase;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
 import ru.belov.ourabroad.api.usecases.update.UserUpdateUsecase;
@@ -10,6 +11,7 @@ import ru.belov.ourabroad.config.security.CurrentUserProvider;
 import ru.belov.ourabroad.core.domain.Context;
 import ru.belov.ourabroad.core.domain.User;
 import ru.belov.ourabroad.web.dto.update.UpdateUserRequest;
+import ru.belov.ourabroad.web.validators.ErrorCode;
 import ru.belov.ourabroad.web.validators.UserValidator;
 
 @Service
@@ -36,8 +38,22 @@ public class UserUpdateUseCaseImpl extends AbstractUserUseCase implements UserUp
         Context context = new Context();
 
         validateInputFields(request, context);
+        if (!context.isSuccess()) {
+            return;
+        }
+
+        if (request.getPhone() != null
+                && StringUtils.hasText(request.getPhone())
+                && userService.existsByPhone(userId, request.getPhone(), context)) {
+            log.info("[userId: {}] Phone already exists: {}", userId, request.getPhone());
+            context.setError(ErrorCode.PHONE_ALREADY_EXISTS);
+            return;
+        }
 
         User user = findExistsUser(userId, context);
+        if (!context.isSuccess() || user == null) {
+            return;
+        }
 
         prepareUserToUpdate(request, user, userId);
 
@@ -56,10 +72,18 @@ public class UserUpdateUseCaseImpl extends AbstractUserUseCase implements UserUp
             return;
         }
 
-        userValidator.validateEmail(request.getEmail(), context);
-        userValidator.validatePhone(request.getPhone(), context);
-        userValidator.validateTelegram(request.getTelegramUsername(), context);
-        userValidator.validateWhatsapp(request.getWhatsappNumber(), context);
+        if (request.getEmail() != null) {
+            userValidator.validateEmail(request.getEmail(), context);
+        }
+        if (request.getPhone() != null) {
+            userValidator.validatePhone(request.getPhone(), context);
+        }
+        if (request.getTelegramUsername() != null) {
+            userValidator.validateTelegram(request.getTelegramUsername(), context);
+        }
+        if (request.getWhatsappNumber() != null) {
+            userValidator.validateWhatsapp(request.getWhatsappNumber(), context);
+        }
     }
 
     private void prepareUserToUpdate(UpdateUserRequest request, User user, String userId) {

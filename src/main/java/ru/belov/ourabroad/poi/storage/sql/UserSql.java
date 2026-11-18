@@ -34,6 +34,13 @@ public class UserSql {
             where email = :email
             """;
 
+    public static final String EXISTS_BY_PHONE = """
+            select 1
+            from users
+            where phone = :phone
+              and id <> :id
+            """;
+
     public static final String UPSERT = """
             insert into users (
                 id,

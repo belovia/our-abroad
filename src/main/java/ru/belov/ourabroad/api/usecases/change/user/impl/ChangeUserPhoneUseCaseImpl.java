@@ -3,6 +3,7 @@ package ru.belov.ourabroad.api.usecases.change.user.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.AbstractUserUseCase;
 import ru.belov.ourabroad.api.usecases.change.user.ChangeUserPhoneUseCase;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
@@ -39,6 +40,13 @@ public class ChangeUserPhoneUseCaseImpl extends AbstractUserUseCase implements C
         validateRequest(request, context);
         if (!context.isSuccess()) {
             log.info("[userId: {}] Validation failed", userId);
+            return errorResponse(context, userId);
+        }
+
+        if (StringUtils.hasText(request.newPhone())
+                && userService.existsByPhone(userId, request.newPhone(), context)) {
+            log.info("[userId: {}] Phone already exists: {}", userId, request.newPhone());
+            context.setError(ErrorCode.PHONE_ALREADY_EXISTS);
             return errorResponse(context, userId);
         }
 

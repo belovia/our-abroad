@@ -27,4 +27,9 @@ public class SpecialistProfile {
     public void deactivate() {
         this.active = false;
     }
+
+    public void applyReviewStats(double rating, int reviewsCount) {
+        this.rating = rating;
+        this.reviewsCount = reviewsCount;
+    }
 }

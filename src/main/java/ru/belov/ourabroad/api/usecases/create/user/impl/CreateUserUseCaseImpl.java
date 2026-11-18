@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import ru.belov.ourabroad.api.usecases.create.user.CreateUserUseCase;
 import ru.belov.ourabroad.api.usecases.services.profile.ProfileService;
 import ru.belov.ourabroad.api.usecases.services.user.UserService;
@@ -16,6 +17,7 @@ import ru.belov.ourabroad.web.validators.UserValidator;
 import java.util.UUID;
 
 import static ru.belov.ourabroad.web.validators.ErrorCode.EMAIL_ALREADY_EXISTS;
+import static ru.belov.ourabroad.web.validators.ErrorCode.PHONE_ALREADY_EXISTS;
 import static ru.belov.ourabroad.web.validators.ErrorCode.SUCCESS;
 
 @Service
@@ -48,6 +50,12 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
             return errorResponse(context, userId);
         }
 
+        if (StringUtils.hasText(request.phone()) && checkExistPhone(userId, request.phone(), context)) {
+            log.info("[userId: {}] User already exists with phone: {}", userId, request.phone());
+            context.setError(PHONE_ALREADY_EXISTS);
+            return errorResponse(context, userId);
+        }
+
         User user = buildUser(userId, request);
         userService.save(user, context);
         if (context.isSuccess()) {
@@ -74,6 +82,11 @@ public class CreateUserUseCaseImpl implements CreateUserUseCase {
     private boolean checkExistEmail(String userId, String email, Context context) {
         log.info("[userId: {}] Checking if email already exists: {}", userId, email);
         return userService.existsByEmail(userId, email, context);
+    }
+
+    private boolean checkExistPhone(String userId, String phone, Context context) {
+        log.info("[userId: {}] Checking if phone already exists: {}", userId, phone);
+        return userService.existsByPhone(userId, phone, context);
     }
 
     private User buildUser(String userId, Request request) {
