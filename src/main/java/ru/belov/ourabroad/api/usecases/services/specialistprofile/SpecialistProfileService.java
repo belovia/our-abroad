@@ -13,5 +13,5 @@ public interface SpecialistProfileService {
 
     void update(SpecialistProfile profile, Context context);
 
-    void delete(String profileId);
+    void delete(String profileId, Context context);
 }
